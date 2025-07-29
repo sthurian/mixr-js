@@ -1,0 +1,30 @@
+# Source files - only publish built files
+src/
+
+# Development files
+.vscode/
+.nyc_output/
+coverage/
+TODO.md
+renovate.json
+
+# Config files
+tsconfig.json
+tsconfig.build.json
+eslint.config.ts
+.mocharc.json
+
+# Development dependencies
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

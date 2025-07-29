@@ -1,0 +1,62 @@
+{
+  "extends": ["config:base"],
+  "schedule": ["before 6am on monday"],
+  "timezone": "Europe/Berlin",
+  "labels": ["dependencies"],
+  "dependencyDashboard": false,
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 2,
+  "rebaseWhen": "conflicted",
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["^@types/"],
+      "groupName": "TypeScript definitions",
+      "automerge": true,
+      "minimumReleaseAge": "1 day"
+    },
+    {
+      "matchPackagePatterns": ["^eslint", "^@eslint/", "^typescript-eslint"],
+      "groupName": "ESLint packages",
+      "automerge": true,
+      "minimumReleaseAge": "2 days"
+    },
+    {
+      "matchPackageNames": ["typescript", "ts-node"],
+      "groupName": "TypeScript core",
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchPackageNames": ["mocha", "@types/mocha", "c8", "sinon", "@types/sinon"],
+      "groupName": "Testing framework",
+      "automerge": true,
+      "minimumReleaseAge": "2 days"
+    },
+    {
+      "matchPackageNames": ["prettier", "eslint-config-prettier", "eslint-plugin-prettier"],
+      "groupName": "Code formatting",
+      "automerge": true,
+      "minimumReleaseAge": "1 day"
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "automerge": true,
+      "patch": {
+        "automerge": true
+      }
+    },
+    {
+      "matchDepTypes": ["dependencies"],
+      "automerge": false,
+      "minimumReleaseAge": "7 days",
+      "reviewers": ["sthurian"]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "automerge": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on sunday"]
+  }
+}

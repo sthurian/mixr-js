@@ -1,0 +1,21 @@
+{
+  "all": true,
+  "src": "src",
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/test-factories/**",
+    "src/**/test-helpers/**",
+    "src/index.ts",
+    "src/xair/client.ts",
+    "build/**",
+    "node_modules/**",
+    "coverage/**"
+  ],
+  "reporter": ["text", "text-summary", "html"],
+  "reports-dir": "coverage",
+  "check-coverage": true,
+  "lines": 80,
+  "functions": 80,
+  "branches": 80,
+  "statements": 80
+}

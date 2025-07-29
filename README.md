@@ -1,0 +1,309 @@
+# Mixr.js
+
+[![npm version](https://badge.fury.io/js/mixr-js.svg)](https://badge.fury.io/js/mixr-js)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Type%20Safe-blue.svg)](https://www.typescriptlang.org/)
+[![Test Coverage](https://img.shields.io/badge/Coverage-95.94%25-brightgreen.svg)](https://github.com/sthurian/mixr-js)
+
+A comprehensive TypeScript/JavaScript client library for controlling **digital mixing consoles** over network. Currently supports Behringer X-Air series (XR12, XR16, XR18) via OSC protocol, with extensible architecture designed for future mixer support across different protocols.
+
+> **Why "Mixr.js"?** The name reflects the broader vision of a type-safe, modern mixing console control library. While currently focused on X-Air mixers, the architecture is designed to support multiple mixer brands and models.
+
+## ✨ Features
+
+### 🎛️ Complete Channel Control
+- **Channel Configuration**: Name, color, input source routing
+- **Preamp**: Gain, phantom power, low-cut filter, polarity invert
+- **4-Band Parametric EQ**: Frequency, gain, Q, band type control
+- **Dynamics**: Gate and compressor with full parameter control
+- **Mix Controls**: Fader, pan, mute, LR assignment
+- **Sends**: Aux bus and FX sends with level and tap control
+- **Automix**: Weight and group assignment
+- **Insert Effects**: FX slot assignment
+
+### 🔄 Dual API Design
+- **Raw Protocol Values**: Direct control using underlying protocol values for power users
+- **Audio Engineer Units**: Decibels, Hertz, percentages for intuitive control
+- **Automatic Conversion**: Seamless translation between raw and engineer-friendly values
+
+### 🛡️ Type Safety
+- **Branded Types**: Prevent unit confusion with compile-time safety  
+- **Model-Specific Channels**: TypeScript enforces valid channels per mixer model
+- **Comprehensive Validation**: Runtime parameter validation with clear error messages
+
+### 🔍 Network Discovery
+- **Auto-Discovery**: Find mixers on your network automatically
+- **Manual Connection**: Direct IP connection support
+- **Connection Management**: Automatic connection handling with cleanup
+
+## 📦 Installation
+
+```bash
+npm install mixr-js
+```
+
+## 🚀 Quick Start
+
+### Discover and Connect to Mixers
+
+```typescript
+import { discoverMixers, connectToMixer } from 'mixr-js';
+
+// Auto-discover mixers on the network
+const mixers = await discoverMixers({ timeout: 5000 });
+console.log('Found mixers:', mixers);
+
+// Connect to the first discovered XR18 mixer
+const mixer = await connectToMixer({
+  ...mixers[0],
+  model: 'XR18' // Specify your mixer model for type safety
+});
+
+// Always close connection when done
+await mixer.closeConnection();
+```
+
+### Basic Channel Control
+
+```typescript
+// Get a channel (TypeScript ensures valid channel names per model)
+const channel = mixer.getChannel('CH01');
+
+// Configure channel
+await channel.getConfig().updateName('Lead Vocal');
+await channel.getConfig().updateColor('Red', 'color');
+
+// Preamp control - dual API in action
+await channel.getPreAmp().updateGain(24, 'decibels');        // Audio engineer units
+await channel.getPreAmp().updateGain(0.5);                   // Raw protocol value
+
+// Enable phantom power and configure low-cut
+await channel.getPreAmp().updatePhantomPowerEnabled(true, 'flag');
+await channel.getPreAmp().updateLowCutFrequency(100, 'hertz');
+
+// Mix controls
+await channel.getMix().updateFader(-6, 'decibels');
+await channel.getMix().updatePan(25, 'percent');
+await channel.getMix().updateMuted(false, 'flag');
+```
+
+### EQ Control
+
+```typescript
+const eq = channel.getEqualizer();
+
+// Enable EQ
+await eq.updateEnabled(true, 'flag');
+
+// Configure high-mid band (band 3)
+const highMid = eq.getBand(3);
+await highMid.updateFrequency(3000, 'hertz');
+await highMid.updateGain(2.5, 'decibels');  
+await highMid.updateQ(1.4, 'number');
+await highMid.updateType('PEQ', 'type');
+```
+
+### Dynamics Processing
+
+```typescript
+const compressor = channel.getCompressor();
+
+// Configure compressor
+await compressor.updateEnabled(true, 'flag');
+await compressor.updateThreshold(-12, 'decibels');
+await compressor.updateRatio('4', 'ratio');
+await compressor.updateAttack(10, 'milliseconds');
+await compressor.updateRelease(100, 'milliseconds');
+await compressor.updateGain(3, 'decibels'); // Makeup gain
+
+// Gate configuration
+const gate = channel.getGate();
+await gate.updateEnabled(true, 'flag');
+await gate.updateThreshold(-35, 'decibels');
+await gate.updateRange(40, 'decibels');
+```
+
+### Sends and Routing
+
+```typescript
+// Aux send to Bus 1
+const bus1Send = channel.getSendBus('BUS01');
+await bus1Send.updateLevel(-10, 'decibels');
+await bus1Send.updateTap('POST', 'tap');
+
+// FX send
+const fx1Send = channel.getSendFx('FX1');
+await fx1Send.updateLevel(-15, 'decibels');
+await fx1Send.updateTap('PRE', 'tap');
+
+// DCA and Mute group assignment
+await channel.getDCAGroup().updateAssignment(1, true, 'flag');
+await channel.getMuteGroup().updateAssignment(2, true, 'flag');
+```
+
+### Reading Current Values
+
+```typescript
+// Read values with automatic unit conversion
+const currentGain = await channel.getPreAmp().fetchGain('decibels');
+const currentFreq = await eq.getBand(1).fetchFrequency('hertz');
+const isMuted = await channel.getMix().fetchIsMuted('flag');
+
+console.log(`Channel gain: ${currentGain}dB`);
+console.log(`Low band frequency: ${currentFreq}Hz`);
+console.log(`Channel muted: ${isMuted}`);
+```
+
+## 📚 API Reference
+
+### Mixer Models
+
+| Model | Channels | Description |
+|-------|----------|-------------|
+| `XR12` | CH01-CH10 | Behringer X-Air XR12 (12-input) |
+| `XR16` | CH01-CH14 | Behringer X-Air XR16 (16-input) |
+| `XR18` | CH01-CH16 | Behringer X-Air XR18 (18-input) |
+
+*Future versions will support additional mixer brands and models.*
+
+### Channel Features
+
+#### Configuration (`channel.getConfig()`)
+- `updateName(name)` / `fetchName()` - Channel name
+- `updateColor(color)` / `fetchColor()` - Color assignment
+- `updateAnalogSource(source)` / `fetchAnalogSource()` - Analog input routing
+- `updateUsbReturnSource(source)` / `fetchUsbReturnSource()` - USB return source
+
+#### Preamp (`channel.getPreAmp()`)
+- `updateGain(gain, 'decibels')` / `fetchGain()` - Input gain (-12dB to +60dB)
+- `updatePhantomPowerEnabled(enabled)` / `fetchIsPhantomPowerEnabled()` - 48V phantom power
+- `updateLowCutFrequency(freq, 'hertz')` / `fetchLowCutFrequency()` - High-pass filter (20Hz-400Hz)
+- `updateLowCutEnabled(enabled)` / `fetchIsLowCutEnabled()` - High-pass filter on/off
+- `updatePolarityInverted(inverted)` / `fetchIsPolarityInverted()` - Phase invert
+- `updateUSBTrim(trim, 'decibels')` / `fetchUSBTrim()` - USB return trim (-18dB to +18dB)
+- `updateUSBReturnEnabled(enabled)` / `fetchIsUSBReturnEnabled()` - USB return on/off
+
+#### 4-Band EQ (`channel.getEqualizer()`)
+- `updateEnabled(enabled)` / `fetchIsEnabled()` - EQ on/off
+- `getBand(1-4)` - Access individual EQ bands
+  - `updateFrequency(freq, 'hertz')` / `fetchFrequency()` - Center frequency
+  - `updateGain(gain, 'decibels')` / `fetchGain()` - Gain adjustment (-15dB to +15dB)
+  - `updateQ(q, 'number')` / `fetchQ()` - Q factor (0.3 to 10)
+  - `updateType(type)` / `fetchType()` - Band type (LCut, LShv, PEQ, HShv, HCut)
+
+#### Dynamics (`channel.getCompressor()`, `channel.getGate()`)
+- **Compressor**: Threshold, ratio, attack, release, knee, makeup gain, mix
+- **Gate**: Threshold, range, attack, hold, release, key source
+- **Shared**: Enable/disable, key source, side-chain filter
+
+#### Mix (`channel.getMix()`)
+- `updateFader(level, 'decibels')` / `fetchFader()` - Channel fader (-∞ to +10dB)
+- `updatePan(pan, 'percent')` / `fetchPan()` - Pan position (-100% to +100%)
+- `updateMuted(muted)` / `fetchIsMuted()` - Channel mute
+- `updateLeftRightAssignmentEnabled(enabled)` / `fetchIsLeftRightAssignmentEnabled()` - LR assignment
+
+#### Sends
+- `getSendBus('BUS01'-'BUS06')` - Aux bus sends
+- `getSendFx('FX1'-'FX4')` - Effects sends
+- Level, tap point (PRE/POST), and group enable control
+
+#### Groups and Routing  
+- `getDCAGroup()` / `getMuteGroup()` - DCA and mute group assignments
+- `getInsert()` - Insert effect slot assignment
+- `getAutomix()` - Automix group and weight
+
+## 🏗️ Architecture Highlights
+
+### Type System
+The library uses a sophisticated branded type system to prevent unit confusion:
+
+```typescript
+// Compile-time prevention of unit errors
+await channel.getPreAmp().updateGain(24, 'decibels');  // ✅ Correct
+await channel.getPreAmp().updateGain(24, 'hertz');     // ❌ TypeScript error
+
+// Raw protocol values bypass unit system for power users
+await channel.getPreAmp().updateGain(0.5);             // ✅ Raw protocol value
+```
+
+### Model-Specific Type Safety
+```typescript
+const xr12 = await connectToMixer({ model: 'XR12', ...connection });
+const xr18 = await connectToMixer({ model: 'XR18', ...connection });
+
+xr12.getChannel('CH11'); // ❌ TypeScript error - XR12 only has CH01-CH10
+xr18.getChannel('CH15'); // ✅ Valid - XR18 supports CH01-CH16
+```
+
+### Dual API Design
+Every parameter supports both raw protocol values and audio engineer units:
+
+```typescript
+// Audio engineer approach - intuitive units
+await channel.getEqualizer().getBand(1).updateFrequency(1000, 'hertz');
+await channel.getMix().updateFader(-6, 'decibels');
+
+// Power user approach - direct protocol control  
+await channel.getEqualizer().getBand(1).updateFrequency(0.3);
+await channel.getMix().updateFader(0.75);
+```
+
+## 🧪 Testing
+
+The library includes comprehensive test coverage (95.94%) with 222+ tests:
+
+```bash
+npm test                    # Run all tests
+npm run test:coverage       # Run tests with coverage report
+npm run test:coverage:html  # Generate HTML coverage report
+```
+
+## 🔧 Development
+
+```bash
+# Install dependencies
+npm install
+
+# Build TypeScript
+npm run build
+
+# Run linting
+npm run lint
+
+# Format code
+npm run format
+```
+
+## 📋 Current Limitations
+
+This library currently implements comprehensive **channel-level control**. Some mixer-wide features are not yet implemented:
+
+- Main LR bus controls
+- Auxiliary bus processing  
+- Effects rack control
+- System-level actions (snapshots, global mute)
+- Advanced routing matrix
+
+See [TODO.md](./TODO.md) for a complete list of planned features.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit pull requests or open issues for:
+
+- Bug fixes
+- New feature implementations  
+- Documentation improvements
+- Test coverage expansion
+
+## 📄 License
+
+MIT License - see [LICENSE](./LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- **Behringer** for creating the X-Air mixer series
+- **Open Sound Control Community** for the OSC specification
+
+---
+
+**Note**: This library is not officially affiliated with Behringer. X-Air and associated trademarks are property of their respective owners.
