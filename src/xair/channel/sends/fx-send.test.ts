@@ -4,7 +4,6 @@ import { fake, match } from 'sinon';
 import { assertClose, isClose } from '../../../test-helpers/is-close.js';
 import assert from 'node:assert';
 import { createChannelFxSend } from './fx-send.js';
-import { decibel } from '../../mapper/level.js';
 
 suite('ChannelFxSend', () => {
   test('send the correct osc message to fetch the fx sends level', async () => {
@@ -20,7 +19,7 @@ suite('ChannelFxSend', () => {
       oscClient,
       fx: 'FX2',
     });
-    const level = await fxSend.fetchLevel();
+    const level = await fxSend.fetchLevel('decibel');
     assertClose(level, -10);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/mix/08/level'), true);
   });
@@ -33,7 +32,7 @@ suite('ChannelFxSend', () => {
       oscClient,
       fx: 'FX2',
     });
-    await fxSend.updateLevel(decibel(6));
+    await fxSend.updateLevel(6, 'decibel');
     assert.ok(
       set.calledWithMatch('/ch/01/mix/08/level', [match({ type: 'float', value: isClose(0.9) })]),
     );
