@@ -27,7 +27,7 @@ suite('OSC Parameter', () => {
 
     const result = await oscParameter.fetch();
     assert.strictEqual(query.calledOnceWithExactly('/test/parameter'), true);
-    assert.strictEqual(validateRawValue.calledOnceWithExactly(),true)
+    assert.strictEqual(validateRawValue.calledOnceWithExactly(0.5),true)
     assert.strictEqual(result, 0.5);
   });
 });
