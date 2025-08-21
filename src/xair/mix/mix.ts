@@ -1,6 +1,7 @@
 import { OSCClient } from '../../osc/client.js';
 import { createEntityFactory } from '../entity.js';
-import { levelMapper, Decibel } from '../mapper/level.js';
+import { AsyncGetter, AsyncSetter, createOSCParameterFactory } from '../osc-parameter.js';
+import { levelParamaterConfig } from '../mapper/level.js';
 import { createLinearMapper } from '../mapper/linear.js';
 import { onOffMapper } from '../mapper/on-off.js';
 
@@ -9,8 +10,8 @@ export type Mix = {
   updateMuted: (enabled: boolean) => Promise<void>;
   fetchIsLeftRightAssignmentEnabled: () => Promise<boolean>;
   updateLeftRightAssignmentEnabled: (enabled: boolean) => Promise<void>;
-  fetchFader: () => Promise<Decibel>;
-  updateFader: (fader: Decibel) => Promise<void>;
+  fetchFader: AsyncGetter<'decibel', 'float'>;
+  updateFader: AsyncSetter<'decibel', 'float'>;
   fetchPan: () => Promise<number>;
   updatePan: (pan: number) => Promise<void>;
 };
@@ -24,9 +25,13 @@ export const createMix = (dependencies: MixDependencies): Mix => {
   const { oscBasePath, oscClient } = dependencies;
   const oscBaseAddress = `${oscBasePath}/mix`;
   const entityFactory = createEntityFactory(oscClient);
+  const oscParameterFactory = createOSCParameterFactory(oscClient);
   const on = entityFactory.createEntity(`${oscBaseAddress}/on`, onOffMapper);
   const lrAssignment = entityFactory.createEntity(`${oscBaseAddress}/lr`, onOffMapper);
-  const fader = entityFactory.createEntity(`${oscBaseAddress}/fader`, levelMapper);
+  const fader = oscParameterFactory.createOSCParameter<'decibel', 'float'>(
+    `${oscBaseAddress}/fader`,
+    levelParamaterConfig,
+  );
   const pan = entityFactory.createEntity(`${oscBaseAddress}/pan`, createLinearMapper(-100, 100));
   return {
     updateMuted: (muted) => on.set(!muted),
@@ -36,8 +41,8 @@ export const createMix = (dependencies: MixDependencies): Mix => {
     },
     updateLeftRightAssignmentEnabled: lrAssignment.set,
     fetchIsLeftRightAssignmentEnabled: lrAssignment.get,
-    updateFader: fader.set,
-    fetchFader: fader.get,
+    updateFader: fader.update,
+    fetchFader: fader.fetch,
     fetchPan: pan.get,
     updatePan: pan.set,
   };

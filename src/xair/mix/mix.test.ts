@@ -4,7 +4,6 @@ import { oscClientFactory } from '../../osc/test-factories/client.js';
 import { fake, match } from 'sinon';
 import { assertClose, isClose } from '../../test-helpers/is-close.js';
 import assert from 'node:assert';
-import { decibel } from '../mapper/level.js';
 
 suite('Mix', () => {
   test('send the correct osc message to fetch the mixes fader level', async () => {
@@ -19,7 +18,7 @@ suite('Mix', () => {
       oscBasePath: '/ch/01',
       oscClient,
     });
-    const fader = await mix.fetchFader();
+    const fader = await mix.fetchFader('decibel');
     assertClose(fader, -10);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/mix/fader'), true);
   });
@@ -31,7 +30,7 @@ suite('Mix', () => {
       oscBasePath: '/ch/01',
       oscClient,
     });
-    await mix.updateFader(decibel(6));
+    await mix.updateFader(6, 'decibel');
     assert.ok(
       set.calledWithMatch('/ch/01/mix/fader', [match({ type: 'float', value: isClose(0.9) })]),
     );

@@ -4,10 +4,10 @@ import { ChannelConfig, createChannelConfig } from './config/config.js';
 import { ChannelEqualizer, createChannelEqualizer } from './equalizer/equalizer.js';
 import { ChannelGate, createChannelGate } from './dynamics/gate/gate.js';
 import { createInsert, Insert } from '../insert/insert.js';
-import { ChannelBusSendLabel } from './sends/mapper/bus-send.js';
+import { ChannelSendBusLabel } from './sends/mapper/send-bus.js';
 import { ChannelFxSend, createChannelFxSend } from './sends/fx-send.js';
 import { ChannelFxSendLabel } from './sends/mapper/fx-send.js';
-import { ChannelBusSend, createChannelBusSend } from './sends/bus-send.js';
+import { ChannelSendBus, createChannelSendBus } from './sends/send-bus.js';
 import { createDCAGroup, DCAGroup } from '../dca/dca-group.js';
 import { createMuteGroup, MuteGroup } from '../mute/mute-group.js';
 import { createMix, Mix } from '../mix/mix.js';
@@ -21,7 +21,7 @@ export type Channel = {
   getEqualizer(): ChannelEqualizer;
   getGate(): ChannelGate;
   getInsert(): Insert;
-  getSendBus(send: ChannelBusSendLabel): ChannelBusSend;
+  getSendBus(send: ChannelSendBusLabel): ChannelSendBus;
   getSendFx(fx: ChannelFxSendLabel): ChannelFxSend;
   getDCAGroup(): DCAGroup;
   getMuteGroup(): MuteGroup;
@@ -54,8 +54,8 @@ export const createChannel = (dependencies: ChannelDependencies): Channel => {
     getEqualizer: () => equalizer,
     getGate: () => gate,
     getInsert: () => insert,
-    getSendBus: (sendBus: ChannelBusSendLabel) =>
-      createChannelBusSend({ channel, oscClient, sendBus }),
+    getSendBus: (sendBus: ChannelSendBusLabel) =>
+      createChannelSendBus({ channel, oscClient, sendBus }),
     getSendFx: (fx: ChannelFxSendLabel) => createChannelFxSend({ channel, oscClient, fx }),
     getDCAGroup: () => dcaGroup,
     getMuteGroup: () => muteGroup,

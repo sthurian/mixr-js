@@ -2,7 +2,7 @@ import { OscSocket, OscOutputMessage, OscMessageInputArgument } from './socket.j
 
 export type OSCClient = {
   query: (oscAddress: string) => Promise<OscOutputMessage>;
-  set: <T extends OscMessageInputArgument[]>(oscAddress: string, value: T) => Promise<void>;
+  set: <T extends OscMessageInputArgument[]>(oscAddress: string, values: T) => Promise<void>;
   close: () => Promise<void>;
 };
 
