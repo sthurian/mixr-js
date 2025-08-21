@@ -3,6 +3,7 @@
   "schedule": ["before 6am on monday"],
   "timezone": "Europe/Berlin",
   "labels": ["dependencies"],
+  "dependencyDashboard": false,
   "prConcurrentLimit": 3,
   "prHourlyLimit": 2,
   "rebaseWhen": "conflicted",
