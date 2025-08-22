@@ -10,8 +10,8 @@ export type ChannelFxSend = {
   fetchIsGroupEnabled: () => Promise<boolean>;
   updateGroupEnabled: (enabled: boolean) => Promise<void>;
 
-  fetchLevel: AsyncGetter<'decibels', 'float'>;
-  updateLevel: AsyncSetter<'decibels', 'float'>;
+  fetchLevel: AsyncGetter<'decibels', 'float', number>;
+  updateLevel: AsyncSetter<'decibels', 'float', number>;
 
   fetchTap: () => Promise<FxSendTap>;
   updateTap: (tap: FxSendTap) => Promise<void>;

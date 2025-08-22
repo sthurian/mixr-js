@@ -54,7 +54,7 @@ export const dbToLevel = (db: number): number => {
 
   return 1.0;
 };
-export const levelParamaterConfig: OSCParameterConfig<'decibels', 'float'> = {
+export const levelParamaterConfig: OSCParameterConfig<'decibels', 'float', number> = {
   oscDataType: 'float',
   convertToUnit: levelToDb,
   convertToRaw: dbToLevel,

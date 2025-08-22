@@ -14,10 +14,10 @@ export type ChannelPreamp = {
   updateUSBReturnEnabled: (enabled: boolean) => Promise<void>;
   updateLowCutFrequency: (frequency: number) => Promise<void>;
   fetchLowCutFrequency: () => Promise<number>;
-  updateUSBTrim: AsyncSetter<'decibels', 'float'>;
-  fetchUSBTrim: AsyncGetter<'decibels', 'float'>;
-  updateGain: AsyncSetter<'decibels', 'float'>;
-  fetchGain: AsyncGetter<'decibels', 'float'>;
+  updateUSBTrim: AsyncSetter<'decibels', 'float', number>;
+  fetchUSBTrim: AsyncGetter<'decibels', 'float', number>;
+  updateGain: AsyncSetter<'decibels', 'float', number>;
+  fetchGain: AsyncGetter<'decibels', 'float', number>;
   fetchIsPhantomPowerEnabled: () => Promise<boolean>;
   updatePhantomPowerEnabled: (enabled: boolean) => Promise<void>;
 };

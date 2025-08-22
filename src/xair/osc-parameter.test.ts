@@ -18,7 +18,7 @@ suite('OSC Parameter', () => {
     const validateRawValue = fake.returns(0.5);
     const convertToUnit = fake.returns(100);
     const oscParameterFactory = createOSCParameterFactory(oscClient);
-    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>(
+    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float', number>(
       '/test/parameter',
       {
         convertToRaw: (value) => value,
@@ -48,7 +48,7 @@ suite('OSC Parameter', () => {
     const validateRawValue = fake.returns(0.5);
     const convertToUnit = fake.returns(100);
     const oscParameterFactory = createOSCParameterFactory(oscClient);
-    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>(
+    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float', number>(
       '/test/parameter',
       {
         convertToRaw: (value) => value,
@@ -74,7 +74,7 @@ suite('OSC Parameter', () => {
     };
     const validateRawValue = fake.returns(0.42);
     const oscParameterFactory = createOSCParameterFactory(oscClient);
-    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>(
+    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float', number>(
       '/test/parameter',
       {
         convertToRaw: fake(),
@@ -104,7 +104,7 @@ suite('OSC Parameter', () => {
     const convertToRaw = fake.returns(0.5);
     const oscParameterFactory = createOSCParameterFactory(oscClient);
     const validateUnitValue = fake.returns(50);
-    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>(
+    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float', number>(
       '/test/parameter',
       {
         convertToRaw,
@@ -133,7 +133,7 @@ suite('OSC Parameter', () => {
     };
     const validateRawValue = fake.returns('test');
     const oscParameterFactory = createOSCParameterFactory(oscClient);
-    const oscParameter = oscParameterFactory.createOSCParameter<'raw', 'string'>(
+    const oscParameter = oscParameterFactory.createOSCParameter<'raw', 'string', string>(
       '/test/parameter',
       {
         convertToRaw: fake(),
@@ -161,7 +161,7 @@ suite('OSC Parameter', () => {
     };
     const validateRawValue = fake.returns(42);
     const oscParameterFactory = createOSCParameterFactory(oscClient);
-    const oscParameter = oscParameterFactory.createOSCParameter<'raw', 'integer'>(
+    const oscParameter = oscParameterFactory.createOSCParameter<'raw', 'integer', number>(
       '/test/parameter',
       {
         convertToRaw: fake(),
@@ -187,7 +187,7 @@ suite('OSC Parameter', () => {
       set: fake(),
     };
     const oscParameterFactory = createOSCParameterFactory(oscClient);
-    const oscParameter = oscParameterFactory.createOSCParameter<'raw', 'float'>('/test/parameter', {
+    const oscParameter = oscParameterFactory.createOSCParameter<'raw', 'float', number>('/test/parameter', {
       convertToRaw: fake(),
       convertToUnit: fake(),
       validateRawValue: fake(),
@@ -195,7 +195,7 @@ suite('OSC Parameter', () => {
       oscDataType: 'float',
     });
 
-    await assert.rejects(
+    assert.throws(
       () => oscParameter.update(undefined as unknown as number),
       new Error('Unsupported OSC type "undefined" for address "/test/parameter"'),
     );

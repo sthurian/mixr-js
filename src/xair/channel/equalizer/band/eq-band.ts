@@ -13,8 +13,8 @@ export type ChannelEqualizerBand = {
   fetchFrequency: () => Promise<number>;
   updateType: (type: EqBandType) => Promise<void>;
   fetchType: () => Promise<EqBandType>;
-  updateGain: AsyncSetter<'decibels', 'float'>;
-  fetchGain: AsyncGetter<'decibels', 'float'>;
+  updateGain: AsyncSetter<'decibels', 'float', number>;
+  fetchGain: AsyncGetter<'decibels', 'float', number>;
   updateQ: (q: number) => Promise<void>;
   fetchQ: () => Promise<number>;
 };

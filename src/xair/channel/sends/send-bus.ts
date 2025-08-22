@@ -16,11 +16,11 @@ export type ChannelSendBus = {
    * @param unit - Optional. If provided, the value will be converted to this unit, otherwise it will return the raw osc value.
    * @returns A promise that resolves to the level in the specified unit.
    */
-  fetchLevel: AsyncGetter<'decibels', 'float'>;
-  updateLevel: AsyncSetter<'decibels', 'float'>;
+  fetchLevel: AsyncGetter<'decibels', 'float', number>;
+  updateLevel: AsyncSetter<'decibels', 'float', number>;
 
-  fetchPan: AsyncGetter<'percent', 'float'>;
-  updatePan: AsyncSetter<'percent', 'float'>;
+  fetchPan: AsyncGetter<'percent', 'float', number>;
+  updatePan: AsyncSetter<'percent', 'float', number>;
 
   fetchTap: () => Promise<SendBusTap>;
   updateTap: (tap: SendBusTap) => Promise<void>;
@@ -42,7 +42,7 @@ export const createChannelSendBus = (dependencies: ChannelSendBusDependencies): 
   const entityFactory = createEntityFactory(oscClient);
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const grpEnabled = entityFactory.createEntity(`${oscBasePath}/grpon`, onOffMapper);
-  const level = oscParameterFactory.createOSCParameter<'decibels', 'float'>(
+  const level = oscParameterFactory.createOSCParameter<'decibels', 'float', number>(
     `${oscBasePath}/level`,
     levelParamaterConfig,
   );

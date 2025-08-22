@@ -10,10 +10,10 @@ export type Mix = {
   updateMuted: (enabled: boolean) => Promise<void>;
   fetchIsLeftRightAssignmentEnabled: () => Promise<boolean>;
   updateLeftRightAssignmentEnabled: (enabled: boolean) => Promise<void>;
-  fetchFader: AsyncGetter<'decibels', 'float'>;
-  updateFader: AsyncSetter<'decibels', 'float'>;
-  fetchPan: AsyncGetter<'percent', 'float'>;
-  updatePan: AsyncSetter<'percent', 'float'>;
+  fetchFader: AsyncGetter<'decibels', 'float', number>;
+  updateFader: AsyncSetter<'decibels', 'float', number>;
+  fetchPan: AsyncGetter<'percent', 'float', number>;
+  updatePan: AsyncSetter<'percent', 'float', number>;
 };
 
 type MixDependencies = {
@@ -28,7 +28,7 @@ export const createMix = (dependencies: MixDependencies): Mix => {
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const on = entityFactory.createEntity(`${oscBaseAddress}/on`, onOffMapper);
   const lrAssignment = entityFactory.createEntity(`${oscBaseAddress}/lr`, onOffMapper);
-  const fader = oscParameterFactory.createOSCParameter<'decibels', 'float'>(
+  const fader = oscParameterFactory.createOSCParameter<'decibels', 'float', number>(
     `${oscBaseAddress}/fader`,
     levelParamaterConfig,
   );

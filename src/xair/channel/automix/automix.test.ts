@@ -17,7 +17,7 @@ suite('ChannelAutomix', () => {
       channel: 1,
       oscClient,
     });
-    const result = await automix.fetchGroup();
+    const result = await automix.fetchGroup('groupName');
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/automix/group'), true);
     assert.strictEqual(result, 'OFF');
   });
@@ -31,7 +31,7 @@ suite('ChannelAutomix', () => {
       channel: 1,
       oscClient,
     });
-    await automix.updateGroup('Y');
+    await automix.updateGroup('Y', 'groupName');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/automix/group', [{ type: 'integer', value: 2 }]),
       true,

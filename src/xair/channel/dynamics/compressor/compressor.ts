@@ -19,12 +19,12 @@ export type ChannelCompressor = {
    * @param attack - Attack time in milliseconds.
    * @returns A promise that resolves when the operation is complete.
    */
-  updateAttack: AsyncSetter<'milliseconds', 'float'>;
+  updateAttack: AsyncSetter<'milliseconds', 'float', number>;
   /**
    * Gets the compressor's attack time.
    * @returns A promise that resolves to the attack time in milliseconds.
    */
-  fetchAttack: AsyncGetter<'milliseconds', 'float'>;
+  fetchAttack: AsyncGetter<'milliseconds', 'float', number>;
 
   updateDetectionMode: (mode: CompressorDetectionMode) => Promise<void>;
   fetchDetectionMode: () => Promise<CompressorDetectionMode>;
@@ -40,14 +40,14 @@ export type ChannelCompressor = {
   updateKeySource: (type: DynamicsKeySource) => Promise<void>;
   fetchKeySource: () => Promise<DynamicsKeySource>;
 
-  updateKnee: AsyncSetter<'number', 'float'>;
-  fetchKnee: AsyncGetter<'number', 'float'>;
+  updateKnee: AsyncSetter<'number', 'float', number>;
+  fetchKnee: AsyncGetter<'number', 'float', number>;
 
-  updateGain: AsyncSetter<'decibels', 'float'>;
-  fetchGain: AsyncGetter<'decibels', 'float'>;
+  updateGain: AsyncSetter<'decibels', 'float', number>;
+  fetchGain: AsyncGetter<'decibels', 'float', number>;
 
-  updateMix: AsyncSetter<'percent', 'float'>;
-  fetchMix: AsyncGetter<'percent', 'float'>;
+  updateMix: AsyncSetter<'percent', 'float', number>;
+  fetchMix: AsyncGetter<'percent', 'float', number>;
 
   updateMode: (mode: CompressorMode) => Promise<void>;
   fetchMode: () => Promise<CompressorMode>;
@@ -61,8 +61,8 @@ export type ChannelCompressor = {
   updateRelease: (time: number) => Promise<void>;
   fetchRelease: () => Promise<number>;
 
-  updateThreshold: AsyncSetter<'decibels', 'float'>;
-  fetchThreshold: AsyncGetter<'decibels', 'float'>;
+  updateThreshold: AsyncSetter<'decibels', 'float', number>;
+  fetchThreshold: AsyncGetter<'decibels', 'float', number>;
 };
 
 type ChannelCompressorDependencies = {
@@ -78,7 +78,7 @@ export const createChannelCompressor = (
   const entityFactory = createEntityFactory(oscClient);
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const autotime = entityFactory.createEntity(`${oscBaseAddress}/auto`, onOffMapper);
-  const attack = oscParameterFactory.createOSCParameter<'milliseconds', 'float'>(
+  const attack = oscParameterFactory.createOSCParameter<'milliseconds', 'float', number>(
     `${oscBaseAddress}/attack`,
     createLinearParameterConfig(0.0, 120.0),
   );
@@ -95,7 +95,7 @@ export const createChannelCompressor = (
   );
 
   const keySource = entityFactory.createEntity(`${oscBaseAddress}/keysrc`, dynamicsKeySourceMapper);
-  const knee = oscParameterFactory.createOSCParameter<'number', 'float'>(
+  const knee = oscParameterFactory.createOSCParameter<'number', 'float', number>(
     `${oscBaseAddress}/knee`,
     createLinearParameterConfig(0, 5),
   );

@@ -1,14 +1,14 @@
 import { OSCClient } from '../../../osc/client.js';
-import { createEntityFactory } from '../../entity.js';
 import { createLinearParameterConfig } from '../../mapper/linear.js';
+import { createLiteralParameterConfig } from '../../mapper/literal.js';
 import { AsyncGetter, AsyncSetter, createOSCParameterFactory } from '../../osc-parameter.js';
-import { AutomixGroup, automixGroupMapper } from './mapper/automix.js';
+import { AutomixGroup, automixGroupMap } from './mapper/automix.js';
 
 export type ChannelAutomix = {
-  fetchGroup: () => Promise<AutomixGroup>;
-  updateGroup: (autoMixGroup: AutomixGroup) => Promise<void>;
-  fetchWeight: AsyncGetter<'decibels', 'float'>;
-  updateWeight: AsyncSetter<'decibels', 'float'>;
+  fetchGroup: AsyncGetter<'groupName', 'integer', AutomixGroup>;
+  updateGroup: AsyncSetter<'groupName', 'integer', AutomixGroup>;
+  fetchWeight: AsyncGetter<'decibels', 'float', number>;
+  updateWeight: AsyncSetter<'decibels', 'float', number>;
 };
 
 type ChannelAutomixDependencies = {
@@ -18,12 +18,12 @@ type ChannelAutomixDependencies = {
 
 export const createChannelAutomix = (dependencies: ChannelAutomixDependencies): ChannelAutomix => {
   const { channel, oscClient } = dependencies;
-  const entityFactory = createEntityFactory(oscClient);
+  // const entityFactory = createEntityFactory(oscClient);
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const channelAutoMixOscAddress = `/ch/${channel.toString().padStart(2, '0')}/automix`;
-  const automixGroup = entityFactory.createEntity(
+  const automixGroup = oscParameterFactory.createOSCParameter<'groupName', 'integer', AutomixGroup>(
     `${channelAutoMixOscAddress}/group`,
-    automixGroupMapper,
+    createLiteralParameterConfig(automixGroupMap),
   );
   const automixWeight = oscParameterFactory.createOSCParameter(
     `${channelAutoMixOscAddress}/weight`,
@@ -31,8 +31,8 @@ export const createChannelAutomix = (dependencies: ChannelAutomixDependencies): 
   );
 
   return {
-    fetchGroup: automixGroup.get,
-    updateGroup: automixGroup.set,
+    fetchGroup: automixGroup.fetch,
+    updateGroup: automixGroup.update,
     fetchWeight: automixWeight.fetch,
     updateWeight: automixWeight.update,
   };

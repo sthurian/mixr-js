@@ -10,7 +10,7 @@ function mapRangeToZeroToOne(value: number, min: number, max: number): number {
   return (value - min) / (max - min);
 }
 
-export const createLinearParameterConfig = <Unit>(min: number, max: number):  OSCParameterConfig<Unit, 'float'> => {
+export const createLinearParameterConfig = <Unit>(min: number, max: number):  OSCParameterConfig<Unit, 'float', number> => {
   if (max === min) throw new Error('min and max must be different');
   return {
     oscDataType: 'float',

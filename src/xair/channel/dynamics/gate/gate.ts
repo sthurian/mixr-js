@@ -14,12 +14,12 @@ export type ChannelGate = {
    * @param attack - Attack time in milliseconds.
    * @returns A promise that resolves when the operation is complete.
    */
-  updateAttack: AsyncSetter<'milliseconds', 'float'>;
+  updateAttack: AsyncSetter<'milliseconds', 'float', number>;
   /**
    * Gets the compressor's attack time.
    * @returns A promise that resolves to the attack time in milliseconds.
    */
-  fetchAttack: AsyncGetter<'milliseconds', 'float'>;
+  fetchAttack: AsyncGetter<'milliseconds', 'float', number>;
 
   getFilter: () => DynamicsFilter;
 
@@ -35,14 +35,14 @@ export type ChannelGate = {
   updateEnabled: (enabled: boolean) => Promise<void>;
   fetchIsEnabled: () => Promise<boolean>;
 
-  updateRange: AsyncSetter<'decibels', 'float'>;
-  fetchRange: AsyncGetter<'decibels', 'float'>;
+  updateRange: AsyncSetter<'decibels', 'float', number>;
+  fetchRange: AsyncGetter<'decibels', 'float', number>;
 
   updateRelease: (time: number) => Promise<void>;
   fetchRelease: () => Promise<number>;
 
-  updateThreshold: AsyncSetter<'decibels', 'float'>;
-  fetchThreshold: AsyncGetter<'decibels', 'float'>;
+  updateThreshold: AsyncSetter<'decibels', 'float', number>;
+  fetchThreshold: AsyncGetter<'decibels', 'float', number>;
 };
 
 type ChannelGateDependencies = {
