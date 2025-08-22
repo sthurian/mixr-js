@@ -1,58 +1,40 @@
 import { suite, test } from 'mocha';
-import { createLinearMapper } from './linear.js';
+import { createLinearParameterConfig } from './linear.js';
 import assert from 'node:assert';
 
-suite('LinearMapper', () => {
-  test('maps to float', () => {
-    const linearMapper = createLinearMapper(0, 1);
-    assert.strictEqual(linearMapper.getOscType(), 'float');
+suite('createLinearParameterConfig', () => {
+  test('has the correct oscDataType', () => {
+    const linearParameterConfig = createLinearParameterConfig<'percent'>(-100, 100);
+    assert.strictEqual(linearParameterConfig.oscDataType, 'float');
   });
 
-  suite('to mixer value', () => {
-    test('throws when a string is provided', () => {
-      const linearMapper = createLinearMapper(0, 1);
-      assert.throws(
-        () => linearMapper.oscArgumentToMixerValue('foo'),
-        new Error('Cannot map a string value'),
-      );
-    });
-
-    test('maps linear from 0 to 10', () => {
-      const linearMapper = createLinearMapper(0, 10);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(0), 0);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(2.5), 0.25);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(5), 0.5);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(7.5), 0.75);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(10), 1.0);
-    });
-
-    test('maps linear from -10 to 10', () => {
-      const linearMapper = createLinearMapper(-10, 10);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(-10), 0);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(-5), 0.25);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(0), 0.5);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(5), 0.75);
-      assert.strictEqual(linearMapper.mixerValueToOscArgument(10), 1.0);
-    });
+  test('convertToRaw maps correctly', () => {
+    const linearParameterConfig = createLinearParameterConfig<'percent'>(-100, 100);
+    assert.strictEqual(linearParameterConfig.convertToRaw(0, 'percent'), 0.5);
+    assert.strictEqual(linearParameterConfig.convertToRaw(-100, 'percent'), 0);
+    assert.strictEqual(linearParameterConfig.convertToRaw(100, 'percent'), 1);
   });
 
-  suite('to osc value', () => {
-    test('maps linear from 0 to 10', () => {
-      const linearMapper = createLinearMapper(0, 10);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(0), 0);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(0.25), 2.5);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(0.5), 5);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(0.75), 7.5);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(1.0), 10);
-    });
+  test('convertToUnit maps correctly', () => {
+    const linearParameterConfig = createLinearParameterConfig<'percent'>(-100, 100);
+    assert.strictEqual(linearParameterConfig.convertToUnit(0.5, 'percent'), 0);
+    assert.strictEqual(linearParameterConfig.convertToUnit(0, 'percent'), -100);
+    assert.strictEqual(linearParameterConfig.convertToUnit(1, 'percent'), 100);
+  });
 
-    test('maps linear from -10 to 10', () => {
-      const linearMapper = createLinearMapper(-10, 10);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(0), -10);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(0.25), -5);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(0.5), 0);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(0.75), 5);
-      assert.strictEqual(linearMapper.oscArgumentToMixerValue(1.0), 10);
-    });
+  test('validateRawValue throws an exception for out of range values', () => {
+    const linearParameterConfig = createLinearParameterConfig<'percent'>(-100, 100);
+    assert.throws(() => linearParameterConfig.validateRawValue(-0.1), /Too small: expected number to be >=0/);
+    assert.throws(() => linearParameterConfig.validateRawValue(1.1), /Too big: expected number to be <=1/);
+  });
+
+  test('validateUnitValue throws an exception for out of range values', () => {
+    const linearParameterConfig = createLinearParameterConfig<'percent'>(-100, 100);
+    assert.throws(() => linearParameterConfig.validateUnitValue(-101), /Too small: expected number to be >=-100/);
+    assert.throws(() => linearParameterConfig.validateUnitValue(101), /Too big: expected number to be <=100/);
+  });
+
+  test('throws an exception if min and max are equal', () => {
+    assert.throws(() => createLinearParameterConfig<'percent'>(100, 100), /min and max must be different/);
   });
 });

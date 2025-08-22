@@ -19,7 +19,7 @@ suite('ChannelFxSend', () => {
       oscClient,
       fx: 'FX2',
     });
-    const level = await fxSend.fetchLevel('decibel');
+    const level = await fxSend.fetchLevel('decibels');
     assertClose(level, -10);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/mix/08/level'), true);
   });
@@ -32,7 +32,7 @@ suite('ChannelFxSend', () => {
       oscClient,
       fx: 'FX2',
     });
-    await fxSend.updateLevel(6, 'decibel');
+    await fxSend.updateLevel(6, 'decibels');
     assert.ok(
       set.calledWithMatch('/ch/01/mix/08/level', [match({ type: 'float', value: isClose(0.9) })]),
     );

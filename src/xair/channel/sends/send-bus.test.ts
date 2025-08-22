@@ -19,7 +19,7 @@ suite('ChannelSendBus', () => {
       oscClient,
       sendBus: 'Bus2',
     });
-    const level = await sendBus.fetchLevel('decibel');
+    const level = await sendBus.fetchLevel('decibels');
     assertClose(level, -10);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/mix/02/level'), true);
   });
@@ -32,7 +32,7 @@ suite('ChannelSendBus', () => {
       oscClient,
       sendBus: 'Bus2',
     });
-    await sendBus.updateLevel(6, 'decibel');
+    await sendBus.updateLevel(6, 'decibels');
     assert.ok(
       set.calledWithMatch('/ch/01/mix/02/level', [match({ type: 'float', value: isClose(0.9) })]),
     );
@@ -51,7 +51,7 @@ suite('ChannelSendBus', () => {
       oscClient,
       sendBus: 'Bus2',
     });
-    const pan = await sendBus.fetchPan();
+    const pan = await sendBus.fetchPan('percent');
     assert.strictEqual(pan, -50);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/mix/01/pan'), true);
   });
@@ -64,7 +64,7 @@ suite('ChannelSendBus', () => {
       oscClient,
       sendBus: 'Bus2',
     });
-    await sendBus.updatePan(100);
+    await sendBus.updatePan(100, 'percent');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/mix/01/pan', [{ type: 'float', value: 1.0 }]),
       true,
@@ -84,7 +84,7 @@ suite('ChannelSendBus', () => {
       oscClient,
       sendBus: 'Bus3',
     });
-    const pan = await sendBus.fetchPan();
+    const pan = await sendBus.fetchPan('percent');
     assert.strictEqual(pan, -50);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/mix/03/pan'), true);
   });
@@ -97,7 +97,7 @@ suite('ChannelSendBus', () => {
       oscClient,
       sendBus: 'Bus3',
     });
-    await sendBus.updatePan(100);
+    await sendBus.updatePan(100, 'percent');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/mix/03/pan', [{ type: 'float', value: 1.0 }]),
       true,

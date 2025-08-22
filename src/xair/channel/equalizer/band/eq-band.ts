@@ -1,8 +1,9 @@
 import { OSCClient } from '../../../../osc/client.js';
 import { createEntityFactory } from '../../../entity.js';
-import { createLinearMapper } from '../../../mapper/linear.js';
+import { createLinearParameterConfig } from '../../../mapper/linear.js';
 import { createLogarithmicMapper } from '../../../mapper/log.js';
 import { onOffMapper } from '../../../mapper/on-off.js';
+import { AsyncGetter, AsyncSetter, createOSCParameterFactory } from '../../../osc-parameter.js';
 import { EqBandType, eqBandTypeMapper } from './mapper/eq-band-type.js';
 
 export type ChannelEqualizerBand = {
@@ -12,8 +13,8 @@ export type ChannelEqualizerBand = {
   fetchFrequency: () => Promise<number>;
   updateType: (type: EqBandType) => Promise<void>;
   fetchType: () => Promise<EqBandType>;
-  updateGain: (gain: number) => Promise<void>;
-  fetchGain: () => Promise<number>;
+  updateGain: AsyncSetter<'decibels', 'float'>;
+  fetchGain: AsyncGetter<'decibels', 'float'>;
   updateQ: (q: number) => Promise<void>;
   fetchQ: () => Promise<number>;
 };
@@ -30,12 +31,13 @@ export const createChannelEqualizerBand = (
   const { channel, band, oscClient } = dependencies;
   const oscBaseAddress = `/ch/${channel.toString().padStart(2, '0')}/eq/${band}`;
   const entityFactory = createEntityFactory(oscClient);
+  const oscParameterFactory = createOSCParameterFactory(oscClient);
   const enabled = entityFactory.createEntity(`${oscBaseAddress}/on`, onOffMapper);
   const frequency = entityFactory.createEntity(
     `${oscBaseAddress}/f`,
     createLogarithmicMapper(20, 20000),
   );
-  const gain = entityFactory.createEntity(`${oscBaseAddress}/g`, createLinearMapper(-15, 15));
+  const gain = oscParameterFactory.createOSCParameter(`${oscBaseAddress}/g`, createLinearParameterConfig<'decibels'>(-15, 15));
   const q = entityFactory.createEntity(`${oscBaseAddress}/q`, createLogarithmicMapper(10, 0.3));
   const type = entityFactory.createEntity(`${oscBaseAddress}/type`, eqBandTypeMapper);
 
@@ -44,8 +46,8 @@ export const createChannelEqualizerBand = (
     updateEnabled: enabled.set,
     fetchFrequency: frequency.get,
     updateFrequency: frequency.set,
-    fetchGain: gain.get,
-    updateGain: gain.set,
+    fetchGain: gain.fetch,
+    updateGain: gain.update,
     fetchQ: q.get,
     updateQ: q.set,
     fetchType: type.get,

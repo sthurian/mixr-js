@@ -1,12 +1,14 @@
 import { OSCClient } from '../../../osc/client.js';
 import { createEntityFactory } from '../../entity.js';
-import { AutomixGroup, automixGroupMapper, automixWeightMapper } from './mapper/automix.js';
+import { createLinearParameterConfig } from '../../mapper/linear.js';
+import { AsyncGetter, AsyncSetter, createOSCParameterFactory } from '../../osc-parameter.js';
+import { AutomixGroup, automixGroupMapper } from './mapper/automix.js';
 
 export type ChannelAutomix = {
   fetchGroup: () => Promise<AutomixGroup>;
   updateGroup: (autoMixGroup: AutomixGroup) => Promise<void>;
-  fetchWeight: () => Promise<number>;
-  updateWeight: (weight: number) => Promise<void>;
+  fetchWeight: AsyncGetter<'decibels', 'float'>;
+  updateWeight: AsyncSetter<'decibels', 'float'>;
 };
 
 type ChannelAutomixDependencies = {
@@ -17,20 +19,21 @@ type ChannelAutomixDependencies = {
 export const createChannelAutomix = (dependencies: ChannelAutomixDependencies): ChannelAutomix => {
   const { channel, oscClient } = dependencies;
   const entityFactory = createEntityFactory(oscClient);
+  const oscParameterFactory = createOSCParameterFactory(oscClient);
   const channelAutoMixOscAddress = `/ch/${channel.toString().padStart(2, '0')}/automix`;
   const automixGroup = entityFactory.createEntity(
     `${channelAutoMixOscAddress}/group`,
     automixGroupMapper,
   );
-  const automixWeight = entityFactory.createEntity(
+  const automixWeight = oscParameterFactory.createOSCParameter(
     `${channelAutoMixOscAddress}/weight`,
-    automixWeightMapper,
+    createLinearParameterConfig<'decibels'>(-12, 12),
   );
 
   return {
     fetchGroup: automixGroup.get,
     updateGroup: automixGroup.set,
-    fetchWeight: automixWeight.get,
-    updateWeight: automixWeight.set,
+    fetchWeight: automixWeight.fetch,
+    updateWeight: automixWeight.update,
   };
 };

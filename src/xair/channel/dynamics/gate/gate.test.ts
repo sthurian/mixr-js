@@ -16,7 +16,7 @@ suite('ChannelGate', () => {
       channel: 1,
       oscClient,
     });
-    const attack = await gate.fetchAttack();
+    const attack = await gate.fetchAttack('milliseconds');
     assert.strictEqual(attack, 60);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/gate/attack'), true);
   });
@@ -28,7 +28,7 @@ suite('ChannelGate', () => {
       channel: 1,
       oscClient,
     });
-    await gate.updateAttack(90);
+    await gate.updateAttack(90, 'milliseconds');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/gate/attack', [{ type: 'float', value: 0.75 }]),
       true,
@@ -131,7 +131,7 @@ suite('ChannelGate', () => {
       channel: 1,
       oscClient,
     });
-    const range = await gate.fetchRange();
+    const range = await gate.fetchRange('decibels');
     assert.strictEqual(range, 31.5);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/gate/range'), true);
   });
@@ -143,7 +143,7 @@ suite('ChannelGate', () => {
       channel: 1,
       oscClient,
     });
-    await gate.updateRange(60);
+    await gate.updateRange(60, 'decibels');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/gate/range', [{ type: 'float', value: 1 }]),
       true,
@@ -188,7 +188,7 @@ suite('ChannelGate', () => {
       channel: 1,
       oscClient,
     });
-    const threshold = await gate.fetchThreshold();
+    const threshold = await gate.fetchThreshold('decibels');
     assert.strictEqual(threshold, -40);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/gate/thr'), true);
   });
@@ -200,7 +200,7 @@ suite('ChannelGate', () => {
       channel: 1,
       oscClient,
     });
-    await gate.updateThreshold(-60);
+    await gate.updateThreshold(-60, 'decibels');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/gate/thr', [{ type: 'float', value: 0.25 }]),
       true,

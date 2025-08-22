@@ -5,6 +5,8 @@
     "src/**/*.test.ts",
     "src/**/test-factories/**",
     "src/**/test-helpers/**",
+    "src/index.ts",
+    "src/xair/client.ts",
     "build/**",
     "node_modules/**",
     "coverage/**"

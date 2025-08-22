@@ -18,7 +18,7 @@ suite('Mix', () => {
       oscBasePath: '/ch/01',
       oscClient,
     });
-    const fader = await mix.fetchFader('decibel');
+    const fader = await mix.fetchFader('decibels');
     assertClose(fader, -10);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/mix/fader'), true);
   });
@@ -30,7 +30,7 @@ suite('Mix', () => {
       oscBasePath: '/ch/01',
       oscClient,
     });
-    await mix.updateFader(6, 'decibel');
+    await mix.updateFader(6, 'decibels');
     assert.ok(
       set.calledWithMatch('/ch/01/mix/fader', [match({ type: 'float', value: isClose(0.9) })]),
     );
@@ -48,7 +48,7 @@ suite('Mix', () => {
       oscBasePath: '/ch/01',
       oscClient,
     });
-    const pan = await mix.fetchPan();
+    const pan = await mix.fetchPan('percent');
     assert.strictEqual(pan, 50);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/mix/pan'), true);
   });
@@ -60,7 +60,7 @@ suite('Mix', () => {
       oscBasePath: '/ch/01',
       oscClient,
     });
-    await mix.updatePan(100);
+    await mix.updatePan(100, 'percent');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/mix/pan', [{ type: 'float', value: 1 }]),
       true,

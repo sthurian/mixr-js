@@ -18,17 +18,20 @@ suite('OSC Parameter', () => {
     const validateRawValue = fake.returns(0.5);
     const convertToUnit = fake.returns(100);
     const oscParameterFactory = createOSCParameterFactory(oscClient);
-    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>('/test/parameter', {
-      convertToRaw: (value) => value,
-      convertToUnit,
-      validateRawValue,
-      validateUnitValue: (value) => value,
-      oscDataType: 'float',
-    });
+    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>(
+      '/test/parameter',
+      {
+        convertToRaw: (value) => value,
+        convertToUnit,
+        validateRawValue,
+        validateUnitValue: (value) => value,
+        oscDataType: 'float',
+      },
+    );
 
     const result = await oscParameter.fetch();
     assert.strictEqual(query.calledOnceWithExactly('/test/parameter'), true);
-    assert.strictEqual(validateRawValue.calledOnceWithExactly(0.5),true)
+    assert.strictEqual(validateRawValue.calledOnceWithExactly(0.5), true);
     assert.strictEqual(result, 0.5);
   });
 
@@ -45,17 +48,156 @@ suite('OSC Parameter', () => {
     const validateRawValue = fake.returns(0.5);
     const convertToUnit = fake.returns(100);
     const oscParameterFactory = createOSCParameterFactory(oscClient);
-    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>('/test/parameter', {
-      convertToRaw: (value) => value,
-      convertToUnit,
-      validateRawValue,
-      validateUnitValue: (value) => value,
-      oscDataType: 'float',
-    });
+    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>(
+      '/test/parameter',
+      {
+        convertToRaw: (value) => value,
+        convertToUnit,
+        validateRawValue,
+        validateUnitValue: (value) => value,
+        oscDataType: 'float',
+      },
+    );
 
     const result = await oscParameter.fetch('myUnit');
     assert.strictEqual(query.calledOnceWithExactly('/test/parameter'), true);
-    assert.strictEqual(validateRawValue.calledOnceWithExactly(0.5),true)
+    assert.strictEqual(validateRawValue.calledOnceWithExactly(0.5), true);
     assert.strictEqual(result, 100);
+  });
+
+  test('update sends the raw value', async () => {
+    const set = fake.resolves({});
+    const oscClient: OSCClient = {
+      close: fake(),
+      query: fake(),
+      set,
+    };
+    const validateRawValue = fake.returns(0.42);
+    const oscParameterFactory = createOSCParameterFactory(oscClient);
+    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>(
+      '/test/parameter',
+      {
+        convertToRaw: fake(),
+        convertToUnit: fake(),
+        validateRawValue,
+        validateUnitValue: fake(),
+        oscDataType: 'float',
+      },
+    );
+
+    await oscParameter.update(0.42);
+    assert.strictEqual(
+      set.calledOnceWithExactly('/test/parameter', [{ type: 'float', value: 0.42 }]),
+      true,
+    );
+    assert.strictEqual(validateRawValue.calledOnceWithExactly(0.42), true);
+  });
+
+  test('update sends the value converted to raw', async () => {
+    const set = fake.resolves(1);
+    const oscClient: OSCClient = {
+      close: fake(),
+      query: fake(),
+      set,
+    };
+
+    const convertToRaw = fake.returns(0.5);
+    const oscParameterFactory = createOSCParameterFactory(oscClient);
+    const validateUnitValue = fake.returns(50);
+    const oscParameter = oscParameterFactory.createOSCParameter<'myUnit', 'float'>(
+      '/test/parameter',
+      {
+        convertToRaw,
+        convertToUnit: fake(),
+        validateRawValue: fake(),
+        validateUnitValue,
+        oscDataType: 'float',
+      },
+    );
+
+    await oscParameter.update(42, 'myUnit');
+    assert.strictEqual(
+      set.calledOnceWithExactly('/test/parameter', [{ type: 'float', value: 0.5 }]),
+      true,
+    );
+    assert.strictEqual(validateUnitValue.calledOnceWithExactly(42), true);
+    assert.strictEqual(convertToRaw.calledOnceWithExactly(50, 'myUnit'), true);
+  });
+
+  test('update sends string parameters correctly', async () => {
+    const set = fake.resolves({});
+    const oscClient: OSCClient = {
+      close: fake(),
+      query: fake(),
+      set,
+    };
+    const validateRawValue = fake.returns('test');
+    const oscParameterFactory = createOSCParameterFactory(oscClient);
+    const oscParameter = oscParameterFactory.createOSCParameter<'raw', 'string'>(
+      '/test/parameter',
+      {
+        convertToRaw: fake(),
+        convertToUnit: fake(),
+        validateRawValue,
+        validateUnitValue: fake(),
+        oscDataType: 'string',
+      },
+    );
+
+    await oscParameter.update('test');
+    assert.strictEqual(
+      set.calledOnceWithExactly('/test/parameter', [{ type: 'string', value: 'test' }]),
+      true,
+    );
+    assert.strictEqual(validateRawValue.calledOnceWithExactly('test'), true);
+  });
+
+  test('update sends integer parameters correctly', async () => {
+    const set = fake.resolves({});
+    const oscClient: OSCClient = {
+      close: fake(),
+      query: fake(),
+      set,
+    };
+    const validateRawValue = fake.returns(42);
+    const oscParameterFactory = createOSCParameterFactory(oscClient);
+    const oscParameter = oscParameterFactory.createOSCParameter<'raw', 'integer'>(
+      '/test/parameter',
+      {
+        convertToRaw: fake(),
+        convertToUnit: fake(),
+        validateRawValue,
+        validateUnitValue: fake(),
+        oscDataType: 'integer',
+      },
+    );
+
+    await oscParameter.update(42);
+    assert.strictEqual(
+      set.calledOnceWithExactly('/test/parameter', [{ type: 'integer', value: 42 }]),
+      true,
+    );
+    assert.strictEqual(validateRawValue.calledOnceWithExactly(42), true);
+  });
+
+  test('throws an error for unsupported OSC types', async () => {
+    const oscClient: OSCClient = {
+      close: fake(),
+      query: fake(),
+      set: fake(),
+    };
+    const oscParameterFactory = createOSCParameterFactory(oscClient);
+    const oscParameter = oscParameterFactory.createOSCParameter<'raw', 'float'>('/test/parameter', {
+      convertToRaw: fake(),
+      convertToUnit: fake(),
+      validateRawValue: fake(),
+      validateUnitValue: fake(),
+      oscDataType: 'float',
+    });
+
+    await assert.rejects(
+      () => oscParameter.update(undefined as unknown as number),
+      new Error('Unsupported OSC type "undefined" for address "/test/parameter"'),
+    );
   });
 });

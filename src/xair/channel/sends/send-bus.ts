@@ -2,10 +2,10 @@ import { OSCClient } from '../../../osc/client.js';
 import { createEntityFactory } from '../../entity.js';
 import { createOSCParameterFactory, AsyncGetter, AsyncSetter } from '../../osc-parameter.js';
 import { levelParamaterConfig } from '../../mapper/level.js';
-import { createLinearMapper } from '../../mapper/linear.js';
 import { onOffMapper } from '../../mapper/on-off.js';
 import { ChannelSendBusLabel, mapChannelSendBusLabelToNumber } from './mapper/send-bus.js';
 import { SendBusTap, sendBusTapMapper } from './mapper/bus-tap.js';
+import { createLinearParameterConfig } from '../../mapper/linear.js';
 
 export type ChannelSendBus = {
   fetchIsGroupEnabled: () => Promise<boolean>;
@@ -16,11 +16,11 @@ export type ChannelSendBus = {
    * @param unit - Optional. If provided, the value will be converted to this unit, otherwise it will return the raw osc value.
    * @returns A promise that resolves to the level in the specified unit.
    */
-  fetchLevel: AsyncGetter<'decibel', 'float'>;
-  updateLevel: AsyncSetter<'decibel', 'float'>;
+  fetchLevel: AsyncGetter<'decibels', 'float'>;
+  updateLevel: AsyncSetter<'decibels', 'float'>;
 
-  fetchPan: () => Promise<number>;
-  updatePan: (pan: number) => Promise<void>;
+  fetchPan: AsyncGetter<'percent', 'float'>;
+  updatePan: AsyncSetter<'percent', 'float'>;
 
   fetchTap: () => Promise<SendBusTap>;
   updateTap: (tap: SendBusTap) => Promise<void>;
@@ -42,19 +42,19 @@ export const createChannelSendBus = (dependencies: ChannelSendBusDependencies): 
   const entityFactory = createEntityFactory(oscClient);
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const grpEnabled = entityFactory.createEntity(`${oscBasePath}/grpon`, onOffMapper);
-  const level = oscParameterFactory.createOSCParameter<'decibel', 'float'>(
+  const level = oscParameterFactory.createOSCParameter<'decibels', 'float'>(
     `${oscBasePath}/level`,
     levelParamaterConfig,
   );
-  const pan = entityFactory.createEntity(`${oscBaseGroupPath}/pan`, createLinearMapper(-100, 100));
+  const pan = oscParameterFactory.createOSCParameter(`${oscBaseGroupPath}/pan`, createLinearParameterConfig<'percent'>(-100, 100));
   const tap = entityFactory.createEntity(`${oscBasePath}/tap`, sendBusTapMapper);
   return {
     fetchIsGroupEnabled: grpEnabled.get,
     updateGroupEnabled: grpEnabled.set,
     fetchLevel: level.fetch,
     updateLevel: level.update,
-    fetchPan: pan.get,
-    updatePan: pan.set,
+    fetchPan: pan.fetch,
+    updatePan: pan.update,
     fetchTap: tap.get,
     updateTap: tap.set,
   };

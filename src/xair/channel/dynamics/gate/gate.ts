@@ -1,11 +1,12 @@
 import { OSCClient } from '../../../../osc/client.js';
 import { createEntityFactory } from '../../../entity.js';
-import { createLinearMapper } from '../../../mapper/linear.js';
+import { createLinearParameterConfig } from '../../../mapper/linear.js';
 import { createLogarithmicMapper } from '../../../mapper/log.js';
 import { onOffMapper } from '../../../mapper/on-off.js';
 import { createDynamicsFilter, DynamicsFilter } from '../filter/filter.js';
 import { DynamicsKeySource, dynamicsKeySourceMapper } from '../mapper/key-source.js';
 import { GateMode, gateModeMapper } from './mapper/mode.js';
+import { AsyncGetter, AsyncSetter, createOSCParameterFactory } from '../../../osc-parameter.js';
 
 export type ChannelGate = {
   /**
@@ -13,12 +14,12 @@ export type ChannelGate = {
    * @param attack - Attack time in milliseconds.
    * @returns A promise that resolves when the operation is complete.
    */
-  updateAttack: (attack: number) => Promise<void>;
+  updateAttack: AsyncSetter<'milliseconds', 'float'>;
   /**
    * Gets the compressor's attack time.
    * @returns A promise that resolves to the attack time in milliseconds.
    */
-  fetchAttack: () => Promise<number>;
+  fetchAttack: AsyncGetter<'milliseconds', 'float'>;
 
   getFilter: () => DynamicsFilter;
 
@@ -34,14 +35,14 @@ export type ChannelGate = {
   updateEnabled: (enabled: boolean) => Promise<void>;
   fetchIsEnabled: () => Promise<boolean>;
 
-  updateRange: (ratio: number) => Promise<void>;
-  fetchRange: () => Promise<number>;
+  updateRange: AsyncSetter<'decibels', 'float'>;
+  fetchRange: AsyncGetter<'decibels', 'float'>;
 
   updateRelease: (time: number) => Promise<void>;
   fetchRelease: () => Promise<number>;
 
-  updateThreshold: (threshold: number) => Promise<void>;
-  fetchThreshold: () => Promise<number>;
+  updateThreshold: AsyncSetter<'decibels', 'float'>;
+  fetchThreshold: AsyncGetter<'decibels', 'float'>;
 };
 
 type ChannelGateDependencies = {
@@ -53,9 +54,10 @@ export const createChannelGate = (dependencies: ChannelGateDependencies): Channe
   const { channel, oscClient } = dependencies;
   const oscBaseAddress = `/ch/${channel.toString().padStart(2, '0')}/gate`;
   const entityFactory = createEntityFactory(oscClient);
-  const attack = entityFactory.createEntity(
+  const oscParameterFactory = createOSCParameterFactory(oscClient);
+  const attack = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/attack`,
-    createLinearMapper(0.0, 120.0),
+    createLinearParameterConfig<'milliseconds'>(0.0, 120.0),
   );
   const filter = createDynamicsFilter({ ...dependencies, dynamicsType: 'gate' });
 
@@ -67,16 +69,16 @@ export const createChannelGate = (dependencies: ChannelGateDependencies): Channe
   const keySource = entityFactory.createEntity(`${oscBaseAddress}/keysrc`, dynamicsKeySourceMapper);
   const mode = entityFactory.createEntity(`${oscBaseAddress}/mode`, gateModeMapper);
   const enabled = entityFactory.createEntity(`${oscBaseAddress}/on`, onOffMapper);
-  const range = entityFactory.createEntity(`${oscBaseAddress}/range`, createLinearMapper(3, 60));
+  const range = oscParameterFactory.createOSCParameter(`${oscBaseAddress}/range`, createLinearParameterConfig<'decibels'>(3, 60));
   const release = entityFactory.createEntity(
     `${oscBaseAddress}/release`,
     createLogarithmicMapper(5, 4000),
   );
-  const threshold = entityFactory.createEntity(`${oscBaseAddress}/thr`, createLinearMapper(-80, 0));
+  const threshold = oscParameterFactory.createOSCParameter(`${oscBaseAddress}/thr`, createLinearParameterConfig<'decibels'>(-80, 0));
 
   return {
-    fetchAttack: attack.get,
-    updateAttack: attack.set,
+    fetchAttack: attack.fetch,
+    updateAttack: attack.update,
     getFilter: () => filter,
     updateHold: hold.set,
     fetchHold: hold.get,
@@ -86,11 +88,11 @@ export const createChannelGate = (dependencies: ChannelGateDependencies): Channe
     updateMode: mode.set,
     updateEnabled: enabled.set,
     fetchIsEnabled: enabled.get,
-    updateRange: range.set,
-    fetchRange: range.get,
+    updateRange: range.update,
+    fetchRange: range.fetch,
     updateRelease: release.set,
     fetchRelease: release.get,
-    updateThreshold: threshold.set,
-    fetchThreshold: threshold.get,
+    updateThreshold: threshold.update,
+    fetchThreshold: threshold.fetch,
   };
 };

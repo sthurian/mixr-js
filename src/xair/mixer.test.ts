@@ -64,7 +64,7 @@ suite('Mixer', () => {
       set: fake(),
     };
     const mixer = createMixer(oscClient);
-    const result = await mixer.getChannel('CH01').getCompressor().fetchAttack();
+    const result = await mixer.getChannel('CH01').getCompressor().fetchAttack('milliseconds');
     assert.strictEqual(result, 120);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/dyn/attack'), true);
   });
@@ -122,10 +122,22 @@ suite('Mixer', () => {
       set,
     };
     const mixer = createMixer(oscClient);
-    await mixer.getChannel('CH01').getCompressor().updateAttack(120);
+    await mixer.getChannel('CH01').getCompressor().updateAttack(120, 'milliseconds');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/dyn/attack', [{ type: 'float', value: 1.0 }]),
       true,
     );
+  });
+
+  test('closes the osc client when the mixer is closed', async () => {
+    const close = fake();
+    const oscClient: OSCClient = {
+      close,
+      query: fake(),
+      set: fake(),
+    };
+    const mixer = createMixer(oscClient);
+    await mixer.closeConnection();
+    assert.strictEqual(close.calledOnce, true);
   });
 });

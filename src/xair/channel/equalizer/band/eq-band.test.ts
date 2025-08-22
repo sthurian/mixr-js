@@ -77,7 +77,7 @@ suite('ChannelEqualizerBand', () => {
       band: 2,
       oscClient,
     });
-    const gain = await eqBand.fetchGain();
+    const gain = await eqBand.fetchGain('decibels');
     assert.strictEqual(gain, 0);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/eq/2/g'), true);
   });
@@ -90,7 +90,7 @@ suite('ChannelEqualizerBand', () => {
       band: 2,
       oscClient,
     });
-    await eqBand.updateGain(7.5);
+    await eqBand.updateGain(7.5, 'decibels');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/eq/2/g', [{ type: 'float', value: 0.75 }]),
       true,

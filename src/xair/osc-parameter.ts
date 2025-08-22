@@ -4,7 +4,7 @@ import { OscArgument, oscArgumentListSchema, OscArgumentValue } from '../osc/osc
 type OSCDataType = 'float' | 'integer' | 'string';
 type OSCValue<T extends OSCDataType> = T extends 'string' ? string : number;
 
-export type AsyncGetter<Unit, T extends OSCDataType> = {
+export type AsyncGetter<Unit extends string | 'raw', T extends OSCDataType> = {
   /**
    * Fetch the value of the parameter.
    * @param unit - Optional. If provided, the value will be converted to this unit, otherwise it will return the raw osc value.
@@ -13,7 +13,7 @@ export type AsyncGetter<Unit, T extends OSCDataType> = {
   (unit: Unit): Promise<OSCValue<T>>;
 };
 
-export type AsyncSetter<Unit, T extends OSCDataType> = {
+export type AsyncSetter<Unit extends string | 'raw', T extends OSCDataType> = {
   /**
    * Update the value of the parameter.
    * @param value - The value to set.
@@ -25,7 +25,7 @@ export type AsyncSetter<Unit, T extends OSCDataType> = {
   (value: OSCValue<T>, unit: Unit): Promise<void>;
 };
 
-export type OSCParameter<Unit, T extends OSCDataType> = {
+export type OSCParameter<Unit extends string | 'raw', T extends OSCDataType> = {
   fetch: AsyncGetter<Unit, T>;
   update: AsyncSetter<Unit, T>;
 };
@@ -44,7 +44,7 @@ export type OSCParameterDependencies<Unit, T extends OSCDataType> = {
   config: OSCParameterConfig<Unit, T>;
 };
 
-const createOSCParameter = <Unit, T extends OSCDataType>(
+const createOSCParameter = <Unit extends string | 'raw', T extends OSCDataType>(
   deps: OSCParameterDependencies<Unit, T>
 ): OSCParameter<Unit, T> => {
   const { oscClient, oscAddress, config } = deps;
@@ -81,7 +81,7 @@ const createOSCParameter = <Unit, T extends OSCDataType>(
 };
 
 export type OSCParameterFactory = {
-  createOSCParameter: <Unit, T extends OSCDataType>(
+  createOSCParameter: <Unit extends string | 'raw', T extends OSCDataType>(
     oscAddress: string,
     config: OSCParameterConfig<Unit, T>,
   ) => OSCParameter<Unit, T>;

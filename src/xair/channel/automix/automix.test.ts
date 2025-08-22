@@ -50,7 +50,7 @@ suite('ChannelAutomix', () => {
       channel: 1,
       oscClient,
     });
-    const result = await automix.fetchWeight();
+    const result = await automix.fetchWeight('decibels');
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/automix/weight'), true);
     assert.strictEqual(result, 0);
   });
@@ -64,7 +64,7 @@ suite('ChannelAutomix', () => {
       channel: 1,
       oscClient,
     });
-    await automix.updateWeight(-12);
+    await automix.updateWeight(-12, 'decibels');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/automix/weight', [{ type: 'float', value: 0 }]),
       true,

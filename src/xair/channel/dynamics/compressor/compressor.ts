@@ -1,5 +1,5 @@
 import { createEntityFactory } from '../../../entity.js';
-import { createLinearMapper } from '../../../mapper/linear.js';
+import { createLinearParameterConfig } from '../../../mapper/linear.js';
 import { onOffMapper } from '../../../mapper/on-off.js';
 import { CompressorDetectionMode, compressorDetectionModeMapper } from './mapper/detection-mode.js';
 import { CompressorEnvelope, compressorEnvelopeMapper } from './mapper/envelope.js';
@@ -9,6 +9,7 @@ import { CompressorRatio, compressorRatioMapper } from './mapper/ratio.js';
 import { DynamicsFilter, createDynamicsFilter } from '../filter/filter.js';
 import { createLogarithmicMapper } from '../../../mapper/log.js';
 import { OSCClient } from '../../../../osc/client.js';
+import { AsyncGetter, AsyncSetter, createOSCParameterFactory } from '../../../osc-parameter.js';
 
 export type ChannelCompressor = {
   fetchIsAutoTimeEnabled: () => Promise<boolean>;
@@ -18,12 +19,12 @@ export type ChannelCompressor = {
    * @param attack - Attack time in milliseconds.
    * @returns A promise that resolves when the operation is complete.
    */
-  updateAttack: (attack: number) => Promise<void>;
+  updateAttack: AsyncSetter<'milliseconds', 'float'>;
   /**
    * Gets the compressor's attack time.
    * @returns A promise that resolves to the attack time in milliseconds.
    */
-  fetchAttack: () => Promise<number>;
+  fetchAttack: AsyncGetter<'milliseconds', 'float'>;
 
   updateDetectionMode: (mode: CompressorDetectionMode) => Promise<void>;
   fetchDetectionMode: () => Promise<CompressorDetectionMode>;
@@ -39,14 +40,14 @@ export type ChannelCompressor = {
   updateKeySource: (type: DynamicsKeySource) => Promise<void>;
   fetchKeySource: () => Promise<DynamicsKeySource>;
 
-  updateKnee: (time: number) => Promise<void>;
-  fetchKnee: () => Promise<number>;
+  updateKnee: AsyncSetter<'number', 'float'>;
+  fetchKnee: AsyncGetter<'number', 'float'>;
 
-  updateGain: (time: number) => Promise<void>;
-  fetchGain: () => Promise<number>;
+  updateGain: AsyncSetter<'decibels', 'float'>;
+  fetchGain: AsyncGetter<'decibels', 'float'>;
 
-  updateMix: (time: number) => Promise<void>;
-  fetchMix: () => Promise<number>;
+  updateMix: AsyncSetter<'percent', 'float'>;
+  fetchMix: AsyncGetter<'percent', 'float'>;
 
   updateMode: (mode: CompressorMode) => Promise<void>;
   fetchMode: () => Promise<CompressorMode>;
@@ -60,8 +61,8 @@ export type ChannelCompressor = {
   updateRelease: (time: number) => Promise<void>;
   fetchRelease: () => Promise<number>;
 
-  updateThreshold: (threshold: number) => Promise<void>;
-  fetchThreshold: () => Promise<number>;
+  updateThreshold: AsyncSetter<'decibels', 'float'>;
+  fetchThreshold: AsyncGetter<'decibels', 'float'>;
 };
 
 type ChannelCompressorDependencies = {
@@ -75,10 +76,11 @@ export const createChannelCompressor = (
   const { channel, oscClient } = dependencies;
   const oscBaseAddress = `/ch/${channel.toString().padStart(2, '0')}/dyn`;
   const entityFactory = createEntityFactory(oscClient);
+  const oscParameterFactory = createOSCParameterFactory(oscClient);
   const autotime = entityFactory.createEntity(`${oscBaseAddress}/auto`, onOffMapper);
-  const attack = entityFactory.createEntity(
+  const attack = oscParameterFactory.createOSCParameter<'milliseconds', 'float'>(
     `${oscBaseAddress}/attack`,
-    createLinearMapper(0.0, 120.0),
+    createLinearParameterConfig(0.0, 120.0),
   );
   const detectionMode = entityFactory.createEntity(
     `${oscBaseAddress}/det`,
@@ -93,9 +95,18 @@ export const createChannelCompressor = (
   );
 
   const keySource = entityFactory.createEntity(`${oscBaseAddress}/keysrc`, dynamicsKeySourceMapper);
-  const knee = entityFactory.createEntity(`${oscBaseAddress}/knee`, createLinearMapper(0, 5));
-  const gain = entityFactory.createEntity(`${oscBaseAddress}/mgain`, createLinearMapper(0, 24));
-  const mix = entityFactory.createEntity(`${oscBaseAddress}/mix`, createLinearMapper(0, 100));
+  const knee = oscParameterFactory.createOSCParameter<'number', 'float'>(
+    `${oscBaseAddress}/knee`,
+    createLinearParameterConfig(0, 5),
+  );
+  const gain = oscParameterFactory.createOSCParameter(
+    `${oscBaseAddress}/mgain`,
+    createLinearParameterConfig<'decibels'>(0, 24),
+  );
+  const mix = oscParameterFactory.createOSCParameter(
+    `${oscBaseAddress}/mix`,
+    createLinearParameterConfig<'percent'>(0, 100),
+  );
   const mode = entityFactory.createEntity(`${oscBaseAddress}/mode`, compressorModeMapper);
   const enabled = entityFactory.createEntity(`${oscBaseAddress}/on`, onOffMapper);
   const ratio = entityFactory.createEntity(`${oscBaseAddress}/ratio`, compressorRatioMapper);
@@ -103,13 +114,16 @@ export const createChannelCompressor = (
     `${oscBaseAddress}/release`,
     createLogarithmicMapper(5, 4000),
   );
-  const threshold = entityFactory.createEntity(`${oscBaseAddress}/thr`, createLinearMapper(-60, 0));
+  const threshold = oscParameterFactory.createOSCParameter(
+    `${oscBaseAddress}/thr`,
+    createLinearParameterConfig<'decibels'>(-60, 0),
+  );
 
   return {
     fetchIsAutoTimeEnabled: autotime.get,
     updateAutoTimeEnabled: autotime.set,
-    fetchAttack: attack.get,
-    updateAttack: attack.set,
+    fetchAttack: attack.fetch,
+    updateAttack: attack.update,
     fetchDetectionMode: detectionMode.get,
     updateDetectionMode: detectionMode.set,
     fetchEnvelope: envelope.get,
@@ -119,12 +133,12 @@ export const createChannelCompressor = (
     fetchHold: hold.get,
     updateKeySource: keySource.set,
     fetchKeySource: keySource.get,
-    updateKnee: knee.set,
-    fetchKnee: knee.get,
-    updateGain: gain.set,
-    fetchGain: gain.get,
-    updateMix: mix.set,
-    fetchMix: mix.get,
+    updateKnee: knee.update,
+    fetchKnee: knee.fetch,
+    updateGain: gain.update,
+    fetchGain: gain.fetch,
+    updateMix: mix.update,
+    fetchMix: mix.fetch,
     fetchMode: mode.get,
     updateMode: mode.set,
     updateEnabled: enabled.set,
@@ -133,7 +147,7 @@ export const createChannelCompressor = (
     fetchRatio: ratio.get,
     updateRelease: release.set,
     fetchRelease: release.get,
-    updateThreshold: threshold.set,
-    fetchThreshold: threshold.get,
+    updateThreshold: threshold.update,
+    fetchThreshold: threshold.fetch,
   };
 };

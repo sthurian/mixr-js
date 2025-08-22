@@ -1,25 +1,22 @@
-import { Mapper } from '../entity.js';
+import { z } from 'zod/v4';
+// import { Mapper } from '../entity.js';
+import { OSCParameterConfig } from '../osc-parameter.js';
 
 function mapZeroToOneToRange(value: number, min: number, max: number): number {
   return min + value * (max - min);
 }
 
 function mapRangeToZeroToOne(value: number, min: number, max: number): number {
-  if (max === min) throw new Error('min and max must be different');
   return (value - min) / (max - min);
 }
 
-export const createLinearMapper = (min: number, max: number): Mapper<number> => {
+export const createLinearParameterConfig = <Unit>(min: number, max: number):  OSCParameterConfig<Unit, 'float'> => {
+  if (max === min) throw new Error('min and max must be different');
   return {
-    mixerValueToOscArgument: (value) => {
-      return mapRangeToZeroToOne(value, min, max);
-    },
-    oscArgumentToMixerValue: (arg) => {
-      if (typeof arg === 'string') {
-        throw new Error('Cannot map a string value');
-      }
-      return mapZeroToOneToRange(arg, min, max);
-    },
-    getOscType: () => 'float',
-  };
+    oscDataType: 'float',
+    convertToUnit: (raw) => mapZeroToOneToRange(raw, min, max),
+    convertToRaw: (unit) => mapRangeToZeroToOne(unit, min, max),
+    validateRawValue: z.number().min(0).max(1).parse,
+    validateUnitValue: z.number().min(min).max(max).parse
+  }
 };

@@ -16,7 +16,7 @@ suite('ChannelPreamp', () => {
       channel: 1,
       oscClient,
     });
-    const gain = await preamp.fetchGain();
+    const gain = await preamp.fetchGain('decibels');
     assert.strictEqual(gain, 24);
     assert.strictEqual(query.calledOnceWithExactly('/headamp/01/gain'), true);
   });
@@ -28,7 +28,7 @@ suite('ChannelPreamp', () => {
       channel: 1,
       oscClient,
     });
-    await preamp.updateGain(6);
+    await preamp.updateGain(6, 'decibels');
     assert.strictEqual(
       set.calledOnceWithExactly('/headamp/01/gain', [{ type: 'float', value: 0.25 }]),
       true,
@@ -73,7 +73,7 @@ suite('ChannelPreamp', () => {
       channel: 1,
       oscClient,
     });
-    const trim = await preamp.fetchUSBTrim();
+    const trim = await preamp.fetchUSBTrim('decibels');
     assert.strictEqual(trim, 9);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/preamp/rtntrim'), true);
   });
@@ -85,7 +85,7 @@ suite('ChannelPreamp', () => {
       channel: 1,
       oscClient,
     });
-    await preamp.updateUSBTrim(-9);
+    await preamp.updateUSBTrim(-9, 'decibels');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/preamp/rtntrim', [{ type: 'float', value: 0.25 }]),
       true,

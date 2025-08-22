@@ -16,7 +16,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    const attack = await compressor.fetchAttack();
+    const attack = await compressor.fetchAttack('milliseconds');
     assert.strictEqual(attack, 60);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/dyn/attack'), true);
   });
@@ -28,7 +28,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    await compressor.updateAttack(120);
+    await compressor.updateAttack(120, 'milliseconds');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/dyn/attack', [{ type: 'float', value: 1.0 }]),
       true,
@@ -161,7 +161,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    const gain = await compressor.fetchGain();
+    const gain = await compressor.fetchGain('decibels');
     assert.strictEqual(gain, 12);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/dyn/mgain'), true);
   });
@@ -173,7 +173,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    await compressor.updateGain(24);
+    await compressor.updateGain(24, 'decibels');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/dyn/mgain', [{ type: 'float', value: 1.0 }]),
       true,
@@ -247,7 +247,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    const knee = await compressor.fetchKnee();
+    const knee = await compressor.fetchKnee('number');
     assert.strictEqual(knee, 2.5);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/dyn/knee'), true);
   });
@@ -259,7 +259,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    await compressor.updateKnee(5);
+    await compressor.updateKnee(5, 'number');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/dyn/knee', [{ type: 'float', value: 1 }]),
       true,
@@ -276,7 +276,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    const mix = await compressor.fetchMix();
+    const mix = await compressor.fetchMix('percent');
     assert.strictEqual(mix, 65);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/dyn/mix'), true);
   });
@@ -288,7 +288,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    await compressor.updateMix(42);
+    await compressor.updateMix(42, 'percent');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/dyn/mix', [{ type: 'float', value: 0.42 }]),
       true,
@@ -391,7 +391,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    const threshold = await compressor.fetchThreshold();
+    const threshold = await compressor.fetchThreshold('decibels');
     assert.strictEqual(threshold, -30);
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/dyn/thr'), true);
   });
@@ -403,7 +403,7 @@ suite('ChannelCompressor', () => {
       channel: 1,
       oscClient,
     });
-    await compressor.updateThreshold(-45);
+    await compressor.updateThreshold(-45, 'decibels');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/dyn/thr', [{ type: 'float', value: 0.25 }]),
       true,
