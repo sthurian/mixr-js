@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/mixr-js.svg)](https://badge.fury.io/js/mixr-js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Type%20Safe-blue.svg)](https://www.typescriptlang.org/)
-[![Test Coverage](https://img.shields.io/badge/Coverage-95.94%25-brightgreen.svg)](https://github.com/sthurian/mixr-js)
+[![Test Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen.svg)](https://github.com/sthurian/mixr-js)
 
 A comprehensive TypeScript/JavaScript client library for controlling **digital mixing consoles** over network. Currently supports Behringer X-Air series (XR12, XR16, XR18) via OSC protocol, with extensible architecture designed for future mixer support across different protocols.
 
@@ -165,6 +165,8 @@ console.log(`Channel muted: ${isMuted}`);
 | `XR18` | CH01-CH16 | Behringer X-Air XR18 (18-input) |
 
 *Future versions will support additional mixer brands and models.*
+
+> **Note**: This library has been extensively tested with real hardware on an XR18 mixer. XR12 and XR16 support is implemented based on protocol documentation and should work correctly, but has not been verified with physical hardware.
 
 ### Channel Features
 
