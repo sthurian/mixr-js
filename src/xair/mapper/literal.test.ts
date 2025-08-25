@@ -32,6 +32,21 @@ suite('createLiteralParameterConfig', () => {
     assert.strictEqual(literalParameterConfig.convertToUnit(1, 'color'), 'Green');
     assert.strictEqual(literalParameterConfig.convertToUnit(2, 'color'), 'Blue');
   });
+  test('convertToUnit throws an exception for out of bounds values', () => {
+    const literalParameterConfig = createLiteralParameterConfig<'color', 'Red' | 'Green' | 'Blue'>([
+      'Red',
+      'Green',
+      'Blue',
+    ]);
+    assert.throws(
+      () => literalParameterConfig.convertToUnit(3, 'color'),
+      /Raw value 3 is out of bounds for literal map of length 3/,
+    );
+    assert.throws(
+      () => literalParameterConfig.convertToUnit(-1, 'color'),
+      /Raw value -1 is out of bounds for literal map of length 3/,
+    );
+  });
   test('validateRawValue throws an exception for out of range values', () => {
     const literalParameterConfig = createLiteralParameterConfig<'color', 'Red' | 'Green' | 'Blue'>([
       'Red',

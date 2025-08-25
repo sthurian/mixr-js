@@ -14,6 +14,9 @@ export const createLiteralParameterConfig = <UnitName extends string, T extends 
       return map.indexOf(value);
     },
     convertToUnit: (value) => {
+      if(map[value] === undefined) {
+        throw new Error(`Raw value ${value} is out of bounds for literal map of length ${map.length}`);
+      }
       return map[value];
     },
     validateRawValue: z

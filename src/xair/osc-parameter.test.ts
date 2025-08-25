@@ -203,4 +203,34 @@ suite('OSC Parameter', () => {
       new Error('Unsupported OSC type "undefined" for address "/test/parameter"'),
     );
   });
+
+  test('throws an error when fetching and no valid argument is returned', async () => {
+    const query = fake.resolves({
+      address: '/test/parameter',
+      args: [],
+    });
+    const oscClient: OSCClient = {
+      close: fake(),
+      query,
+      set: fake(),
+    };
+    const oscParameterFactory = createOSCParameterFactory(oscClient);
+    const oscParameter = oscParameterFactory.createOSCParameter<Unit<'myUnit', number>, 'float'>(
+      '/test/parameter',
+      {
+        convertToRaw: (value) => value,
+        convertToUnit: (value) => value,
+        validateRawValue: (value) => parseInt(`${value}`, 10),
+        validateUnitValue: (value) => value,
+        oscDataType: 'float',
+      },
+    );
+
+    await assert.rejects(
+      async () => {
+        await oscParameter.fetch();
+      },
+      new Error('No valid OSC argument found for address "/test/parameter"'),
+    );
+  });
 });

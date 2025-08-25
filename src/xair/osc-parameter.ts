@@ -70,6 +70,9 @@ const createOSCParameter = <U extends Unit, T extends OSCDataType>(
   async function fetch(unit?: U['name']): Promise<OSCValue<T> | U['value']> {
     const response = await oscClient.query(oscAddress);
     const [firstArg] = oscArgumentListSchema.parse(response.args);
+    if(firstArg === undefined) {
+      throw new Error(`No valid OSC argument found for address "${oscAddress}"`);
+    }
     const rawValue = config.validateRawValue(firstArg.value);
 
     if (unit === undefined) {
