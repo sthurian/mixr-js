@@ -7,22 +7,11 @@ type OSCValue<T extends OSCDataType> = T extends 'string' ? string : number;
 export type Unit<N extends string = string, V = string | number | boolean> = { name: N; value: V };
 
 export type AsyncGetter<U extends Unit, T extends OSCDataType> = {
-  /**
-   * Fetch the value of the parameter.
-   * @param unit - Optional. If provided, the value will be converted to this unit, otherwise it will return the raw osc value.
-   */
   (): Promise<OSCValue<T>>;
   (unit: U['name']): Promise<U['value']>;
 };
 
 export type AsyncSetter<U extends Unit, T extends OSCDataType> = {
-  /**
-   * Update the value of the parameter.
-   * @param value - The value to set.
-   * @param unit - Optional. If provided, the value has to be interpreted as this unit, otherwise it will be treated as raw osc value.
-   * @returns A promise that resolves when the update is complete.
-   * @throws If the value is not valid for the specified OSC data type.
-   */
   (value: OSCValue<T>): Promise<void>;
   (value: U['value'], unit: U['name']): Promise<void>;
 };
@@ -70,7 +59,7 @@ const createOSCParameter = <U extends Unit, T extends OSCDataType>(
   async function fetch(unit?: U['name']): Promise<OSCValue<T> | U['value']> {
     const response = await oscClient.query(oscAddress);
     const [firstArg] = oscArgumentListSchema.parse(response.args);
-    if(firstArg === undefined) {
+    if (firstArg === undefined) {
       throw new Error(`No valid OSC argument found for address "${oscAddress}"`);
     }
     const rawValue = config.validateRawValue(firstArg.value);

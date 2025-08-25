@@ -226,11 +226,8 @@ suite('OSC Parameter', () => {
       },
     );
 
-    await assert.rejects(
-      async () => {
-        await oscParameter.fetch();
-      },
-      new Error('No valid OSC argument found for address "/test/parameter"'),
-    );
+    await assert.rejects(async () => {
+      await oscParameter.fetch();
+    }, new Error('No valid OSC argument found for address "/test/parameter"'));
   });
 });

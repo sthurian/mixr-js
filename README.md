@@ -12,6 +12,7 @@ A comprehensive TypeScript/JavaScript client library for controlling **digital m
 ## ✨ Features
 
 ### 🎛️ Complete Channel Control
+
 - **Channel Configuration**: Name, color, input source routing
 - **Preamp**: Gain, phantom power, low-cut filter, polarity invert
 - **4-Band Parametric EQ**: Frequency, gain, Q, band type control
@@ -22,16 +23,19 @@ A comprehensive TypeScript/JavaScript client library for controlling **digital m
 - **Insert Effects**: FX slot assignment
 
 ### 🔄 Dual API Design
+
 - **Raw Protocol Values**: Direct control using underlying protocol values for power users
 - **Audio Engineer Units**: Decibels, Hertz, percentages for intuitive control
 - **Automatic Conversion**: Seamless translation between raw and engineer-friendly values
 
 ### 🛡️ Type Safety
-- **Branded Types**: Prevent unit confusion with compile-time safety  
+
+- **Branded Types**: Prevent unit confusion with compile-time safety
 - **Model-Specific Channels**: TypeScript enforces valid channels per mixer model
 - **Comprehensive Validation**: Runtime parameter validation with clear error messages
 
 ### 🔍 Network Discovery
+
 - **Auto-Discovery**: Find mixers on your network automatically
 - **Manual Connection**: Direct IP connection support
 - **Connection Management**: Automatic connection handling with cleanup
@@ -56,7 +60,7 @@ console.log('Found mixers:', mixers);
 // Connect to the first discovered XR18 mixer
 const mixer = await connectToMixer({
   ...mixers[0],
-  model: 'XR18' // Specify your mixer model for type safety
+  model: 'XR18', // Specify your mixer model for type safety
 });
 
 // Always close connection when done
@@ -74,8 +78,8 @@ await channel.getConfig().updateName('Lead Vocal');
 await channel.getConfig().updateColor('Red', 'color');
 
 // Preamp control - dual API in action
-await channel.getPreAmp().updateGain(24, 'decibels');        // Audio engineer units
-await channel.getPreAmp().updateGain(0.5);                   // Raw protocol value
+await channel.getPreAmp().updateGain(24, 'decibels'); // Audio engineer units
+await channel.getPreAmp().updateGain(0.5); // Raw protocol value
 
 // Enable phantom power and configure low-cut
 await channel.getPreAmp().updatePhantomPowerEnabled(true, 'flag');
@@ -98,7 +102,7 @@ await eq.updateEnabled(true, 'flag');
 // Configure high-mid band (band 3)
 const highMid = eq.getBand(3);
 await highMid.updateFrequency(3000, 'hertz');
-await highMid.updateGain(2.5, 'decibels');  
+await highMid.updateGain(2.5, 'decibels');
 await highMid.updateQ(1.4, 'number');
 await highMid.updateType('PEQ', 'type');
 ```
@@ -158,25 +162,27 @@ console.log(`Channel muted: ${isMuted}`);
 
 ### Mixer Models
 
-| Model | Channels | Description |
-|-------|----------|-------------|
+| Model  | Channels  | Description                     |
+| ------ | --------- | ------------------------------- |
 | `XR12` | CH01-CH10 | Behringer X-Air XR12 (12-input) |
 | `XR16` | CH01-CH14 | Behringer X-Air XR16 (16-input) |
 | `XR18` | CH01-CH16 | Behringer X-Air XR18 (18-input) |
 
-*Future versions will support additional mixer brands and models.*
+_Future versions will support additional mixer brands and models._
 
 > **Note**: This library has been extensively tested with real hardware on an XR18 mixer. XR12 and XR16 support is implemented based on protocol documentation and should work correctly, but has not been verified with physical hardware.
 
 ### Channel Features
 
 #### Configuration (`channel.getConfig()`)
+
 - `updateName(name)` / `fetchName()` - Channel name
 - `updateColor(color)` / `fetchColor()` - Color assignment
 - `updateAnalogSource(source)` / `fetchAnalogSource()` - Analog input routing
 - `updateUsbReturnSource(source)` / `fetchUsbReturnSource()` - USB return source
 
 #### Preamp (`channel.getPreAmp()`)
+
 - `updateGain(gain, 'decibels')` / `fetchGain()` - Input gain (-12dB to +60dB)
 - `updatePhantomPowerEnabled(enabled)` / `fetchIsPhantomPowerEnabled()` - 48V phantom power
 - `updateLowCutFrequency(freq, 'hertz')` / `fetchLowCutFrequency()` - High-pass filter (20Hz-400Hz)
@@ -186,6 +192,7 @@ console.log(`Channel muted: ${isMuted}`);
 - `updateUSBReturnEnabled(enabled)` / `fetchIsUSBReturnEnabled()` - USB return on/off
 
 #### 4-Band EQ (`channel.getEqualizer()`)
+
 - `updateEnabled(enabled)` / `fetchIsEnabled()` - EQ on/off
 - `getBand(1-4)` - Access individual EQ bands
   - `updateFrequency(freq, 'hertz')` / `fetchFrequency()` - Center frequency
@@ -194,22 +201,26 @@ console.log(`Channel muted: ${isMuted}`);
   - `updateType(type)` / `fetchType()` - Band type (LCut, LShv, PEQ, HShv, HCut)
 
 #### Dynamics (`channel.getCompressor()`, `channel.getGate()`)
+
 - **Compressor**: Threshold, ratio, attack, release, knee, makeup gain, mix
 - **Gate**: Threshold, range, attack, hold, release, key source
 - **Shared**: Enable/disable, key source, side-chain filter
 
 #### Mix (`channel.getMix()`)
+
 - `updateFader(level, 'decibels')` / `fetchFader()` - Channel fader (-∞ to +10dB)
 - `updatePan(pan, 'percent')` / `fetchPan()` - Pan position (-100% to +100%)
 - `updateMuted(muted)` / `fetchIsMuted()` - Channel mute
 - `updateLeftRightAssignmentEnabled(enabled)` / `fetchIsLeftRightAssignmentEnabled()` - LR assignment
 
 #### Sends
+
 - `getSendBus('BUS01'-'BUS06')` - Aux bus sends
 - `getSendFx('FX1'-'FX4')` - Effects sends
 - Level, tap point (PRE/POST), and group enable control
 
-#### Groups and Routing  
+#### Groups and Routing
+
 - `getDCAGroup()` / `getMuteGroup()` - DCA and mute group assignments
 - `getInsert()` - Insert effect slot assignment
 - `getAutomix()` - Automix group and weight
@@ -217,18 +228,20 @@ console.log(`Channel muted: ${isMuted}`);
 ## 🏗️ Architecture Highlights
 
 ### Type System
+
 The library uses a sophisticated branded type system to prevent unit confusion:
 
 ```typescript
 // Compile-time prevention of unit errors
-await channel.getPreAmp().updateGain(24, 'decibels');  // ✅ Correct
-await channel.getPreAmp().updateGain(24, 'hertz');     // ❌ TypeScript error
+await channel.getPreAmp().updateGain(24, 'decibels'); // ✅ Correct
+await channel.getPreAmp().updateGain(24, 'hertz'); // ❌ TypeScript error
 
 // Raw protocol values bypass unit system for power users
-await channel.getPreAmp().updateGain(0.5);             // ✅ Raw protocol value
+await channel.getPreAmp().updateGain(0.5); // ✅ Raw protocol value
 ```
 
 ### Model-Specific Type Safety
+
 ```typescript
 const xr12 = await connectToMixer({ model: 'XR12', ...connection });
 const xr18 = await connectToMixer({ model: 'XR18', ...connection });
@@ -238,6 +251,7 @@ xr18.getChannel('CH15'); // ✅ Valid - XR18 supports CH01-CH16
 ```
 
 ### Dual API Design
+
 Every parameter supports both raw protocol values and audio engineer units:
 
 ```typescript
@@ -245,7 +259,7 @@ Every parameter supports both raw protocol values and audio engineer units:
 await channel.getEqualizer().getBand(1).updateFrequency(1000, 'hertz');
 await channel.getMix().updateFader(-6, 'decibels');
 
-// Power user approach - direct protocol control  
+// Power user approach - direct protocol control
 await channel.getEqualizer().getBand(1).updateFrequency(0.3);
 await channel.getMix().updateFader(0.75);
 ```
@@ -281,7 +295,7 @@ npm run format
 This library currently implements comprehensive **channel-level control**. Some mixer-wide features are not yet implemented:
 
 - Main LR bus controls
-- Auxiliary bus processing  
+- Auxiliary bus processing
 - Effects rack control
 - System-level actions (snapshots, global mute)
 - Advanced routing matrix
@@ -293,7 +307,7 @@ See [TODO.md](./TODO.md) for a complete list of planned features.
 Contributions are welcome! Please feel free to submit pull requests or open issues for:
 
 - Bug fixes
-- New feature implementations  
+- New feature implementations
 - Documentation improvements
 - Test coverage expansion
 

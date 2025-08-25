@@ -7,14 +7,14 @@ import { onOffInvertedParameterConfig, onOffParameterConfig } from '../mapper/on
 export type Mix = {
   /**
    * Fetches the current mute status.
-   * 
+   *
    * @returns Promise resolving to the mute state. Returns boolean (true=muted, false=unmuted) or raw OSC integer (0=unmuted, 1=muted).
-   * 
+   *
    * @example
    * ```typescript
    * // Get as boolean
    * const isMuted = await mix.fetchIsMuted();
-   * 
+   *
    * // Get as raw OSC value
    * const oscValue = await mix.fetchIsMuted();
    * ```
@@ -23,15 +23,15 @@ export type Mix = {
 
   /**
    * Updates the mute status.
-   * 
+   *
    * @param muted - Mute state. Either a boolean (true=muted, false=unmuted) or a raw OSC integer (0=unmuted, 1=muted).
    * @returns Promise that resolves when the operation completes.
-   * 
+   *
    * @example
    * ```typescript
    * // Using boolean value
    * await mix.updateMuted(true);
-   * 
+   *
    * // Using raw OSC value
    * await mix.updateMuted(1);
    * ```
@@ -40,14 +40,14 @@ export type Mix = {
 
   /**
    * Fetches the current left-right assignment status.
-   * 
+   *
    * @returns Promise resolving to the assignment state. Returns boolean (true=assigned, false=unassigned) or raw OSC integer (0=unassigned, 1=assigned).
-   * 
+   *
    * @example
    * ```typescript
    * // Get as boolean
    * const isAssigned = await mix.fetchIsLeftRightAssignmentEnabled();
-   * 
+   *
    * // Get as raw OSC value
    * const oscValue = await mix.fetchIsLeftRightAssignmentEnabled();
    * ```
@@ -56,15 +56,15 @@ export type Mix = {
 
   /**
    * Updates the left-right assignment status.
-   * 
+   *
    * @param enabled - Assignment state. Either a boolean (true=assigned, false=unassigned) or a raw OSC integer (0=unassigned, 1=assigned).
    * @returns Promise that resolves when the operation completes.
-   * 
+   *
    * @example
    * ```typescript
    * // Using boolean value
    * await mix.updateLeftRightAssignmentEnabled(true);
-   * 
+   *
    * // Using raw OSC value
    * await mix.updateLeftRightAssignmentEnabled(1);
    * ```
@@ -73,14 +73,14 @@ export type Mix = {
 
   /**
    * Fetches the current fader level.
-   * 
+   *
    * @returns Promise resolving to the fader level. Returns level in decibels (-∞ to +10dB) or raw OSC float (0.0-1.0).
-   * 
+   *
    * @example
    * ```typescript
    * // Get level in dB
    * const level = await mix.fetchFader();
-   * 
+   *
    * // Get as raw OSC value
    * const oscValue = await mix.fetchFader();
    * ```
@@ -89,15 +89,15 @@ export type Mix = {
 
   /**
    * Updates the fader level.
-   * 
+   *
    * @param level - Fader level. Either in decibels (-∞ to +10dB) or as a raw OSC float (0.0-1.0).
    * @returns Promise that resolves when the operation completes.
-   * 
+   *
    * @example
    * ```typescript
    * // Using level in dB
    * await mix.updateFader(-20);
-   * 
+   *
    * // Using raw OSC value
    * await mix.updateFader(0.5);
    * ```
@@ -106,14 +106,14 @@ export type Mix = {
 
   /**
    * Fetches the current pan position.
-   * 
+   *
    * @returns Promise resolving to the pan position. Returns percentage (-100% to +100%) or raw OSC float (0.0-1.0).
-   * 
+   *
    * @example
    * ```typescript
    * // Get pan as percentage
    * const pan = await mix.fetchPan();
-   * 
+   *
    * // Get as raw OSC value
    * const oscValue = await mix.fetchPan();
    * ```
@@ -122,15 +122,15 @@ export type Mix = {
 
   /**
    * Updates the pan position.
-   * 
+   *
    * @param pan - Pan position. Either as percentage (-100% to +100%) or as a raw OSC float (0.0-1.0).
    * @returns Promise that resolves when the operation completes.
-   * 
+   *
    * @example
    * ```typescript
    * // Using percentage
    * await mix.updatePan(-50);
-   * 
+   *
    * // Using raw OSC value
    * await mix.updatePan(0.25);
    * ```

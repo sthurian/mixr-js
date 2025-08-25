@@ -12,12 +12,12 @@ export type ChannelEqualizer = {
    * @example
    * // Set using raw OSC value (0 = disabled, 1 = enabled)
    * await equalizer.updateEnabled(1);
-   * 
+   *
    * // Set using boolean
    * await equalizer.updateEnabled(true, 'flag');
    */
   updateEnabled: AsyncSetter<Unit<'flag', boolean>, 'integer'>;
-  
+
   /**
    * Fetch the current equalizer enabled state
    * @param unit - Optional unit parameter. If 'flag' is provided, returns boolean value
@@ -25,12 +25,12 @@ export type ChannelEqualizer = {
    * @example
    * // Get raw OSC value (0 = disabled, 1 = enabled)
    * const rawEnabled = await equalizer.fetchIsEnabled();
-   * 
+   *
    * // Get boolean value
    * const isEnabled = await equalizer.fetchIsEnabled('flag');
    */
   fetchIsEnabled: AsyncGetter<Unit<'flag', boolean>, 'integer'>;
-  
+
   /**
    * Get access to a specific equalizer band
    * @param band - The band number (1-4 for most channels)
@@ -38,7 +38,7 @@ export type ChannelEqualizer = {
    * @example
    * // Get band 1 (low frequency)
    * const lowBand = equalizer.getBand(1);
-   * 
+   *
    * // Get band 4 (high frequency)
    * const highBand = equalizer.getBand(4);
    */

@@ -1,7 +1,7 @@
 {
   "name": "mixr-js",
   "type": "module",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "exports": {
