@@ -1,6 +1,6 @@
 # Mixr.js
 
-![npm](https://img.shields.io/npm/v/mixr-js)
+[![npm](https://img.shields.io/npm/v/mixr-js)](https://www.npmjs.com/package/mixr-js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Type%20Safe-blue.svg)](https://www.typescriptlang.org/)
 [![Test Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen.svg)](https://github.com/sthurian/mixr-js)
