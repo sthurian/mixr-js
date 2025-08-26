@@ -1,7 +1,7 @@
 import dgram, { RemoteInfo } from 'node:dgram';
 import { OscArgOrArrayInput, OscArgOutputOrArray, OscPacketInput, OscPacketOutput } from 'osc-min';
 
-export type OscMessageOutputArgument = OscArgOutputOrArray;
+type OscMessageOutputArgument = OscArgOutputOrArray;
 export type OscMessageInputArgument = OscArgOrArrayInput;
 
 export type OscOutputMessage = {
@@ -9,7 +9,7 @@ export type OscOutputMessage = {
   args?: OscMessageOutputArgument[];
 };
 
-export type OscInputMessage = {
+type OscInputMessage = {
   address: string;
   args?: OscMessageInputArgument[];
 };
@@ -18,8 +18,8 @@ export type RInfo = {
   address: string;
   port: number;
 };
-export type OscHandler = (message: OscOutputMessage, rinfo: RInfo) => void;
-export type ErrorHandler = (err: Error | null) => void;
+type OscHandler = (message: OscOutputMessage, rinfo: RInfo) => void;
+
 export interface OscSocket {
   send(message: OscInputMessage, port: number, address: string): Promise<void>;
   setBroadcast(flag: boolean): void;
@@ -31,7 +31,7 @@ export interface OscSocket {
 type ToBuffer = (msg: OscPacketInput) => DataView<ArrayBufferLike>;
 type FromBuffer = (buffer: Buffer) => OscPacketOutput;
 
-export type OscSocketDependencies = {
+type OscSocketDependencies = {
   socket: dgram.Socket;
   toBuffer: ToBuffer;
   fromBuffer: FromBuffer;

@@ -2,7 +2,7 @@ import { OSCClient } from '../../osc/client.js';
 import { integerOscParameterConfig } from '../mapper/single-integer.js';
 import { createOSCParameterFactory } from '../osc-parameter.js';
 
-export type DCAGroupNumber = 1 | 2 | 3 | 4;
+type DCAGroupNumber = 1 | 2 | 3 | 4;
 
 export type DCAGroup = {
   /**

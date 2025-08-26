@@ -6,7 +6,7 @@ const linearMap = (x: number, x1: number, x2: number, y1: number, y2: number): n
   return y1 + t * (y2 - y1);
 };
 
-export const levelToDb = (level: number): number => {
+const levelToDb = (level: number): number => {
   if (level <= 0.00625) return Number.NEGATIVE_INFINITY;
 
   if (level <= 0.0625) {
@@ -33,7 +33,7 @@ const inverseLinearMap = (y: number, y1: number, y2: number, x1: number, x2: num
   return x1 + t * (x2 - x1);
 };
 
-export const dbToLevel = (db: number): number => {
+const dbToLevel = (db: number): number => {
   if (db < -87) return 0;
 
   if (db <= -60) {

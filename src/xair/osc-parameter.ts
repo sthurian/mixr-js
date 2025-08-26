@@ -4,7 +4,7 @@ import { OscArgument, oscArgumentListSchema, OscArgumentValue } from '../osc/osc
 type OSCDataType = 'float' | 'integer' | 'string';
 
 type OSCValue<T extends OSCDataType> = T extends 'string' ? string : number;
-type Unit<N extends string = string, V = string | number | boolean> = { name: N; value: V };
+export type Unit<N extends string = string, V = string | number | boolean> = { name: N; value: V };
 
 type AsyncGetter<U extends Unit, T extends OSCDataType> = {
   (): Promise<OSCValue<T>>;
@@ -16,7 +16,7 @@ type AsyncSetter<U extends Unit, T extends OSCDataType> = {
   (value: U['value'], unit: U['name']): Promise<void>;
 };
 
-export type OSCParameter<U extends Unit, T extends OSCDataType> = {
+type OSCParameter<U extends Unit, T extends OSCDataType> = {
   fetch: AsyncGetter<U, T>;
   update: AsyncSetter<U, T>;
 };
@@ -29,7 +29,7 @@ export type OSCParameterConfig<U extends Unit, T extends OSCDataType> = {
   validateUnitValue: (value: U['value']) => U['value'];
 };
 
-export type OSCParameterDependencies<U extends Unit, T extends OSCDataType> = {
+type OSCParameterDependencies<U extends Unit, T extends OSCDataType> = {
   oscClient: OSCClient;
   oscAddress: string;
   config: OSCParameterConfig<U, T>;
@@ -91,7 +91,7 @@ const createOSCParameter = <U extends Unit, T extends OSCDataType>(
   return { fetch, update };
 };
 
-export type OSCParameterFactory = {
+type OSCParameterFactory = {
   createOSCParameter: <U extends Unit, T extends OSCDataType>(
     oscAddress: string,
     config: OSCParameterConfig<U, T>,
