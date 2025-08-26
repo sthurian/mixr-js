@@ -1,19 +1,20 @@
 import { suite, test } from 'mocha';
-import { createChannelCompressor } from './compressor.js';
+import { createCompressor } from './compressor.js';
+import { oscClientFactory } from '../../../osc/test-factories/client.js';
 import { fake, match } from 'sinon';
 import assert from 'node:assert';
-import { oscClientFactory } from '../../../../osc/test-factories/client.js';
-import { assertClose, isClose } from '../../../../test-helpers/is-close.js';
+import { assertClose, isClose } from '../../../test-helpers/is-close.js';
+import { DynamicsFilter } from '../filter/filter.js';
 
-suite('ChannelCompressor', () => {
+suite('Compressor', () => {
   test('send the correct osc message to fetch the compressors attack', async () => {
     const query = fake.resolves({
       address: '/ch/01/dyn/attack',
       args: [{ type: 'float', value: 0.5 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -25,8 +26,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors attack', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -43,8 +44,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'integer', value: 1 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -56,8 +57,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors autotime enabled', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -74,8 +75,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'integer', value: 1 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -87,8 +88,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to enable the compressor', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -105,8 +106,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'integer', value: 0 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -118,8 +119,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors detection mode', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -136,8 +137,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'integer', value: 0 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -149,8 +150,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors envelope', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -167,8 +168,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'float', value: 0.5 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -180,8 +181,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors makeup gain', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -198,8 +199,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'float', value: 0.5 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -211,8 +212,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors hold time', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -222,45 +223,14 @@ suite('ChannelCompressor', () => {
     );
   });
 
-  test('send the correct osc message to fetch the compressors key source', async () => {
-    const query = fake.resolves({
-      address: '/ch/01/dyn/keysrc',
-      args: [{ type: 'integer', value: 3 }],
-    });
-    const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
-      oscClient,
-      createDynamicsFilter: fake(),
-    });
-    const keysrc = await compressor.fetchKeySource('keySource');
-    assert.strictEqual(keysrc, 'CH03');
-    assert.strictEqual(query.calledOnceWithExactly('/ch/01/dyn/keysrc'), true);
-  });
-
-  test('send the correct osc message to set the compressors key source', async () => {
-    const set = fake();
-    const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
-      oscClient,
-      createDynamicsFilter: fake(),
-    });
-    await compressor.updateKeySource('BUS02', 'keySource');
-    assert.strictEqual(
-      set.calledOnceWithExactly('/ch/01/dyn/keysrc', [{ type: 'integer', value: 18 }]),
-      true,
-    );
-  });
-
   test('send the correct osc message to fetch the compressors knee', async () => {
     const query = fake.resolves({
       address: '/ch/01/dyn/knee',
       args: [{ type: 'float', value: 0.5 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -272,8 +242,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors knee', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -290,8 +260,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'float', value: 0.65 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -303,8 +273,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors mix', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -321,8 +291,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'integer', value: 1 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -334,8 +304,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors mode', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -352,8 +322,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'integer', value: 2 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -365,8 +335,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors ratio', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -383,8 +353,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'float', value: 0.5 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -396,8 +366,8 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors release time', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -413,8 +383,8 @@ suite('ChannelCompressor', () => {
       args: [{ type: 'float', value: 0.5 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -426,14 +396,33 @@ suite('ChannelCompressor', () => {
   test('send the correct osc message to set the compressors threshold', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const compressor = createChannelCompressor({
-      channel: 1,
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
     await compressor.updateThreshold(-45, 'decibels');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/dyn/thr', [{ type: 'float', value: 0.25 }]),
+      true,
+    );
+  });
+
+  test('creates the filter correctly', () => {
+    const oscClient = oscClientFactory.build();
+    const createDynamicsFilter = fake.returns('filter' as unknown as DynamicsFilter);
+    const compressor = createCompressor({
+      oscBasePath: '/ch/01',
+      oscClient,
+      createDynamicsFilter,
+    });
+    assert.strictEqual(compressor.getFilter(), 'filter');
+    assert.strictEqual(
+      createDynamicsFilter.calledOnceWithExactly({
+        oscBasePath: '/ch/01',
+        oscClient,
+        dynamicsType: 'compressor',
+      }),
       true,
     );
   });

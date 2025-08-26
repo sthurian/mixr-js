@@ -1,9 +1,9 @@
 import { suite, test } from 'mocha';
 import { fake, match } from 'sinon';
-import { oscClientFactory } from '../../../../osc/test-factories/client.js';
-import { createChannelEqualizerBand } from './eq-band.js';
+import { oscClientFactory } from '../../../osc/test-factories/client.js';
+import { createEqualizerBand } from './eq-band.js';
 import assert from 'node:assert';
-import { assertClose, isClose } from '../../../../test-helpers/is-close.js';
+import { assertClose, isClose } from '../../../test-helpers/is-close.js';
 suite('ChannelEqualizerBand', () => {
   test('send the correct osc message to query if the eq band is enabled', async () => {
     const query = fake.resolves({
@@ -11,8 +11,8 @@ suite('ChannelEqualizerBand', () => {
       args: [{ type: 'integer', value: 1 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });
@@ -24,8 +24,8 @@ suite('ChannelEqualizerBand', () => {
   test('send the correct osc message to enable the eq band', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });
@@ -42,8 +42,8 @@ suite('ChannelEqualizerBand', () => {
       args: [{ type: 'float', value: 0.5 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });
@@ -55,8 +55,8 @@ suite('ChannelEqualizerBand', () => {
   test('send the correct osc message to set the eq bands frequency', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });
@@ -72,8 +72,8 @@ suite('ChannelEqualizerBand', () => {
       args: [{ type: 'float', value: 0.5 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });
@@ -85,8 +85,8 @@ suite('ChannelEqualizerBand', () => {
   test('send the correct osc message to set the eq bands gain', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });
@@ -103,8 +103,8 @@ suite('ChannelEqualizerBand', () => {
       args: [{ type: 'float', value: 0.5 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });
@@ -116,8 +116,8 @@ suite('ChannelEqualizerBand', () => {
   test('send the correct osc message to set the eq bands q', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });
@@ -133,8 +133,8 @@ suite('ChannelEqualizerBand', () => {
       args: [{ type: 'integer', value: 2 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });
@@ -146,8 +146,8 @@ suite('ChannelEqualizerBand', () => {
   test('send the correct osc message to set the eq bands type', async () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
-    const eqBand = createChannelEqualizerBand({
-      channel: 1,
+    const eqBand = createEqualizerBand({
+      oscBasePath: '/ch/01',
       band: 2,
       oscClient,
     });

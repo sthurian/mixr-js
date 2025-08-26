@@ -272,7 +272,7 @@ export interface ChannelPreamp {
   updatePhantomPowerEnabled(value: boolean, unit: 'flag'): Promise<void>;
 }
 
-type ChannelPreampDependencies = {
+export type ChannelPreampDependencies = {
   channel: number;
   oscClient: OSCClient;
 };

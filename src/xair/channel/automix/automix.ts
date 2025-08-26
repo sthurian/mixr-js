@@ -64,7 +64,7 @@ export type ChannelAutomix = {
   updateWeight(value: number, unit: 'decibels'): Promise<void>;
 };
 
-type ChannelAutomixDependencies = {
+export type ChannelAutomixDependencies = {
   channel: number;
   oscClient: OSCClient;
 };

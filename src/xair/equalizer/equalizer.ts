@@ -1,9 +1,9 @@
-import { OSCClient } from '../../../osc/client.js';
-import { onOffParameterConfig } from '../../mapper/on-off.js';
-import { createOSCParameterFactory } from '../../osc-parameter.js';
-import { ChannelEqualizerBand, createChannelEqualizerBand } from './band/eq-band.js';
+import { OSCClient } from '../../osc/client.js';
+import { onOffParameterConfig } from '../mapper/on-off.js';
+import { createOSCParameterFactory } from '../osc-parameter.js';
+import { EqualizerBand, EqualizerBandDependencies } from './band/eq-band.js';
 
-export type ChannelEqualizer = {
+export type Equalizer = {
   /**
    * Update the equalizer enabled state
    */
@@ -33,19 +33,18 @@ export type ChannelEqualizer = {
    * // Get band 4 (high frequency)
    * const highBand = equalizer.getBand(4);
    */
-  getBand: (band: number) => ChannelEqualizerBand;
+  getBand: (band: number) => EqualizerBand;
 };
 
-type ChannelEqualizerDependencies = {
-  channel: number;
+export type EqualizerDependencies = {
+  oscBasePath: string;
   oscClient: OSCClient;
+  createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
 };
 
-export const createChannelEqualizer = (
-  dependencies: ChannelEqualizerDependencies,
-): ChannelEqualizer => {
-  const { channel, oscClient } = dependencies;
-  const oscBaseAddress = `/ch/${channel.toString().padStart(2, '0')}/eq`;
+export const createEqualizer = (dependencies: EqualizerDependencies): Equalizer => {
+  const { oscBasePath, oscClient, createEqualizerBand } = dependencies;
+  const oscBaseAddress = `${oscBasePath}/eq`;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const enabled = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/on`,
@@ -55,6 +54,6 @@ export const createChannelEqualizer = (
   return {
     updateEnabled: enabled.update,
     fetchIsEnabled: enabled.fetch,
-    getBand: (band) => createChannelEqualizerBand({ band, channel, oscClient }),
+    getBand: (band) => createEqualizerBand({ band, oscBasePath, oscClient }),
   };
 };

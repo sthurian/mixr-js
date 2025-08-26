@@ -1,8 +1,8 @@
 import { suite, test } from 'mocha';
 import { createDynamicsFilter } from './filter.js';
-import { oscClientFactory } from '../../../../osc/test-factories/client.js';
+import { oscClientFactory } from '../../../osc/test-factories/client.js';
 import { fake, match } from 'sinon';
-import { assertClose, isClose } from '../../../../test-helpers/is-close.js';
+import { assertClose, isClose } from '../../../test-helpers/is-close.js';
 import assert from 'node:assert';
 
 suite('DynamicsFilter', () => {
@@ -13,7 +13,7 @@ suite('DynamicsFilter', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const filter = createDynamicsFilter({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       dynamicsType: 'compressor',
     });
@@ -26,7 +26,7 @@ suite('DynamicsFilter', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const filter = createDynamicsFilter({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       dynamicsType: 'compressor',
     });
@@ -43,7 +43,7 @@ suite('DynamicsFilter', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const filter = createDynamicsFilter({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       dynamicsType: 'compressor',
     });
@@ -56,7 +56,7 @@ suite('DynamicsFilter', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const filter = createDynamicsFilter({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       dynamicsType: 'compressor',
     });
@@ -74,7 +74,7 @@ suite('DynamicsFilter', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const filter = createDynamicsFilter({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       dynamicsType: 'gate',
     });
@@ -87,7 +87,7 @@ suite('DynamicsFilter', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const filter = createDynamicsFilter({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       dynamicsType: 'gate',
     });

@@ -1,7 +1,7 @@
-import { OSCClient } from '../../../../osc/client.js';
-import { createLogarithmicParameterConfig } from '../../../mapper/log.js';
-import { onOffParameterConfig } from '../../../mapper/on-off.js';
-import { createOSCParameterFactory } from '../../../osc-parameter.js';
+import { OSCClient } from '../../../osc/client.js';
+import { createLogarithmicParameterConfig } from '../../mapper/log.js';
+import { onOffParameterConfig } from '../../mapper/on-off.js';
+import { createOSCParameterFactory } from '../../osc-parameter.js';
 import { CompressorFilterType, compressorFilterTypeParameterConfig } from './mapper/filter-type.js';
 
 export type DynamicsFilter = {
@@ -126,16 +126,16 @@ export type DynamicsFilter = {
   fetchType(unit: 'filterType'): Promise<CompressorFilterType>;
 };
 
-type DynamicsFilterDependencies = {
-  channel: number;
+export type DynamicsFilterDependencies = {
+  oscBasePath: string;
   oscClient: OSCClient;
   dynamicsType: 'compressor' | 'gate';
 };
 
 export const createDynamicsFilter = (dependencies: DynamicsFilterDependencies): DynamicsFilter => {
-  const { channel, oscClient, dynamicsType } = dependencies;
+  const { oscClient, dynamicsType, oscBasePath } = dependencies;
   const oscDynamicsPath = dynamicsType === 'compressor' ? 'dyn' : 'gate';
-  const oscBaseAddress = `/ch/${channel.toString().padStart(2, '0')}/${oscDynamicsPath}/filter`;
+  const oscBaseAddress = `${oscBasePath}/${oscDynamicsPath}/filter`;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const enabled = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/on`,

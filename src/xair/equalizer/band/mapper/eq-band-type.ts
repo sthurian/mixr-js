@@ -1,4 +1,4 @@
-import { createLiteralParameterConfig } from '../../../../mapper/literal.js';
+import { createLiteralParameterConfig } from '../../../mapper/literal.js';
 
 const eqBandType = ['LCut', 'LShv', 'PEQ', 'VEQ', 'HShv', 'HCut'] as const;
 

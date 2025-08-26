@@ -127,7 +127,7 @@ export type ChannelFxSend = {
   updateTap(value: FxSendTap, unit: 'tap'): Promise<void>;
 };
 
-type ChannelFxSendDependencies = {
+export type ChannelFxSendDependencies = {
   channel: number;
   fx: ChannelFxSendLabel;
   oscClient: OSCClient;
