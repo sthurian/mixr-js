@@ -22,6 +22,14 @@ A comprehensive TypeScript/JavaScript client library for controlling **digital m
 - **Automix**: Weight and group assignment
 - **Insert Effects**: FX slot assignment
 
+### 🎚️ Main LR Bus Control
+
+- **Mix Controls**: Master fader, mute, pan control
+- **Configuration**: Name and color assignment
+- **6-Band Parametric EQ**: Full frequency control with mode selection (PEQ/GEQ/TEQ)
+- **Dynamics**: Professional compressor with insert effects support
+- **Audio Processing**: Complete signal path control for main outputs
+
 ### 🔄 Dual API Design
 
 - **Raw Protocol Values**: Direct control using underlying protocol values for power users
@@ -145,17 +153,64 @@ await channel.getDCAGroup().updateAssignment(1, true, 'flag');
 await channel.getMuteGroup().updateAssignment(2, true, 'flag');
 ```
 
+### Main LR Bus Control
+
+```typescript
+// Access the main LR bus
+const mainLR = mixer.getMainLR();
+
+// Mix controls
+await mainLR.getMix().updateFader(-2, 'decibels');
+await mainLR.getMix().updateMuted(false, 'flag');
+await mainLR.getMix().updatePan(0, 'percent'); // Center pan
+
+// Configuration
+await mainLR.getConfig().updateName('Main Mix');
+await mainLR.getConfig().updateColor('White', 'color');
+
+// 6-band EQ with mode control
+const lrEQ = mainLR.getEqualizer();
+await lrEQ.updateEnabled(true, 'flag');
+await lrEQ.updateMode('PEQ', 'mode'); // PEQ, GEQ, or TEQ
+
+// Configure EQ bands (1-6)
+const midBand = lrEQ.getBand(3);
+await midBand.updateFrequency(1000, 'hertz');
+await midBand.updateGain(1.5, 'decibels');
+await midBand.updateQ(2.0, 'number');
+
+// Compressor with insert support
+const lrCompressor = mainLR.getCompressor();
+await lrCompressor.updateEnabled(true, 'flag');
+await lrCompressor.updateThreshold(-6, 'decibels');
+await lrCompressor.updateRatio('3', 'ratio');
+
+// Insert effects support
+const lrInsert = lrCompressor.getInsert();
+await lrInsert.updateEnabled(true, 'flag');
+await lrInsert.updateSlot('FX1A', 'slot');
+```
+
 ### Reading Current Values
 
 ```typescript
-// Read values with automatic unit conversion
+// Read channel values with automatic unit conversion
 const currentGain = await channel.getPreAmp().fetchGain('decibels');
 const currentFreq = await eq.getBand(1).fetchFrequency('hertz');
 const isMuted = await channel.getMix().fetchIsMuted('flag');
 
+// Read main LR values
+const mainLR = mixer.getMainLR();
+const masterLevel = await mainLR.getMix().fetchFader('decibels');
+const eqMode = await mainLR.getEqualizer().fetchMode('mode');
+const compressorRatio = await mainLR.getCompressor().fetchRatio('ratio');
+
 console.log(`Channel gain: ${currentGain}dB`);
 console.log(`Low band frequency: ${currentFreq}Hz`);
 console.log(`Channel muted: ${isMuted}`);
+console.log(`Master level: ${masterLevel}dB`);
+console.log(`Main EQ mode: ${eqMode}`);
+console.log(`Main compressor ratio: ${compressorRatio}:1`);
 ```
 
 ## 📚 API Reference
@@ -225,6 +280,34 @@ _Future versions will support additional mixer brands and models._
 - `getInsert()` - Insert effect slot assignment
 - `getAutomix()` - Automix group and weight
 
+### Main LR Bus Features
+
+#### Configuration (`mixer.getMainLR().getConfig()`)
+
+- `updateName(name)` / `fetchName()` - Main LR name
+- `updateColor(color)` / `fetchColor()` - Color assignment
+
+#### Mix (`mixer.getMainLR().getMix()`)
+
+- `updateFader(level, 'decibels')` / `fetchFader()` - Main fader (-∞ to +10dB)
+- `updateMuted(muted)` / `fetchIsMuted()` - Main LR mute
+- `updatePan(pan, 'percent')` / `fetchPan()` - Pan position (-100% to +100%)
+
+#### 6-Band EQ (`mixer.getMainLR().getEqualizer()`)
+
+- `updateEnabled(enabled)` / `fetchIsEnabled()` - EQ on/off
+- `updateMode(mode)` / `fetchMode()` - EQ mode (PEQ, GEQ, TEQ)
+- `getBand(1-6)` - Access individual EQ bands
+  - Full parametric control (frequency, gain, Q, type)
+  - Same interface as channel EQ bands
+
+#### Compressor (`mixer.getMainLR().getCompressor()`)
+
+- Full dynamics control (threshold, ratio, attack, release, etc.)
+- `getInsert()` - Access insert effects slot
+  - `updateEnabled(enabled)` / `fetchIsEnabled()` - Insert on/off
+  - `updateSlot(slot)` / `fetchSlot()` - FX slot assignment
+
 ## 🏗️ Architecture Highlights
 
 ### Type System
@@ -266,7 +349,7 @@ await channel.getMix().updateFader(0.75);
 
 ## 🧪 Testing
 
-The library includes comprehensive test coverage (95.94%) with 222+ tests:
+The library includes comprehensive test coverage (100%) with 304+ tests:
 
 ```bash
 npm test                    # Run all tests
@@ -290,15 +373,22 @@ npm run lint
 npm run format
 ```
 
-## 📋 Current Limitations
+## 📋 Current Status & Limitations
 
-This library currently implements comprehensive **channel-level control**. Some mixer-wide features are not yet implemented:
+This library currently implements comprehensive **channel-level control** and **main LR bus control**. Some mixer-wide features are not yet implemented:
 
-- Main LR bus controls
-- Auxiliary bus processing
-- Effects rack control
+- Auxiliary bus processing (Bus 1-6)
+- Effects rack control (FX1-FX4)
 - System-level actions (snapshots, global mute)
 - Advanced routing matrix
+
+### Recent Updates
+
+**Main LR Bus Implementation (Latest)**: Complete main output control including:
+- Mix controls (fader, mute, pan)
+- 6-band parametric EQ with mode selection
+- Professional compressor with insert effects
+- Configuration (name, color)
 
 See [TODO.md](./TODO.md) for a complete list of planned features.
 
