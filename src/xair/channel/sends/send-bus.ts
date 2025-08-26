@@ -168,7 +168,7 @@ export type ChannelSendBus = {
   updateTap(value: SendBusTap, unit: 'tap'): Promise<void>;
 };
 
-type ChannelSendBusDependencies = {
+export type ChannelSendBusDependencies = {
   channel: number;
   sendBus: ChannelSendBusLabel;
   oscClient: OSCClient;

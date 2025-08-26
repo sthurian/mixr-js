@@ -85,7 +85,7 @@ export type Insert = {
   updateFxSlot(value: InsertFxSlot, unit: 'slot'): Promise<void>;
 };
 
-type InsertDependencies = {
+export type InsertDependencies = {
   oscBasePath: string;
   oscClient: OSCClient;
 };

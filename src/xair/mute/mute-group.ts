@@ -69,7 +69,7 @@ export type MuteGroup = {
   updateDisabled: (muteGroupNumber: MuteGroupNumber) => Promise<void>;
 };
 
-type MuteGroupDependencies = {
+export type MuteGroupDependencies = {
   oscBasePath: string;
   oscClient: OSCClient;
 };

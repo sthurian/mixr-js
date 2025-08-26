@@ -16,7 +16,7 @@ suite('ChannelConfig', () => {
       channel: 1,
       oscClient,
     });
-    const result = await channelConfig.fetchName('string');
+    const result = await channelConfig.fetchName();
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/config/name'), true);
     assert.strictEqual(result, 'test-channel');
   });
@@ -30,7 +30,7 @@ suite('ChannelConfig', () => {
       channel: 1,
       oscClient,
     });
-    await channelConfig.updateName('test-channel', 'string');
+    await channelConfig.updateName('test-channel');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/config/name', [{ type: 'string', value: 'test-channel' }]),
       true,

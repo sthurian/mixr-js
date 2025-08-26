@@ -68,7 +68,7 @@ export type DCAGroup = {
   updateDisabled: (dcaGroupNumber: DCAGroupNumber) => Promise<void>;
 };
 
-type DCAGroupDependencies = {
+export type DCAGroupDependencies = {
   oscBasePath: string;
   oscClient: OSCClient;
 };

@@ -1,142 +1,161 @@
 import { suite, test } from 'mocha';
 import { createMixer } from './mixer.js';
-import { OSCClient } from '../osc/client.js';
 import { fake } from 'sinon';
 import assert from 'node:assert';
+import { oscClientFactory } from '../osc/test-factories/client.js';
+import { Channel } from './channel/channel.js';
+import { MainLR } from './main-lr/main-lr.js';
 
 suite('Mixer', () => {
-  test('queries the correct osc-address for a string', async () => {
-    const query = fake.resolves({
-      type: 'message',
-      args: [{ type: 'string', value: 'my-mixer' }],
+  test('creates the channel correctly', () => {
+    const oscClient = oscClientFactory.build();
+    const createChannel = fake.returns('channel' as unknown as Channel);
+    const createChannelConfig = fake();
+    const createChannelCompressor = fake();
+    const createDynamicsFilter = fake();
+    const createEqualizerBand = fake();
+    const createChannelAutomix = fake();
+    const createEqualizer = fake();
+    const createChannelGate = fake();
+    const createInsert = fake();
+    const createDCAGroup = fake();
+    const createMuteGroup = fake();
+    const createMix = fake();
+    const createChannelPreamp = fake();
+    const createChannelFxSend = fake();
+    const createChannelSendBus = fake();
+    const createConfig = fake();
+    const createLRMix = fake();
+    const createMainLRCompressor = fake();
+    const createMainLREqualizer = fake();
+    const createMainLR = fake();
+    const mixer = createMixer({
+      oscClient,
+      createChannel,
+      createChannelConfig,
+      createChannelCompressor,
+      createDynamicsFilter,
+      createEqualizerBand,
+      createChannelAutomix,
+      createEqualizer,
+      createChannelGate,
+      createInsert,
+      createDCAGroup,
+      createMuteGroup,
+      createMix,
+      createChannelPreamp,
+      createChannelFxSend,
+      createChannelSendBus,
+      createConfig,
+      createLRMix,
+      createMainLRCompressor,
+      createMainLR,
+      createMainLREqualizer,
     });
-    const oscClient: OSCClient = {
-      close: fake(),
-      query,
-      set: fake(),
-    };
-    const mixer = createMixer(oscClient);
-    const result = await mixer.getChannel('CH01').getConfig().fetchName();
-    assert.strictEqual(result, 'my-mixer');
-    assert.strictEqual(query.calledOnceWithExactly('/ch/01/config/name'), true);
-  });
-
-  test('queries the correct osc-address for a literal', async () => {
-    const query = fake.resolves({
-      type: 'message',
-      args: [{ type: 'integer', value: 1 }],
-    });
-    const oscClient: OSCClient = {
-      close: fake(),
-      query,
-      set: fake(),
-    };
-    const mixer = createMixer(oscClient);
-    const result = await mixer.getChannel('CH01').getConfig().fetchColor('color');
-    assert.strictEqual(result, 'Red');
-    assert.strictEqual(query.calledOnceWithExactly('/ch/01/config/color'), true);
-  });
-
-  test('queries the correct osc-address for a on/off-switch', async () => {
-    const query = fake.resolves({
-      type: 'message',
-      args: [{ type: 'integer', value: 1 }],
-    });
-    const oscClient: OSCClient = {
-      close: fake(),
-      query,
-      set: fake(),
-    };
-    const mixer = createMixer(oscClient);
-    const result = await mixer.getChannel('CH01').getCompressor().fetchIsAutoTimeEnabled('flag');
-    assert.strictEqual(result, true);
-    assert.strictEqual(query.calledOnceWithExactly('/ch/01/dyn/auto'), true);
-  });
-
-  test('queries the correct osc-address for a linear range', async () => {
-    const query = fake.resolves({
-      type: 'message',
-      args: [{ type: 'float', value: 1.0 }],
-    });
-    const oscClient: OSCClient = {
-      close: fake(),
-      query,
-      set: fake(),
-    };
-    const mixer = createMixer(oscClient);
-    const result = await mixer.getChannel('CH01').getCompressor().fetchAttack('milliseconds');
-    assert.strictEqual(result, 120);
-    assert.strictEqual(query.calledOnceWithExactly('/ch/01/dyn/attack'), true);
-  });
-
-  test('sets the osc-address and arguments correctly for a single string', async () => {
-    const set = fake.resolves({});
-    const oscClient: OSCClient = {
-      close: fake(),
-      query: fake(),
-      set,
-    };
-    const mixer = createMixer(oscClient);
-    await mixer.getChannel('CH01').getConfig().updateName('my-mixer');
+    const channel = mixer.getChannel('CH01');
+    assert.strictEqual(channel, 'channel');
     assert.strictEqual(
-      set.calledOnceWithExactly('/ch/01/config/name', [{ type: 'string', value: 'my-mixer' }]),
+      createChannel.calledOnceWithExactly({
+        channel: 1,
+        oscClient,
+        createChannelConfig,
+        createChannelCompressor,
+        createDynamicsFilter,
+        createEqualizerBand,
+        createChannelAutomix,
+        createEqualizer,
+        createChannelFxSend,
+        createChannelSendBus,
+        createChannelGate,
+        createChannelPreamp,
+        createDCAGroup,
+        createInsert,
+        createMix,
+        createMuteGroup,
+      }),
       true,
     );
   });
 
-  test('sets the osc-address and arguments correctly for a single literal', async () => {
-    const set = fake.resolves({});
-    const oscClient: OSCClient = {
-      close: fake(),
-      query: fake(),
-      set,
-    };
-    const mixer = createMixer(oscClient);
-    await mixer.getChannel('CH01').getConfig().updateColor('Red', 'color');
+  test('creates the mainLR correctly', () => {
+    const oscClient = oscClientFactory.build();
+    const createMainLR = fake.returns('mainLR' as unknown as MainLR);
+    const createConfig = fake();
+    const createLRMix = fake();
+    const createInsert = fake();
+    const createMainLRCompressor = fake();
+    const createDynamicsFilter = fake();
+    const createMainLREqualizer = fake();
+    const createEqualizer = fake();
+    const createEqualizerBand = fake();
+    const mixer = createMixer({
+      oscClient,
+      createChannel: fake(),
+      createChannelConfig: fake(),
+      createChannelCompressor: fake(),
+      createDynamicsFilter,
+      createEqualizerBand,
+      createChannelAutomix: fake(),
+      createEqualizer,
+      createChannelGate: fake(),
+      createInsert,
+      createDCAGroup: fake(),
+      createMuteGroup: fake(),
+      createMix: fake(),
+      createChannelPreamp: fake(),
+      createChannelFxSend: fake(),
+      createChannelSendBus: fake(),
+      createConfig,
+      createLRMix,
+      createMainLRCompressor,
+      createMainLR,
+      createMainLREqualizer,
+    });
+    const mainLR = mixer.getMainLR();
+    assert.strictEqual(mainLR, 'mainLR');
     assert.strictEqual(
-      set.calledOnceWithExactly('/ch/01/config/color', [{ type: 'integer', value: 1 }]),
+      createMainLR.calledOnceWithExactly({
+        oscClient,
+        createConfig,
+        createLRMix,
+        createInsert,
+        createMainLRCompressor,
+        createDynamicsFilter,
+        createEqualizer,
+        createEqualizerBand,
+        createMainLREqualizer,
+      }),
       true,
     );
   });
 
-  test('sets the osc-address and arguments correctly for a single on/off-switch', async () => {
-    const set = fake.resolves({});
-    const oscClient: OSCClient = {
-      close: fake(),
-      query: fake(),
-      set,
-    };
-    const mixer = createMixer(oscClient);
-    await mixer.getChannel('CH01').getCompressor().updateAutoTimeEnabled(true, 'flag');
-    assert.strictEqual(
-      set.calledOnceWithExactly('/ch/01/dyn/auto', [{ type: 'integer', value: 1 }]),
-      true,
-    );
-  });
-
-  test('sets the osc-address and arguments correctly for a linear range', async () => {
-    const set = fake.resolves({});
-    const oscClient: OSCClient = {
-      close: fake(),
-      query: fake(),
-      set,
-    };
-    const mixer = createMixer(oscClient);
-    await mixer.getChannel('CH01').getCompressor().updateAttack(120, 'milliseconds');
-    assert.strictEqual(
-      set.calledOnceWithExactly('/ch/01/dyn/attack', [{ type: 'float', value: 1.0 }]),
-      true,
-    );
-  });
-
-  test('closes the osc client when the mixer is closed', async () => {
-    const close = fake();
-    const oscClient: OSCClient = {
-      close,
-      query: fake(),
-      set: fake(),
-    };
-    const mixer = createMixer(oscClient);
+  test('closes the connection correctly', async () => {
+    const oscClient = oscClientFactory.build();
+    const close = fake.resolves({});
+    oscClient.close = close;
+    const mixer = createMixer({
+      oscClient,
+      createChannel: fake(),
+      createChannelConfig: fake(),
+      createChannelCompressor: fake(),
+      createDynamicsFilter: fake(),
+      createEqualizerBand: fake(),
+      createChannelAutomix: fake(),
+      createEqualizer: fake(),
+      createChannelGate: fake(),
+      createInsert: fake(),
+      createDCAGroup: fake(),
+      createMuteGroup: fake(),
+      createMix: fake(),
+      createChannelPreamp: fake(),
+      createChannelFxSend: fake(),
+      createChannelSendBus: fake(),
+      createConfig: fake(),
+      createLRMix: fake(),
+      createMainLRCompressor: fake(),
+      createMainLR: fake(),
+      createMainLREqualizer: fake(),
+    });
     await mixer.closeConnection();
     assert.strictEqual(close.calledOnce, true);
   });

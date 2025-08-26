@@ -1,24 +1,30 @@
-import { ChannelCompressor, createChannelCompressor } from './dynamics/compressor/compressor.js';
-import { ChannelAutomix, createChannelAutomix } from './automix/automix.js';
-import { ChannelConfig, createChannelConfig } from './config/config.js';
-import { ChannelEqualizer, createChannelEqualizer } from './equalizer/equalizer.js';
-import { ChannelGate, createChannelGate } from './dynamics/gate/gate.js';
-import { createInsert, Insert } from '../insert/insert.js';
+import { Compressor } from '../dynamics/compressor/compressor.js';
+import { ChannelAutomix, ChannelAutomixDependencies } from './automix/automix.js';
+import { ChannelConfig, ChannelConfigDependencies } from './config/config.js';
+import { Equalizer, EqualizerDependencies } from '../equalizer/equalizer.js';
+import { ChannelGate, ChannelGateDependencies } from './dynamics/gate/gate.js';
+import { Insert, InsertDependencies } from '../insert/insert.js';
 import { ChannelSendBusLabel } from './sends/mapper/send-bus.js';
-import { ChannelFxSend, createChannelFxSend } from './sends/fx-send.js';
+import { ChannelFxSend, ChannelFxSendDependencies } from './sends/fx-send.js';
 import { ChannelFxSendLabel } from './sends/mapper/fx-send.js';
-import { ChannelSendBus, createChannelSendBus } from './sends/send-bus.js';
-import { createDCAGroup, DCAGroup } from '../dca/dca-group.js';
-import { createMuteGroup, MuteGroup } from '../mute/mute-group.js';
-import { createMix, Mix } from '../mix/mix.js';
-import { ChannelPreamp, createChannelPreamp } from './preamp/preamp.js';
+import { ChannelSendBus, ChannelSendBusDependencies } from './sends/send-bus.js';
+import { DCAGroup, DCAGroupDependencies } from '../dca/dca-group.js';
+import { MuteGroup, MuteGroupDependencies } from '../mute/mute-group.js';
+import { Mix, MixDependencies } from '../mix/mix.js';
+import { ChannelPreamp, ChannelPreampDependencies } from './preamp/preamp.js';
 import { OSCClient } from '../../osc/client.js';
+import { DynamicsFilter, DynamicsFilterDependencies } from '../dynamics/filter/filter.js';
+import { EqualizerBand, EqualizerBandDependencies } from '../equalizer/band/eq-band.js';
+import {
+  ChannelCompressor,
+  ChannelCompressorDependencies,
+} from './dynamics/compressor/compressor.js';
 
 export type Channel = {
   getConfig(): ChannelConfig;
   getAutomix(): ChannelAutomix;
-  getCompressor(): ChannelCompressor;
-  getEqualizer(): ChannelEqualizer;
+  getCompressor(): Compressor;
+  getEqualizer(): Equalizer;
   getGate(): ChannelGate;
   getInsert(): Insert;
   getSendBus(send: ChannelSendBusLabel): ChannelSendBus;
@@ -29,24 +35,55 @@ export type Channel = {
   getPreAmp(): ChannelPreamp;
 };
 
-type ChannelDependencies = {
+export type ChannelDependencies = {
   channel: number;
   oscClient: OSCClient;
+  createChannelConfig: (dependencies: ChannelConfigDependencies) => ChannelConfig;
+  createChannelCompressor: (dependencies: ChannelCompressorDependencies) => ChannelCompressor;
+  createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
+  createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
+  createChannelAutomix: (dependencies: ChannelAutomixDependencies) => ChannelAutomix;
+  createEqualizer: (dependencies: EqualizerDependencies) => Equalizer;
+  createChannelGate: (dependencies: ChannelGateDependencies) => ChannelGate;
+  createInsert: (dependencies: InsertDependencies) => Insert;
+  createDCAGroup: (dependencies: DCAGroupDependencies) => DCAGroup;
+  createMuteGroup: (dependencies: MuteGroupDependencies) => MuteGroup;
+  createMix: (dependencies: MixDependencies) => Mix;
+  createChannelPreamp: (dependencies: ChannelPreampDependencies) => ChannelPreamp;
+  createChannelFxSend: (dependencies: ChannelFxSendDependencies) => ChannelFxSend;
+  createChannelSendBus: (dependencies: ChannelSendBusDependencies) => ChannelSendBus;
 };
 
 export const createChannel = (dependencies: ChannelDependencies): Channel => {
-  const { channel, oscClient } = dependencies;
+  const {
+    channel,
+    oscClient,
+    createDynamicsFilter,
+    createEqualizerBand,
+    createChannelCompressor,
+    createChannelConfig,
+    createChannelAutomix,
+    createEqualizer,
+    createChannelGate,
+    createInsert,
+    createDCAGroup,
+    createMuteGroup,
+    createMix,
+    createChannelPreamp,
+    createChannelFxSend,
+    createChannelSendBus,
+  } = dependencies;
   const oscBasePath = `/ch/${channel.toString().padStart(2, '0')}`;
   const config = createChannelConfig({ channel, oscClient });
-  const compressor = createChannelCompressor(dependencies);
+  const compressor = createChannelCompressor({ channel, oscClient, createDynamicsFilter });
   const automix = createChannelAutomix({ channel, oscClient });
-  const equalizer = createChannelEqualizer(dependencies);
-  const gate = createChannelGate(dependencies);
+  const equalizer = createEqualizer({ oscBasePath, oscClient, createEqualizerBand });
+  const gate = createChannelGate({ channel, oscClient, createDynamicsFilter });
   const insert = createInsert({ oscBasePath, oscClient });
   const dcaGroup = createDCAGroup({ oscBasePath, oscClient });
   const muteGroup = createMuteGroup({ oscBasePath, oscClient });
   const mix = createMix({ oscBasePath, oscClient });
-  const preamp = createChannelPreamp(dependencies);
+  const preamp = createChannelPreamp({ channel, oscClient });
   return {
     getConfig: () => config,
     getCompressor: () => compressor,

@@ -1,7 +1,5 @@
 import { OSCClient } from '../../../osc/client.js';
-import { stringOscParameterConfig } from '../../mapper/single-string.js';
 import { createOSCParameterFactory } from '../../osc-parameter.js';
-import { ChannelColor, channelColorParameterConfig } from './parameter/color.js';
 import {
   ChannelAnalogInputSource,
   channelAnalogInputSourceParameterConfig,
@@ -10,82 +8,119 @@ import {
   ChannelUsbReturnSource,
   channelUsbReturnSourceParameterConfig,
 } from './parameter/usb-return-source.js';
+import { Config, createConfig } from '../../config/config.js';
 
-export type ChannelConfig = {
+export type ChannelConfig = Config & {
   /**
-   * Fetch the current analog input source assignment
+   * Fetch the current analog input source assignment as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0-18, where 0-15 = INP 01-16, 16-17 = LINE 17-18, 18 = OFF)
+   * @example
+   * // Get raw OSC value
+   * const rawSource = await config.fetchAnalogSource();
+   * // rawSource: 0 = INP 01, 1 = INP 02, ..., 15 = INP 16, 16 = LINE 17, 17 = LINE 18, 18 = OFF
    */
   fetchAnalogSource(): Promise<number>;
+
   /**
-   * Fetch the current analog input source assignment
+   * Fetch the current analog input source assignment as input source name
+   * @param unit - Must be 'inputSource' to get input source name
+   * @returns Promise that resolves to input source name ('INP 01'-'INP 16', 'LINE 17', 'LINE 18', 'OFF')
+   * @example
+   * // Get input source name
+   * const sourceName = await config.fetchAnalogSource('inputSource');
+   * // sourceName: 'INP 01', 'INP 02', ..., 'INP 16', 'LINE 17', 'LINE 18', 'OFF'
    */
   fetchAnalogSource(unit: 'inputSource'): Promise<ChannelAnalogInputSource>;
 
   /**
-   * Update the analog input source assignment
+   * Update the analog input source assignment using raw OSC value
+   * @param value - The input source as raw OSC integer (0-18, where 0-15 = INP 01-16, 16-17 = LINE 17-18, 18 = OFF)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set to INP 01 using raw OSC value
+   * await config.updateAnalogSource(0);
+   *
+   * // Set to LINE 17 using raw OSC value
+   * await config.updateAnalogSource(16);
+   *
+   * // Set to OFF using raw OSC value
+   * await config.updateAnalogSource(18);
    */
   updateAnalogSource(value: number): Promise<void>;
+
   /**
-   * Update the analog input source assignment
+   * Update the analog input source assignment using input source name
+   * @param value - The input source name ('INP 01'-'INP 16', 'LINE 17', 'LINE 18', 'OFF')
+   * @param unit - Must be 'inputSource' when using input source names
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set to INP 01 using source name
+   * await config.updateAnalogSource('INP 01', 'inputSource');
+   *
+   * // Set to LINE 17 using source name
+   * await config.updateAnalogSource('LINE 17', 'inputSource');
+   *
+   * // Set to OFF using source name
+   * await config.updateAnalogSource('OFF', 'inputSource');
    */
   updateAnalogSource(value: ChannelAnalogInputSource, unit: 'inputSource'): Promise<void>;
 
   /**
-   * Fetch the current channel color
-   */
-  fetchColor(): Promise<number>;
-  /**
-   * Fetch the current channel color
-   */
-  fetchColor(unit: 'color'): Promise<ChannelColor>;
-
-  /**
-   * Update the channel color
-   */
-  updateColor(value: number): Promise<void>;
-  /**
-   * Update the channel color
-   */
-  updateColor(value: ChannelColor, unit: 'color'): Promise<void>;
-
-  /**
-   * Fetch the current channel name
-   */
-  fetchName(): Promise<string>;
-  /**
-   * Fetch the current channel name
-   */
-  fetchName(unit: 'string'): Promise<string>;
-
-  /**
-   * Update the channel name
-   */
-  updateName(value: string): Promise<void>;
-  /**
-   * Update the channel name
-   */
-  updateName(value: string, unit: 'string'): Promise<void>;
-
-  /**
-   * Fetch the current USB return source assignment
+   * Fetch the current USB return source assignment as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0-17, where 0-17 = USB 01-18)
+   * @example
+   * // Get raw OSC value
+   * const rawUsbSource = await config.fetchUsbReturnSource();
+   * // rawUsbSource: 0 = USB 01, 1 = USB 02, ..., 17 = USB 18
    */
   fetchUsbReturnSource(): Promise<number>;
+
   /**
-   * Fetch the current USB return source assignment
+   * Fetch the current USB return source assignment as USB source name
+   * @param unit - Must be 'usbReturnSource' to get USB source name
+   * @returns Promise that resolves to USB source name ('USB 01'-'USB 18')
+   * @example
+   * // Get USB source name
+   * const usbSourceName = await config.fetchUsbReturnSource('usbReturnSource');
+   * // usbSourceName: 'USB 01', 'USB 02', ..., 'USB 18'
    */
   fetchUsbReturnSource(unit: 'usbReturnSource'): Promise<ChannelUsbReturnSource>;
 
   /**
-   * Update the USB return source assignment
+   * Update the USB return source assignment using raw OSC value
+   * @param value - The USB source as raw OSC integer (0-17, where 0-17 = USB 01-18)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set to USB 01 using raw OSC value
+   * await config.updateUsbReturnSource(0);
+   *
+   * // Set to USB 10 using raw OSC value
+   * await config.updateUsbReturnSource(9);
+   *
+   * // Set to USB 18 using raw OSC value
+   * await config.updateUsbReturnSource(17);
    */
   updateUsbReturnSource(value: number): Promise<void>;
+
   /**
-   * Update the USB return source assignment
+   * Update the USB return source assignment using USB source name
+   * @param value - The USB source name ('USB 01'-'USB 18')
+   * @param unit - Must be 'usbReturnSource' when using USB source names
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set to USB 01 using source name
+   * await config.updateUsbReturnSource('USB 01', 'usbReturnSource');
+   *
+   * // Set to USB 10 using source name
+   * await config.updateUsbReturnSource('USB 10', 'usbReturnSource');
+   *
+   * // Set to USB 18 using source name
+   * await config.updateUsbReturnSource('USB 18', 'usbReturnSource');
    */
   updateUsbReturnSource(value: ChannelUsbReturnSource, unit: 'usbReturnSource'): Promise<void>;
 };
 
-type ChannelConfigDependencies = {
+export type ChannelConfigDependencies = {
   channel: number;
   oscClient: OSCClient;
 };
@@ -93,15 +128,8 @@ type ChannelConfigDependencies = {
 export const createChannelConfig = (dependencies: ChannelConfigDependencies): ChannelConfig => {
   const { channel, oscClient } = dependencies;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
-  const oscBaseAddress = `/ch/${channel.toString().padStart(2, '0')}/config`;
-  const name = oscParameterFactory.createOSCParameter(
-    `${oscBaseAddress}/name`,
-    stringOscParameterConfig,
-  );
-  const color = oscParameterFactory.createOSCParameter(
-    `${oscBaseAddress}/color`,
-    channelColorParameterConfig,
-  );
+  const oscBasePath = `/ch/${channel.toString().padStart(2, '0')}`;
+  const oscBaseAddress = `${oscBasePath}/config`;
   const analogInputSource = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/insrc`,
     channelAnalogInputSourceParameterConfig,
@@ -110,12 +138,10 @@ export const createChannelConfig = (dependencies: ChannelConfigDependencies): Ch
     `${oscBaseAddress}/rtnsrc`,
     channelUsbReturnSourceParameterConfig,
   );
+  const config = createConfig({ oscBasePath, oscClient });
 
   return {
-    fetchName: name.fetch,
-    updateName: name.update,
-    fetchColor: color.fetch,
-    updateColor: color.update,
+    ...config,
     fetchAnalogSource: analogInputSource.fetch,
     updateAnalogSource: analogInputSource.update,
     fetchUsbReturnSource: usbReturnSource.fetch,

@@ -1,11 +1,14 @@
 import { OSCClient } from '../../../../osc/client.js';
 import { createLinearParameterConfig } from '../../../mapper/linear.js';
-import { createDynamicsFilter, DynamicsFilter } from '../filter/filter.js';
-import { DynamicsKeySource, dynamicsKeySourceParameterConfig } from '../mapper/key-source.js';
-import { GateMode, gateModeParameterConfig } from './mapper/mode.js';
+import { DynamicsFilter, DynamicsFilterDependencies } from '../../../dynamics/filter/filter.js';
+import {
+  DynamicsKeySource,
+  dynamicsKeySourceParameterConfig,
+} from '../../../dynamics/mapper/key-source.js';
 import { createOSCParameterFactory } from '../../../osc-parameter.js';
 import { createLogarithmicParameterConfig } from '../../../mapper/log.js';
 import { onOffParameterConfig } from '../../../mapper/on-off.js';
+import { GateMode, gateModeParameterConfig } from './mapper/mode.js';
 
 export type ChannelGate = {
   /**
@@ -340,20 +343,22 @@ export type ChannelGate = {
   fetchThreshold(unit: 'decibels'): Promise<number>;
 };
 
-type ChannelGateDependencies = {
+export type ChannelGateDependencies = {
   channel: number;
   oscClient: OSCClient;
+  createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
 };
 
 export const createChannelGate = (dependencies: ChannelGateDependencies): ChannelGate => {
-  const { channel, oscClient } = dependencies;
-  const oscBaseAddress = `/ch/${channel.toString().padStart(2, '0')}/gate`;
+  const { channel, oscClient, createDynamicsFilter } = dependencies;
+  const oscBasePath = `/ch/${channel.toString().padStart(2, '0')}`;
+  const oscBaseAddress = `${oscBasePath}/gate`;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const attack = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/attack`,
     createLinearParameterConfig<'milliseconds'>(0.0, 120.0),
   );
-  const filter = createDynamicsFilter({ ...dependencies, dynamicsType: 'gate' });
+  const filter = createDynamicsFilter({ oscBasePath, oscClient, dynamicsType: 'gate' });
 
   const hold = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/hold`,

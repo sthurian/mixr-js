@@ -4,6 +4,7 @@ import { oscClientFactory } from '../../../../osc/test-factories/client.js';
 import { createChannelGate } from './gate.js';
 import { assertClose, isClose } from '../../../../test-helpers/is-close.js';
 import assert from 'node:assert';
+import { DynamicsFilter } from '../../../dynamics/filter/filter.js';
 
 suite('ChannelGate', () => {
   test('send the correct osc message to fetch the gates attack', async () => {
@@ -15,6 +16,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     const attack = await gate.fetchAttack('milliseconds');
     assert.strictEqual(attack, 60);
@@ -27,6 +29,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     await gate.updateAttack(90, 'milliseconds');
     assert.strictEqual(
@@ -44,6 +47,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     const hold = await gate.fetchHold('milliseconds');
     assertClose(hold, 6.325);
@@ -56,6 +60,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     await gate.updateHold(1500, 'milliseconds');
     assert.ok(
@@ -72,6 +77,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     const keysrc = await gate.fetchKeySource('keySource');
     assert.strictEqual(keysrc, 'CH03');
@@ -84,6 +90,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     await gate.updateKeySource('BUS02', 'keySource');
     assert.strictEqual(
@@ -101,6 +108,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     const mode = await gate.fetchMode('mode');
     assert.strictEqual(mode, 'EXP4');
@@ -113,6 +121,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     await gate.updateMode('GATE', 'mode');
     assert.strictEqual(
@@ -130,6 +139,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     const range = await gate.fetchRange('decibels');
     assert.strictEqual(range, 31.5);
@@ -142,6 +152,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     await gate.updateRange(60, 'decibels');
     assert.strictEqual(
@@ -159,6 +170,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     const release = await gate.fetchRelease('milliseconds');
     assertClose(release, 141.421);
@@ -171,6 +183,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     await gate.updateRelease(1500, 'milliseconds');
     assert.ok(
@@ -187,6 +200,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     const threshold = await gate.fetchThreshold('decibels');
     assert.strictEqual(threshold, -40);
@@ -199,6 +213,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     await gate.updateThreshold(-60, 'decibels');
     assert.strictEqual(
@@ -216,6 +231,7 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     const enabled = await gate.fetchIsEnabled('flag');
     assert.strictEqual(enabled, true);
@@ -228,10 +244,31 @@ suite('ChannelGate', () => {
     const gate = createChannelGate({
       channel: 1,
       oscClient,
+      createDynamicsFilter: fake(),
     });
     await gate.updateEnabled(false, 'flag');
     assert.strictEqual(
       set.calledOnceWithExactly('/ch/01/gate/on', [{ type: 'integer', value: 0 }]),
+      true,
+    );
+  });
+
+  test('getFilter calls the factory with the correct parameters', () => {
+    const createDynamicsFilter = fake.returns('filter' as unknown as DynamicsFilter);
+    const oscClient = oscClientFactory.build();
+    const gate = createChannelGate({
+      channel: 3,
+      oscClient,
+      createDynamicsFilter,
+    });
+    const filter = gate.getFilter();
+    assert.strictEqual(filter, 'filter');
+    assert.strictEqual(
+      createDynamicsFilter.calledOnceWithExactly({
+        oscBasePath: '/ch/03',
+        oscClient,
+        dynamicsType: 'gate',
+      }),
       true,
     );
   });

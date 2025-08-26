@@ -1,11 +1,11 @@
-import { OSCClient } from '../../../../osc/client.js';
-import { createLinearParameterConfig } from '../../../mapper/linear.js';
-import { createLogarithmicParameterConfig } from '../../../mapper/log.js';
-import { onOffParameterConfig } from '../../../mapper/on-off.js';
-import { createOSCParameterFactory } from '../../../osc-parameter.js';
+import { OSCClient } from '../../../osc/client.js';
+import { createLinearParameterConfig } from '../../mapper/linear.js';
+import { createLogarithmicParameterConfig } from '../../mapper/log.js';
+import { onOffParameterConfig } from '../../mapper/on-off.js';
+import { createOSCParameterFactory } from '../../osc-parameter.js';
 import { EqBandType, eqBandTypeParameterConfig } from './mapper/eq-band-type.js';
 
-export type ChannelEqualizerBand = {
+export type EqualizerBand = {
   /**
    * Fetch the current equalizer band enabled state as raw OSC value
    * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
@@ -207,17 +207,15 @@ export type ChannelEqualizerBand = {
   fetchQ(unit: 'number'): Promise<number>;
 };
 
-type ChannelEqualizerBandDependencies = {
-  channel: number;
+export type EqualizerBandDependencies = {
+  oscBasePath: string;
   band: number;
   oscClient: OSCClient;
 };
 
-export const createChannelEqualizerBand = (
-  dependencies: ChannelEqualizerBandDependencies,
-): ChannelEqualizerBand => {
-  const { channel, band, oscClient } = dependencies;
-  const oscBaseAddress = `/ch/${channel.toString().padStart(2, '0')}/eq/${band}`;
+export const createEqualizerBand = (dependencies: EqualizerBandDependencies): EqualizerBand => {
+  const { oscBasePath, band, oscClient } = dependencies;
+  const oscBaseAddress = `${oscBasePath}/eq/${band}`;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const enabled = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/on`,
