@@ -24,7 +24,7 @@ export type Equalizer = {
 
   /**
    * Get access to a specific equalizer band
-   * @param band - The band number (1-4 for most channels)
+   * @param band - The band number (1-4 for channels, 1-6 for LR)
    * @returns ChannelEqualizerBand object for the specified band
    * @example
    * // Get band 1 (low frequency)

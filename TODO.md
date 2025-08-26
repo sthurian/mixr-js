@@ -6,18 +6,18 @@ This document outlines the missing OSC parameters that need to be implemented ba
 
 ### ✅ Currently Implemented
 
-- **Channel features**: Basic config (name, color, input source), preamp (gain, phantom, low-cut, polarity), 4-band EQ, compressor/gate dynamics, sends (FX/bus), mix controls, automix, DCA/mute groups
+- **Channel features**: Basic config (name, color, input source), preamp (gain, phantom, low-cut, polarity), 4-band EQ, compressor/gate dynamics, sends (FX/bus), mix controls, automix, DCA/mute groups, insert effects
+- **Main LR bus controls**: Full implementation with fader/mute/pan, compressor with insert, 6-band EQ with mode selection
 - **Dual API**: Raw OSC values + audio engineer units (dB, Hz, etc.)
 - **Type safety**: Branded types with comprehensive unit conversion
-- **Test coverage**: 95.94% coverage across 222 tests
+- **Test coverage**: 100% coverage across 304 tests
 
 ### ❌ Major Missing Categories
 
 - System-level controls (actions, preferences, monitoring)
-- Main LR bus controls
 - Aux/Bus processing and routing
 - Effects rack and routing
-- Advanced channel features
+- Advanced channel features (graphics EQ, solo)
 - MIDI integration
 - Network configuration
 
@@ -73,20 +73,17 @@ This document outlines the missing OSC parameters that need to be implemented ba
 
 ## 3. Main LR Bus (`/lr/`)
 
-### Basic Controls ⭐ HIGH PRIORITY
+### ✅ All LR Controls - COMPLETED
 
-- [ ] `/lr/mix/fader` - Main LR fader level
-- [ ] `/lr/mix/on` - Main LR mute
-- [ ] `/lr/dyn/*` - Main LR dynamics (compressor)
-- [ ] `/lr/eq/*` - Main LR 6-band EQ
-- [ ] `/lr/config/name` - Main LR name
-- [ ] `/lr/config/color` - Main LR color
+- [x] `/lr/mix/fader` - Main LR fader level
+- [x] `/lr/mix/on` - Main LR mute  
+- [x] `/lr/mix/pan` - Main LR pan control
+- [x] `/lr/dyn/*` - Main LR dynamics (compressor with insert)
+- [x] `/lr/eq/*` - Main LR 6-band EQ with mode selection
+- [x] `/lr/config/name` - Main LR name
+- [x] `/lr/config/color` - Main LR color
 
-### Advanced LR Features
-
-- [ ] `/lr/config/chlink` - Channel link settings
-- [ ] `/lr/config/amixenable` - Automix enable for LR
-- [ ] `/lr/config/amixlock` - Automix lock
+**Note**: All available Main LR parameters from the official OSC specification have been implemented. Channel linking and automix settings are global configuration parameters under `/config/`, not LR-specific.
 
 ---
 
@@ -227,7 +224,7 @@ This document outlines the missing OSC parameters that need to be implemented ba
 
 ### 🔴 Phase 1 - Core Mixer Functions (High Impact)
 
-1. Main LR bus controls (`/lr/mix/*`, `/lr/eq/*`, `/lr/dyn/*`)
+1. ~~Main LR bus controls (`/lr/mix/*`, `/lr/eq/*`, `/lr/dyn/*`)~~ ✅ COMPLETED
 2. Auxiliary bus processing (`/bus/xx/mix/*`, `/bus/xx/eq/*`)
 3. DCA group controls (`/dca/x/*`)
 4. System actions (`/-action/clearsolo`, `/-action/mute`, etc.)
