@@ -1,5 +1,5 @@
 import { OSCClient } from '../../../osc/client.js';
-import { AsyncGetter, AsyncSetter, createOSCParameterFactory, Unit } from '../../osc-parameter.js';
+import { createOSCParameterFactory } from '../../osc-parameter.js';
 import {
   AutomixGroup,
   automixGroupParameterConfig,
@@ -8,58 +8,60 @@ import {
 
 export type ChannelAutomix = {
   /**
-   * Fetch the current automix group assignment
-   * @param unit - Optional unit parameter. If 'groupName' is provided, returns the group name string
-   * @returns Promise that resolves to either raw OSC integer (0-2) or group name string
-   * @example
-   * // Get raw OSC value (0=OFF, 1=X, 2=Y)
-   * const rawGroup = await automix.fetchGroup();
-   *
-   * // Get group name ('OFF', 'X', or 'Y')
-   * const groupName = await automix.fetchGroup('groupName');
+   * Fetch the current automix group assignment as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = OFF, 1 = X, 2 = Y)
    */
-  fetchGroup: AsyncGetter<Unit<'groupName', AutomixGroup>, 'integer'>;
+  fetchGroup(): Promise<number>;
 
   /**
-   * Update the automix group assignment
-   * @param value - The group value: raw OSC integer (0-2) or group name string ('OFF', 'X', 'Y')
-   * @param unit - Optional unit parameter. If 'groupName' is provided, value should be a group name string
+   * Fetch the current automix group assignment as group name
+   * @param unit - Must be 'groupName' to get group name string
+   * @returns Promise that resolves to group name string ('OFF', 'X', 'Y')
+   */
+  fetchGroup(unit: 'groupName'): Promise<AutomixGroup>;
+
+  /**
+   * Update the automix group assignment using raw OSC value
+   * @param value - The group value as raw OSC integer (0 = OFF, 1 = X, 2 = Y)
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0=OFF, 1=X, 2=Y)
-   * await automix.updateGroup(1);
-   *
-   * // Set using group name
-   * await automix.updateGroup('X', 'groupName');
    */
-  updateGroup: AsyncSetter<Unit<'groupName', AutomixGroup>, 'integer'>;
+  updateGroup(value: number): Promise<void>;
 
   /**
-   * Fetch the current automix weight
-   * @param unit - Optional unit parameter. If 'decibels' is provided, returns weight in dB
-   * @returns Promise that resolves to either raw OSC float (0.0-1.0) or decibel value (-12 to +12)
-   * @example
-   * // Get raw OSC value (0.0 to 1.0)
-   * const rawWeight = await automix.fetchWeight();
-   *
-   * // Get weight in decibels (-12dB to +12dB)
-   * const weightDb = await automix.fetchWeight('decibels');
-   */
-  fetchWeight: AsyncGetter<Unit<'decibels', number>, 'float'>;
-
-  /**
-   * Update the automix weight
-   * @param value - The weight value: raw OSC float (0.0-1.0) or decibel value (-12 to +12)
-   * @param unit - Optional unit parameter. If 'decibels' is provided, value should be in dB
+   * Update the automix group assignment using group name
+   * @param value - The group name string ('OFF', 'X', 'Y')
+   * @param unit - Must be 'groupName' when using group name string
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0.0 to 1.0)
-   * await automix.updateWeight(0.5);
-   *
-   * // Set using decibels (-12dB to +12dB)
-   * await automix.updateWeight(-6, 'decibels');
    */
-  updateWeight: AsyncSetter<Unit<'decibels', number>, 'float'>;
+  updateGroup(value: AutomixGroup, unit: 'groupName'): Promise<void>;
+
+  /**
+   * Fetch the current automix weight as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   */
+  fetchWeight(): Promise<number>;
+
+  /**
+   * Fetch the current automix weight in decibels
+   * @param unit - Must be 'decibels' to get weight in dB
+   * @returns Promise that resolves to decibel value (-12 to +12dB)
+   */
+  fetchWeight(unit: 'decibels'): Promise<number>;
+
+  /**
+   * Update the automix weight using raw OSC value
+   * @param value - The weight value as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
+   */
+  updateWeight(value: number): Promise<void>;
+
+  /**
+   * Update the automix weight using decibels
+   * @param value - The weight value in decibels (-12 to +12dB)
+   * @param unit - Must be 'decibels' when using dB values
+   * @returns Promise that resolves when the update is complete
+   */
+  updateWeight(value: number, unit: 'decibels'): Promise<void>;
 };
 
 type ChannelAutomixDependencies = {

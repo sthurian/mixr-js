@@ -2,179 +2,209 @@ import { OSCClient } from '../../../../osc/client.js';
 import { createLinearParameterConfig } from '../../../mapper/linear.js';
 import { createLogarithmicParameterConfig } from '../../../mapper/log.js';
 import { onOffParameterConfig } from '../../../mapper/on-off.js';
-import {
-  AsyncGetter,
-  AsyncSetter,
-  createOSCParameterFactory,
-  Unit,
-} from '../../../osc-parameter.js';
+import { createOSCParameterFactory } from '../../../osc-parameter.js';
 import { EqBandType, eqBandTypeParameterConfig } from './mapper/eq-band-type.js';
 
 export type ChannelEqualizerBand = {
   /**
-   * Fetches the current equalizer band enable/disable status.
-   *
-   * @returns Promise resolving to the band state. Returns boolean (true=enabled, false=disabled) or raw OSC integer (0=disabled, 1=enabled).
-   *
+   * Fetch the current equalizer band enabled state as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
    * @example
-   * ```typescript
-   * // Get as boolean
-   * const isEnabled = await band.fetchIsEnabled();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await band.fetchIsEnabled();
-   * ```
+   * // Get raw OSC value
+   * const rawEnabled = await band.fetchIsEnabled();
    */
-  fetchIsEnabled: AsyncGetter<Unit<'flag', boolean>, 'integer'>;
+  fetchIsEnabled(): Promise<number>;
 
   /**
-   * Updates the equalizer band enable/disable status.
-   *
-   * @param enabled - Band state. Either a boolean (true=enabled, false=disabled) or a raw OSC integer (0=disabled, 1=enabled).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current equalizer band enabled state as boolean
+   * @param unit - Must be 'flag' to get boolean value
+   * @returns Promise that resolves to boolean value
    * @example
-   * ```typescript
-   * // Using boolean value
-   * await band.updateEnabled(true);
-   *
-   * // Using raw OSC value
+   * // Get boolean value
+   * const isEnabled = await band.fetchIsEnabled('flag');
+   */
+  fetchIsEnabled(unit: 'flag'): Promise<boolean>;
+
+  /**
+   * Update the equalizer band enabled state using raw OSC value
+   * @param value - The enabled state as raw OSC integer (0 = disabled, 1 = enabled)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await band.updateEnabled(1);
-   * ```
    */
-  updateEnabled: AsyncSetter<Unit<'flag', boolean>, 'integer'>;
+  updateEnabled(value: number): Promise<void>;
 
   /**
-   * Updates the equalizer band frequency.
-   *
-   * @param frequency - Band frequency. Either in hertz (20-20000Hz) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Update the equalizer band enabled state using boolean
+   * @param value - The enabled state as boolean
+   * @param unit - Must be 'flag' when using boolean value
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Using frequency in Hz
-   * await band.updateFrequency(1000);
-   *
-   * // Using raw OSC value
+   * // Set using boolean
+   * await band.updateEnabled(true, 'flag');
+   */
+  updateEnabled(value: boolean, unit: 'flag'): Promise<void>;
+
+  /**
+   * Update the equalizer band frequency using raw OSC value
+   * @param value - The frequency as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await band.updateFrequency(0.5);
-   * ```
    */
-  updateFrequency: AsyncSetter<Unit<'hertz', number>, 'float'>;
+  updateFrequency(value: number): Promise<void>;
 
   /**
-   * Fetches the current equalizer band frequency.
-   *
-   * @returns Promise resolving to the band frequency. Returns frequency in hertz (20-20000Hz) or raw OSC float (0.0-1.0).
-   *
+   * Update the equalizer band frequency using hertz
+   * @param value - The frequency in Hz (20-20000Hz)
+   * @param unit - Must be 'hertz' when using frequency values
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
+   * // Set using frequency in Hz
+   * await band.updateFrequency(1000, 'hertz');
+   */
+  updateFrequency(value: number, unit: 'hertz'): Promise<void>;
+
+  /**
+   * Fetch the current equalizer band frequency as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value
+   * const rawFreq = await band.fetchFrequency();
+   */
+  fetchFrequency(): Promise<number>;
+
+  /**
+   * Fetch the current equalizer band frequency in hertz
+   * @param unit - Must be 'hertz' to get frequency in Hz
+   * @returns Promise that resolves to frequency in Hz (20-20000Hz)
+   * @example
    * // Get frequency in Hz
-   * const frequency = await band.fetchFrequency();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await band.fetchFrequency();
-   * ```
+   * const freqHz = await band.fetchFrequency('hertz');
    */
-  fetchFrequency: AsyncGetter<Unit<'hertz', number>, 'float'>;
+  fetchFrequency(unit: 'hertz'): Promise<number>;
 
   /**
-   * Updates the equalizer band type.
-   *
-   * @param type - Band type. Either a string literal ('LCut', 'LShv', 'PEQ', 'VEQ', 'HShv', 'HCut') or a raw OSC integer (0-5).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Update the equalizer band type using raw OSC value
+   * @param value - The band type as raw OSC integer (0-5)
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Using band type literal
-   * await band.updateType('PEQ');
-   *
-   * // Using raw OSC value
+   * // Set using raw OSC value (2 = 'PEQ')
    * await band.updateType(2);
-   * ```
    */
-  updateType: AsyncSetter<Unit<'type', EqBandType>, 'integer'>;
+  updateType(value: number): Promise<void>;
 
   /**
-   * Fetches the current equalizer band type.
-   *
-   * @returns Promise resolving to the band type. Returns string literal ('LCut', 'LShv', 'PEQ', 'VEQ', 'HShv', 'HCut') or raw OSC integer (0-5).
-   *
+   * Update the equalizer band type using type string
+   * @param value - The band type string ('LCut', 'LShv', 'PEQ', 'VEQ', 'HShv', 'HCut')
+   * @param unit - Must be 'type' when using type string
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get as band type literal
-   * const type = await band.fetchType();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await band.fetchType();
-   * ```
+   * // Set using band type string
+   * await band.updateType('PEQ', 'type');
    */
-  fetchType: AsyncGetter<Unit<'type', EqBandType>, 'integer'>;
+  updateType(value: EqBandType, unit: 'type'): Promise<void>;
 
   /**
-   * Updates the equalizer band gain.
-   *
-   * @param gain - Band gain. Either in decibels (-15 to +15dB) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current equalizer band type as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0-5)
    * @example
-   * ```typescript
-   * // Using gain in dB
-   * await band.updateGain(6);
-   *
-   * // Using raw OSC value
+   * // Get raw OSC value
+   * const rawType = await band.fetchType();
+   */
+  fetchType(): Promise<number>;
+
+  /**
+   * Fetch the current equalizer band type as type string
+   * @param unit - Must be 'type' to get type string
+   * @returns Promise that resolves to type string ('LCut', 'LShv', 'PEQ', 'VEQ', 'HShv', 'HCut')
+   * @example
+   * // Get band type string
+   * const typeStr = await band.fetchType('type');
+   */
+  fetchType(unit: 'type'): Promise<EqBandType>;
+
+  /**
+   * Update the equalizer band gain using raw OSC value
+   * @param value - The gain as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await band.updateGain(0.7);
-   * ```
    */
-  updateGain: AsyncSetter<Unit<'decibels', number>, 'float'>;
+  updateGain(value: number): Promise<void>;
 
   /**
-   * Fetches the current equalizer band gain.
-   *
-   * @returns Promise resolving to the band gain. Returns gain in decibels (-15 to +15dB) or raw OSC float (0.0-1.0).
-   *
+   * Update the equalizer band gain using decibels
+   * @param value - The gain in decibels (-15 to +15dB)
+   * @param unit - Must be 'decibels' when using dB values
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
+   * // Set using gain in dB
+   * await band.updateGain(6, 'decibels');
+   */
+  updateGain(value: number, unit: 'decibels'): Promise<void>;
+
+  /**
+   * Fetch the current equalizer band gain as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value
+   * const rawGain = await band.fetchGain();
+   */
+  fetchGain(): Promise<number>;
+
+  /**
+   * Fetch the current equalizer band gain in decibels
+   * @param unit - Must be 'decibels' to get level in dB
+   * @returns Promise that resolves to gain in dB (-15 to +15dB)
+   * @example
    * // Get gain in dB
-   * const gain = await band.fetchGain();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await band.fetchGain();
-   * ```
+   * const gainDb = await band.fetchGain('decibels');
    */
-  fetchGain: AsyncGetter<Unit<'decibels', number>, 'float'>;
+  fetchGain(unit: 'decibels'): Promise<number>;
 
   /**
-   * Updates the equalizer band Q factor (resonance).
-   *
-   * @param q - Q factor. Either as number (0.3-10.0) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Update the equalizer band Q factor using raw OSC value
+   * @param value - The Q factor as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Using Q factor value
-   * await band.updateQ(2.5);
-   *
-   * // Using raw OSC value
+   * // Set using raw OSC value
    * await band.updateQ(0.4);
-   * ```
    */
-  updateQ: AsyncSetter<Unit<'number', number>, 'float'>;
+  updateQ(value: number): Promise<void>;
 
   /**
-   * Fetches the current equalizer band Q factor (resonance).
-   *
-   * @returns Promise resolving to the Q factor. Returns Q factor (0.3-10.0) or raw OSC float (0.0-1.0).
-   *
+   * Update the equalizer band Q factor using number
+   * @param value - The Q factor as number (0.3-10.0)
+   * @param unit - Must be 'number' when using Q factor values
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get Q factor value
-   * const q = await band.fetchQ();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await band.fetchQ();
-   * ```
+   * // Set using Q factor value
+   * await band.updateQ(2.5, 'number');
    */
-  fetchQ: AsyncGetter<Unit<'number', number>, 'float'>;
+  updateQ(value: number, unit: 'number'): Promise<void>;
+
+  /**
+   * Fetch the current equalizer band Q factor as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value
+   * const rawQ = await band.fetchQ();
+   */
+  fetchQ(): Promise<number>;
+
+  /**
+   * Fetch the current equalizer band Q factor as number
+   * @param unit - Must be 'number' to get Q factor value
+   * @returns Promise that resolves to Q factor (0.3-10.0)
+   * @example
+   * // Get Q factor value
+   * const qValue = await band.fetchQ('number');
+   */
+  fetchQ(unit: 'number'): Promise<number>;
 };
 
 type ChannelEqualizerBandDependencies = {
@@ -197,7 +227,7 @@ export const createChannelEqualizerBand = (
     `${oscBaseAddress}/f`,
     createLogarithmicParameterConfig<'hertz'>(20, 20000),
   );
-  const gain = oscParameterFactory.createOSCParameter<Unit<'decibels', number>, 'float'>(
+  const gain = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/g`,
     createLinearParameterConfig<'decibels'>(-15, 15),
   );

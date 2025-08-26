@@ -1,74 +1,88 @@
 import { OSCClient } from '../../osc/client.js';
 import { onOffParameterConfig } from '../mapper/on-off.js';
-import { AsyncGetter, AsyncSetter, createOSCParameterFactory, Unit } from '../osc-parameter.js';
+import { createOSCParameterFactory } from '../osc-parameter.js';
 import { InsertFxSlot, insertFxSlotParameterConfig } from './mapper/fx-slot.js';
 
 export type Insert = {
   /**
-   * Fetches the current insert enable/disable status.
-   *
-   * @returns Promise resolving to the insert state. Returns boolean (true=enabled, false=disabled) or raw OSC integer (0=disabled, 1=enabled).
-   *
+   * Fetch the current insert enabled state as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
    * @example
-   * ```typescript
-   * // Get as boolean
-   * const isEnabled = await insert.fetchIsEnabled();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await insert.fetchIsEnabled();
-   * ```
+   * // Get raw OSC value
+   * const rawEnabled = await insert.fetchIsEnabled();
    */
-  fetchIsEnabled: AsyncGetter<Unit<'flag', boolean>, 'integer'>;
+  fetchIsEnabled(): Promise<number>;
 
   /**
-   * Updates the insert enable/disable status.
-   *
-   * @param enabled - Insert state. Either a boolean (true=enabled, false=disabled) or a raw OSC integer (0=disabled, 1=enabled).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current insert enabled state as boolean
+   * @param unit - Must be 'flag' to get boolean value
+   * @returns Promise that resolves to boolean value
    * @example
-   * ```typescript
-   * // Using boolean value
-   * await insert.updateEnabled(true);
-   *
-   * // Using raw OSC value
+   * // Get boolean value
+   * const isEnabled = await insert.fetchIsEnabled('flag');
+   */
+  fetchIsEnabled(unit: 'flag'): Promise<boolean>;
+
+  /**
+   * Update the insert enabled state using raw OSC value
+   * @param value - The enabled state as raw OSC integer (0 = disabled, 1 = enabled)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await insert.updateEnabled(1);
-   * ```
    */
-  updateEnabled: AsyncSetter<Unit<'flag', boolean>, 'integer'>;
+  updateEnabled(value: number): Promise<void>;
 
   /**
-   * Fetches the current insert FX slot assignment.
-   *
-   * @returns Promise resolving to the FX slot. Returns string literal ('OFF', 'Fx1A', 'Fx1B', 'Fx2A', 'Fx2B', 'Fx3A', 'Fx3B', 'Fx4A', 'Fx4B') or raw OSC integer (0-8).
-   *
+   * Update the insert enabled state using boolean
+   * @param value - The enabled state as boolean
+   * @param unit - Must be 'flag' when using boolean value
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get as FX slot literal
-   * const slot = await insert.fetchFxSlot();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await insert.fetchFxSlot();
-   * ```
+   * // Set using boolean
+   * await insert.updateEnabled(true, 'flag');
    */
-  fetchFxSlot: AsyncGetter<Unit<'slot', InsertFxSlot>, 'integer'>;
+  updateEnabled(value: boolean, unit: 'flag'): Promise<void>;
 
   /**
-   * Updates the insert FX slot assignment.
-   *
-   * @param slot - FX slot. Either a string literal ('OFF', 'Fx1A', 'Fx1B', 'Fx2A', 'Fx2B', 'Fx3A', 'Fx3B', 'Fx4A', 'Fx4B') or a raw OSC integer (0-8).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current insert FX slot assignment as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0-8)
    * @example
-   * ```typescript
-   * // Using FX slot literal
-   * await insert.updateFxSlot('Fx1A');
-   *
-   * // Using raw OSC value
+   * // Get raw OSC value
+   * const rawSlot = await insert.fetchFxSlot();
+   */
+  fetchFxSlot(): Promise<number>;
+
+  /**
+   * Fetch the current insert FX slot assignment as slot string
+   * @param unit - Must be 'slot' to get slot string
+   * @returns Promise that resolves to FX slot string ('OFF', 'Fx1A', 'Fx1B', 'Fx2A', 'Fx2B', 'Fx3A', 'Fx3B', 'Fx4A', 'Fx4B')
+   * @example
+   * // Get FX slot string
+   * const slot = await insert.fetchFxSlot('slot');
+   */
+  fetchFxSlot(unit: 'slot'): Promise<InsertFxSlot>;
+
+  /**
+   * Update the insert FX slot assignment using raw OSC value
+   * @param value - The FX slot as raw OSC integer (0-8)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value (1 = 'Fx1A')
    * await insert.updateFxSlot(1);
-   * ```
    */
-  updateFxSlot: AsyncSetter<Unit<'slot', InsertFxSlot>, 'integer'>;
+  updateFxSlot(value: number): Promise<void>;
+
+  /**
+   * Update the insert FX slot assignment using slot string
+   * @param value - The FX slot string ('OFF', 'Fx1A', 'Fx1B', 'Fx2A', 'Fx2B', 'Fx3A', 'Fx3B', 'Fx4A', 'Fx4B')
+   * @param unit - Must be 'slot' when using slot string
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using FX slot string
+   * await insert.updateFxSlot('Fx1A', 'slot');
+   */
+  updateFxSlot(value: InsertFxSlot, unit: 'slot'): Promise<void>;
 };
 
 type InsertDependencies = {

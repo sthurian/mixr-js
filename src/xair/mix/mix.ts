@@ -1,141 +1,169 @@
 import { OSCClient } from '../../osc/client.js';
-import { AsyncGetter, AsyncSetter, createOSCParameterFactory, Unit } from '../osc-parameter.js';
+import { createOSCParameterFactory } from '../osc-parameter.js';
 import { levelParamaterConfig } from '../mapper/level.js';
 import { createLinearParameterConfig } from '../mapper/linear.js';
 import { onOffInvertedParameterConfig, onOffParameterConfig } from '../mapper/on-off.js';
 
 export type Mix = {
   /**
-   * Fetches the current mute status.
-   *
-   * @returns Promise resolving to the mute state. Returns boolean (true=muted, false=unmuted) or raw OSC integer (0=unmuted, 1=muted).
-   *
+   * Fetch the current mute status as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = unmuted, 1 = muted)
    * @example
-   * ```typescript
-   * // Get as boolean
-   * const isMuted = await mix.fetchIsMuted();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await mix.fetchIsMuted();
-   * ```
+   * // Get raw OSC value
+   * const rawMuted = await mix.fetchIsMuted();
    */
-  fetchIsMuted: AsyncGetter<Unit<'flag', boolean>, 'integer'>;
+  fetchIsMuted(): Promise<number>;
 
   /**
-   * Updates the mute status.
-   *
-   * @param muted - Mute state. Either a boolean (true=muted, false=unmuted) or a raw OSC integer (0=unmuted, 1=muted).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current mute status as boolean
+   * @param unit - Must be 'flag' to get boolean value
+   * @returns Promise that resolves to boolean value
    * @example
-   * ```typescript
-   * // Using boolean value
-   * await mix.updateMuted(true);
-   *
-   * // Using raw OSC value
+   * // Get boolean value
+   * const isMuted = await mix.fetchIsMuted('flag');
+   */
+  fetchIsMuted(unit: 'flag'): Promise<boolean>;
+
+  /**
+   * Update the mute status using raw OSC value
+   * @param value - The mute state as raw OSC integer (0 = unmuted, 1 = muted)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await mix.updateMuted(1);
-   * ```
    */
-  updateMuted: AsyncSetter<Unit<'flag', boolean>, 'integer'>;
+  updateMuted(value: number): Promise<void>;
 
   /**
-   * Fetches the current left-right assignment status.
-   *
-   * @returns Promise resolving to the assignment state. Returns boolean (true=assigned, false=unassigned) or raw OSC integer (0=unassigned, 1=assigned).
-   *
+   * Update the mute status using boolean
+   * @param value - The mute state as boolean
+   * @param unit - Must be 'flag' when using boolean value
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get as boolean
-   * const isAssigned = await mix.fetchIsLeftRightAssignmentEnabled();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await mix.fetchIsLeftRightAssignmentEnabled();
-   * ```
+   * // Set using boolean
+   * await mix.updateMuted(true, 'flag');
    */
-  fetchIsLeftRightAssignmentEnabled: AsyncGetter<Unit<'flag', boolean>, 'integer'>;
+  updateMuted(value: boolean, unit: 'flag'): Promise<void>;
 
   /**
-   * Updates the left-right assignment status.
-   *
-   * @param enabled - Assignment state. Either a boolean (true=assigned, false=unassigned) or a raw OSC integer (0=unassigned, 1=assigned).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current left-right assignment enabled state as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
    * @example
-   * ```typescript
-   * // Using boolean value
-   * await mix.updateLeftRightAssignmentEnabled(true);
-   *
-   * // Using raw OSC value
+   * // Get raw OSC value
+   * const rawAssignment = await mix.fetchIsLeftRightAssignmentEnabled();
+   */
+  fetchIsLeftRightAssignmentEnabled(): Promise<number>;
+
+  /**
+   * Fetch the current left-right assignment enabled state as boolean
+   * @param unit - Must be 'flag' to get boolean value
+   * @returns Promise that resolves to boolean value
+   * @example
+   * // Get boolean value
+   * const isAssigned = await mix.fetchIsLeftRightAssignmentEnabled('flag');
+   */
+  fetchIsLeftRightAssignmentEnabled(unit: 'flag'): Promise<boolean>;
+
+  /**
+   * Update the left-right assignment enabled state using raw OSC value
+   * @param value - The assignment state as raw OSC integer (0 = disabled, 1 = enabled)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await mix.updateLeftRightAssignmentEnabled(1);
-   * ```
    */
-  updateLeftRightAssignmentEnabled: AsyncSetter<Unit<'flag', boolean>, 'integer'>;
+  updateLeftRightAssignmentEnabled(value: number): Promise<void>;
 
   /**
-   * Fetches the current fader level.
-   *
-   * @returns Promise resolving to the fader level. Returns level in decibels (-∞ to +10dB) or raw OSC float (0.0-1.0).
-   *
+   * Update the left-right assignment enabled state using boolean
+   * @param value - The assignment state as boolean
+   * @param unit - Must be 'flag' when using boolean value
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get level in dB
-   * const level = await mix.fetchFader();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await mix.fetchFader();
-   * ```
+   * // Set using boolean
+   * await mix.updateLeftRightAssignmentEnabled(true, 'flag');
    */
-  fetchFader: AsyncGetter<Unit<'decibels', number>, 'float'>;
+  updateLeftRightAssignmentEnabled(value: boolean, unit: 'flag'): Promise<void>;
 
   /**
-   * Updates the fader level.
-   *
-   * @param level - Fader level. Either in decibels (-∞ to +10dB) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current fader level as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
    * @example
-   * ```typescript
-   * // Using level in dB
-   * await mix.updateFader(-20);
-   *
-   * // Using raw OSC value
-   * await mix.updateFader(0.5);
-   * ```
+   * // Get raw OSC value
+   * const rawLevel = await mix.fetchFader();
    */
-  updateFader: AsyncSetter<Unit<'decibels', number>, 'float'>;
+  fetchFader(): Promise<number>;
 
   /**
-   * Fetches the current pan position.
-   *
-   * @returns Promise resolving to the pan position. Returns percentage (-100% to +100%) or raw OSC float (0.0-1.0).
-   *
+   * Fetch the current fader level in decibels
+   * @param unit - Must be 'decibels' to get level in dB
+   * @returns Promise that resolves to level in dB (-∞ to +10dB)
    * @example
-   * ```typescript
-   * // Get pan as percentage
-   * const pan = await mix.fetchPan();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await mix.fetchPan();
-   * ```
+   * // Get level in decibels
+   * const levelDb = await mix.fetchFader('decibels');
    */
-  fetchPan: AsyncGetter<Unit<'percent', number>, 'float'>;
+  fetchFader(unit: 'decibels'): Promise<number>;
 
   /**
-   * Updates the pan position.
-   *
-   * @param pan - Pan position. Either as percentage (-100% to +100%) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Update the fader level using raw OSC value
+   * @param value - The level as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Using percentage
-   * await mix.updatePan(-50);
-   *
-   * // Using raw OSC value
+   * // Set using raw OSC value
+   * await mix.updateFader(0.75);
+   */
+  updateFader(value: number): Promise<void>;
+
+  /**
+   * Update the fader level using decibels
+   * @param value - The level in dB (-∞ to +10dB)
+   * @param unit - Must be 'decibels' when using dB values
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using level in dB
+   * await mix.updateFader(-10, 'decibels');
+   */
+  updateFader(value: number, unit: 'decibels'): Promise<void>;
+
+  /**
+   * Fetch the current pan position as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value
+   * const rawPan = await mix.fetchPan();
+   */
+  fetchPan(): Promise<number>;
+
+  /**
+   * Fetch the current pan position as percentage
+   * @param unit - Must be 'percent' to get position as percentage
+   * @returns Promise that resolves to position as percentage (-100% to +100%)
+   * @example
+   * // Get position as percentage
+   * const panPercent = await mix.fetchPan('percent');
+   */
+  fetchPan(unit: 'percent'): Promise<number>;
+
+  /**
+   * Update the pan position using raw OSC value
+   * @param value - The position as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value (0.25 = 50% left)
    * await mix.updatePan(0.25);
-   * ```
    */
-  updatePan: AsyncSetter<Unit<'percent', number>, 'float'>;
+  updatePan(value: number): Promise<void>;
+
+  /**
+   * Update the pan position using percentage
+   * @param value - The position as percentage (-100% to +100%)
+   * @param unit - Must be 'percent' when using percentage values
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using percentage (negative = left, positive = right)
+   * await mix.updatePan(-50, 'percent');
+   */
+  updatePan(value: number, unit: 'percent'): Promise<void>;
 };
 
 type MixDependencies = {
@@ -155,11 +183,11 @@ export const createMix = (dependencies: MixDependencies): Mix => {
     `${oscBaseAddress}/lr`,
     onOffParameterConfig,
   );
-  const fader = oscParameterFactory.createOSCParameter<Unit<'decibels', number>, 'float'>(
+  const fader = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/fader`,
     levelParamaterConfig,
   );
-  const pan = oscParameterFactory.createOSCParameter<Unit<'percent', number>, 'float'>(
+  const pan = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/pan`,
     createLinearParameterConfig<'percent'>(-100, 100),
   );

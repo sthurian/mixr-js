@@ -3,293 +3,341 @@ import { createLinearParameterConfig } from '../../../mapper/linear.js';
 import { createDynamicsFilter, DynamicsFilter } from '../filter/filter.js';
 import { DynamicsKeySource, dynamicsKeySourceParameterConfig } from '../mapper/key-source.js';
 import { GateMode, gateModeParameterConfig } from './mapper/mode.js';
-import {
-  AsyncGetter,
-  AsyncSetter,
-  createOSCParameterFactory,
-  Unit,
-} from '../../../osc-parameter.js';
+import { createOSCParameterFactory } from '../../../osc-parameter.js';
 import { createLogarithmicParameterConfig } from '../../../mapper/log.js';
 import { onOffParameterConfig } from '../../../mapper/on-off.js';
 
 export type ChannelGate = {
   /**
-   * Updates the gate attack time.
-   *
-   * @param attack - Attack time. Either in milliseconds (0.0-120.0ms) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Update the gate attack time using raw OSC value
+   * @param value - The attack time as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Using time in milliseconds
-   * await gate.updateAttack(25.0);
-   *
-   * // Using raw OSC value
+   * // Set using raw OSC value
    * await gate.updateAttack(0.2);
-   * ```
    */
-  updateAttack: AsyncSetter<Unit<'milliseconds', number>, 'float'>;
+  updateAttack(value: number): Promise<void>;
 
   /**
-   * Fetches the current gate attack time.
-   *
-   * @returns Promise resolving to the attack time. Returns time in milliseconds (0.0-120.0ms) or raw OSC float (0.0-1.0).
-   *
+   * Update the gate attack time using milliseconds
+   * @param value - The attack time in milliseconds (0.0-120.0ms)
+   * @param unit - Must be 'milliseconds' when using millisecond values
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
+   * // Set using time in milliseconds
+   * await gate.updateAttack(25.0, 'milliseconds');
+   */
+  updateAttack(value: number, unit: 'milliseconds'): Promise<void>;
+
+  /**
+   * Fetch the current gate attack time as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value
+   * const rawAttack = await gate.fetchAttack();
+   */
+  fetchAttack(): Promise<number>;
+
+  /**
+   * Fetch the current gate attack time in milliseconds
+   * @param unit - Must be 'milliseconds' to get time in ms
+   * @returns Promise that resolves to time in milliseconds (0.0-120.0ms)
+   * @example
    * // Get attack time in ms
-   * const attack = await gate.fetchAttack();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await gate.fetchAttack();
-   * ```
+   * const attackMs = await gate.fetchAttack('milliseconds');
    */
-  fetchAttack: AsyncGetter<Unit<'milliseconds', number>, 'float'>;
+  fetchAttack(unit: 'milliseconds'): Promise<number>;
 
   /**
-   * Gets the gate's filter interface for controlling filter settings.
-   *
-   * @returns The dynamics filter interface.
-   *
+   * Get access to the gate's sidechain filter
+   * @returns DynamicsFilter object for configuring the sidechain filter
    * @example
-   * ```typescript
+   * // Get filter and configure it
    * const filter = gate.getFilter();
-   * await filter.updateEnabled(true);
-   * await filter.updateFrequency(1000);
-   * ```
+   * await filter.updateEnabled(true, 'flag');
+   * await filter.updateFrequency(1000, 'hertz');
    */
   getFilter: () => DynamicsFilter;
 
   /**
-   * Updates the gate hold time.
-   *
-   * @param hold - Hold time. Either in milliseconds (0.02-2000ms) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Update the gate hold time using raw OSC value
+   * @param value - The hold time as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Using time in milliseconds
-   * await gate.updateHold(50);
-   *
-   * // Using raw OSC value
+   * // Set using raw OSC value
    * await gate.updateHold(0.3);
-   * ```
    */
-  updateHold: AsyncSetter<Unit<'milliseconds', number>, 'float'>;
+  updateHold(value: number): Promise<void>;
 
   /**
-   * Fetches the current gate hold time.
-   *
-   * @returns Promise resolving to the hold time. Returns time in milliseconds (0.02-2000ms) or raw OSC float (0.0-1.0).
-   *
+   * Update the gate hold time using milliseconds
+   * @param value - The hold time in milliseconds (0.02-2000ms)
+   * @param unit - Must be 'milliseconds' when using millisecond values
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
+   * // Set using time in milliseconds
+   * await gate.updateHold(50, 'milliseconds');
+   */
+  updateHold(value: number, unit: 'milliseconds'): Promise<void>;
+
+  /**
+   * Fetch the current gate hold time as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value
+   * const rawHold = await gate.fetchHold();
+   */
+  fetchHold(): Promise<number>;
+
+  /**
+   * Fetch the current gate hold time in milliseconds
+   * @param unit - Must be 'milliseconds' to get time in ms
+   * @returns Promise that resolves to time in milliseconds (0.02-2000ms)
+   * @example
    * // Get hold time in ms
-   * const hold = await gate.fetchHold();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await gate.fetchHold();
-   * ```
+   * const holdMs = await gate.fetchHold('milliseconds');
    */
-  fetchHold: AsyncGetter<Unit<'milliseconds', number>, 'float'>;
+  fetchHold(unit: 'milliseconds'): Promise<number>;
 
   /**
-   * Updates the gate key source for sidechain detection.
-   *
-   * @param keySource - Key source. Either a string literal ('SELF', 'CH01'-'CH16', 'BUS01'-'BUS06') or a raw OSC integer (0-22).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Update the gate key source for sidechain using raw OSC value
+   * @param value - The key source as raw OSC integer (0-22)
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Using key source literal
-   * await gate.updateKeySource('CH02');
-   *
-   * // Using raw OSC value
+   * // Set using raw OSC value
    * await gate.updateKeySource(2);
-   * ```
    */
-  updateKeySource: AsyncSetter<Unit<'keySource', DynamicsKeySource>, 'integer'>;
+  updateKeySource(value: number): Promise<void>;
 
   /**
-   * Fetches the current gate key source for sidechain detection.
-   *
-   * @returns Promise resolving to the key source. Returns string literal ('SELF', 'CH01'-'CH16', 'BUS01'-'BUS06') or raw OSC integer (0-22).
-   *
+   * Update the gate key source for sidechain using source string
+   * @param value - The key source string ('SELF', 'CH01'-'CH16', 'BUS01'-'BUS06')
+   * @param unit - Must be 'keySource' when using source string
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get as key source literal
-   * const keySource = await gate.fetchKeySource();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await gate.fetchKeySource();
-   * ```
+   * // Set using key source string
+   * await gate.updateKeySource('CH02', 'keySource');
    */
-  fetchKeySource: AsyncGetter<Unit<'keySource', DynamicsKeySource>, 'integer'>;
+  updateKeySource(value: DynamicsKeySource, unit: 'keySource'): Promise<void>;
 
   /**
-   * Updates the gate operating mode.
-   *
-   * @param mode - Gate mode. Either a string literal ('EXP2', 'EXP3', 'EXP4', 'GATE', 'DUCK') or a raw OSC integer (0-4).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current gate key source as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0-22)
    * @example
-   * ```typescript
-   * // Using mode literal
-   * await gate.updateMode('GATE');
-   *
-   * // Using raw OSC value
+   * // Get raw OSC value
+   * const rawKeySource = await gate.fetchKeySource();
+   */
+  fetchKeySource(): Promise<number>;
+
+  /**
+   * Fetch the current gate key source as source string
+   * @param unit - Must be 'keySource' to get source string
+   * @returns Promise that resolves to source string ('SELF', 'CH01'-'CH16', 'BUS01'-'BUS06')
+   * @example
+   * // Get key source string
+   * const keySourceStr = await gate.fetchKeySource('keySource');
+   */
+  fetchKeySource(unit: 'keySource'): Promise<DynamicsKeySource>;
+
+  /**
+   * Update the gate operating mode using raw OSC value
+   * @param value - The mode as raw OSC integer (0-4)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await gate.updateMode(3);
-   * ```
    */
-  updateMode: AsyncSetter<Unit<'mode', GateMode>, 'integer'>;
+  updateMode(value: number): Promise<void>;
 
   /**
-   * Fetches the current gate operating mode.
-   *
-   * @returns Promise resolving to the gate mode. Returns string literal ('EXP2', 'EXP3', 'EXP4', 'GATE', 'DUCK') or raw OSC integer (0-4).
-   *
+   * Update the gate operating mode using mode string
+   * @param value - The mode string ('EXP2', 'EXP3', 'EXP4', 'GATE', 'DUCK')
+   * @param unit - Must be 'mode' when using mode string
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get as mode literal
-   * const mode = await gate.fetchMode();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await gate.fetchMode();
-   * ```
+   * // Set using mode string
+   * await gate.updateMode('GATE', 'mode');
    */
-  fetchMode: AsyncGetter<Unit<'mode', GateMode>, 'integer'>;
+  updateMode(value: GateMode, unit: 'mode'): Promise<void>;
 
   /**
-   * Updates the gate enable/disable status.
-   *
-   * @param enabled - Gate state. Either a boolean (true=enabled, false=disabled) or a raw OSC integer (0=disabled, 1=enabled).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current gate operating mode as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0-4)
    * @example
-   * ```typescript
-   * // Using boolean value
-   * await gate.updateEnabled(true);
-   *
-   * // Using raw OSC value
+   * // Get raw OSC value
+   * const rawMode = await gate.fetchMode();
+   */
+  fetchMode(): Promise<number>;
+
+  /**
+   * Fetch the current gate operating mode as mode string
+   * @param unit - Must be 'mode' to get mode string
+   * @returns Promise that resolves to mode string ('EXP2', 'EXP3', 'EXP4', 'GATE', 'DUCK')
+   * @example
+   * // Get mode string
+   * const modeStr = await gate.fetchMode('mode');
+   */
+  fetchMode(unit: 'mode'): Promise<GateMode>;
+
+  /**
+   * Update the gate enabled state using raw OSC value
+   * @param value - The enabled state as raw OSC integer (0 = disabled, 1 = enabled)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await gate.updateEnabled(1);
-   * ```
    */
-  updateEnabled: AsyncSetter<Unit<'flag', boolean>, 'integer'>;
+  updateEnabled(value: number): Promise<void>;
 
   /**
-   * Fetches the current gate enable/disable status.
-   *
-   * @returns Promise resolving to the gate state. Returns boolean (true=enabled, false=disabled) or raw OSC integer (0=disabled, 1=enabled).
-   *
+   * Update the gate enabled state using boolean
+   * @param value - The enabled state as boolean
+   * @param unit - Must be 'flag' when using boolean value
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get as boolean
-   * const isEnabled = await gate.fetchIsEnabled();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await gate.fetchIsEnabled();
-   * ```
+   * // Set using boolean
+   * await gate.updateEnabled(true, 'flag');
    */
-  fetchIsEnabled: AsyncGetter<Unit<'flag', boolean>, 'integer'>;
+  updateEnabled(value: boolean, unit: 'flag'): Promise<void>;
 
   /**
-   * Updates the gate range (amount of gain reduction).
-   *
-   * @param range - Range in decibels (3-60dB) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current gate enabled state as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
    * @example
-   * ```typescript
-   * // Using range in dB
-   * await gate.updateRange(20);
-   *
-   * // Using raw OSC value
+   * // Get raw OSC value
+   * const rawEnabled = await gate.fetchIsEnabled();
+   */
+  fetchIsEnabled(): Promise<number>;
+
+  /**
+   * Fetch the current gate enabled state as boolean
+   * @param unit - Must be 'flag' to get boolean value
+   * @returns Promise that resolves to boolean value
+   * @example
+   * // Get boolean value
+   * const isEnabled = await gate.fetchIsEnabled('flag');
+   */
+  fetchIsEnabled(unit: 'flag'): Promise<boolean>;
+
+  /**
+   * Update the gate range using raw OSC value
+   * @param value - The range as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await gate.updateRange(0.3);
-   * ```
    */
-  updateRange: AsyncSetter<Unit<'decibels', number>, 'float'>;
+  updateRange(value: number): Promise<void>;
 
   /**
-   * Fetches the current gate range (amount of gain reduction).
-   *
-   * @returns Promise resolving to the range. Returns range in decibels (3-60dB) or raw OSC float (0.0-1.0).
-   *
+   * Update the gate range using decibels
+   * @param value - The range in decibels (3-60dB)
+   * @param unit - Must be 'decibels' when using dB values
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
+   * // Set using decibels
+   * await gate.updateRange(20, 'decibels');
+   */
+  updateRange(value: number, unit: 'decibels'): Promise<void>;
+
+  /**
+   * Fetch the current gate range as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value
+   * const rawRange = await gate.fetchRange();
+   */
+  fetchRange(): Promise<number>;
+
+  /**
+   * Fetch the current gate range in decibels
+   * @param unit - Must be 'decibels' to get level in dB
+   * @returns Promise that resolves to level in dB (3-60dB)
+   * @example
    * // Get range in dB
-   * const range = await gate.fetchRange();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await gate.fetchRange();
-   * ```
+   * const rangeDb = await gate.fetchRange('decibels');
    */
-  fetchRange: AsyncGetter<Unit<'decibels', number>, 'float'>;
+  fetchRange(unit: 'decibels'): Promise<number>;
 
   /**
-   * Updates the gate release time.
-   *
-   * @param release - Release time. Either in milliseconds (5-4000ms) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Update the gate release time using raw OSC value
+   * @param value - The release time as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Using time in milliseconds
-   * await gate.updateRelease(100);
-   *
-   * // Using raw OSC value
+   * // Set using raw OSC value
    * await gate.updateRelease(0.4);
-   * ```
    */
-  updateRelease: AsyncSetter<Unit<'milliseconds', number>, 'float'>;
+  updateRelease(value: number): Promise<void>;
 
   /**
-   * Fetches the current gate release time.
-   *
-   * @returns Promise resolving to the release time. Returns time in milliseconds (5-4000ms) or raw OSC float (0.0-1.0).
-   *
+   * Update the gate release time using milliseconds
+   * @param value - The release time in milliseconds (5-4000ms)
+   * @param unit - Must be 'milliseconds' when using millisecond values
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
+   * // Set using time in milliseconds
+   * await gate.updateRelease(100, 'milliseconds');
+   */
+  updateRelease(value: number, unit: 'milliseconds'): Promise<void>;
+
+  /**
+   * Fetch the current gate release time as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value
+   * const rawRelease = await gate.fetchRelease();
+   */
+  fetchRelease(): Promise<number>;
+
+  /**
+   * Fetch the current gate release time in milliseconds
+   * @param unit - Must be 'milliseconds' to get time in ms
+   * @returns Promise that resolves to time in milliseconds (5-4000ms)
+   * @example
    * // Get release time in ms
-   * const release = await gate.fetchRelease();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await gate.fetchRelease();
-   * ```
+   * const releaseMs = await gate.fetchRelease('milliseconds');
    */
-  fetchRelease: AsyncGetter<Unit<'milliseconds', number>, 'float'>;
+  fetchRelease(unit: 'milliseconds'): Promise<number>;
 
   /**
-   * Updates the gate threshold level.
-   *
-   * @param threshold - Threshold level. Either in decibels (-80 to 0dB) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Update the gate threshold level using raw OSC value
+   * @param value - The threshold as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Using threshold in dB
-   * await gate.updateThreshold(-40);
-   *
-   * // Using raw OSC value
+   * // Set using raw OSC value
    * await gate.updateThreshold(0.5);
-   * ```
    */
-  updateThreshold: AsyncSetter<Unit<'decibels', number>, 'float'>;
+  updateThreshold(value: number): Promise<void>;
 
   /**
-   * Fetches the current gate threshold level.
-   *
-   * @returns Promise resolving to the threshold level. Returns threshold in decibels (-80 to 0dB) or raw OSC float (0.0-1.0).
-   *
+   * Update the gate threshold level using decibels
+   * @param value - The threshold level in dB (-80 to 0dB)
+   * @param unit - Must be 'decibels' when using dB values
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get threshold in dB
-   * const threshold = await gate.fetchThreshold();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await gate.fetchThreshold();
-   * ```
+   * // Set using decibels
+   * await gate.updateThreshold(-40, 'decibels');
    */
-  fetchThreshold: AsyncGetter<Unit<'decibels', number>, 'float'>;
+  updateThreshold(value: number, unit: 'decibels'): Promise<void>;
+
+  /**
+   * Fetch the current gate threshold level as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value
+   * const rawThreshold = await gate.fetchThreshold();
+   */
+  fetchThreshold(): Promise<number>;
+
+  /**
+   * Fetch the current gate threshold level in decibels
+   * @param unit - Must be 'decibels' to get level in dB
+   * @returns Promise that resolves to level in dB (-80 to 0dB)
+   * @example
+   * // Get threshold in dB
+   * const thresholdDb = await gate.fetchThreshold('decibels');
+   */
+  fetchThreshold(unit: 'decibels'): Promise<number>;
 };
 
 type ChannelGateDependencies = {
@@ -301,7 +349,7 @@ export const createChannelGate = (dependencies: ChannelGateDependencies): Channe
   const { channel, oscClient } = dependencies;
   const oscBaseAddress = `/ch/${channel.toString().padStart(2, '0')}/gate`;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
-  const attack = oscParameterFactory.createOSCParameter<Unit<'milliseconds', number>, 'float'>(
+  const attack = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/attack`,
     createLinearParameterConfig<'milliseconds'>(0.0, 120.0),
   );
@@ -324,7 +372,7 @@ export const createChannelGate = (dependencies: ChannelGateDependencies): Channe
     `${oscBaseAddress}/on`,
     onOffParameterConfig,
   );
-  const range = oscParameterFactory.createOSCParameter<Unit<'decibels', number>, 'float'>(
+  const range = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/range`,
     createLinearParameterConfig<'decibels'>(3, 60),
   );
@@ -332,7 +380,7 @@ export const createChannelGate = (dependencies: ChannelGateDependencies): Channe
     `${oscBaseAddress}/release`,
     createLogarithmicParameterConfig<'milliseconds'>(5, 4000),
   );
-  const threshold = oscParameterFactory.createOSCParameter<Unit<'decibels', number>, 'float'>(
+  const threshold = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/thr`,
     createLinearParameterConfig<'decibels'>(-80, 0),
   );

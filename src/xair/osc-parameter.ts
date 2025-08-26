@@ -4,14 +4,14 @@ import { OscArgument, oscArgumentListSchema, OscArgumentValue } from '../osc/osc
 type OSCDataType = 'float' | 'integer' | 'string';
 
 type OSCValue<T extends OSCDataType> = T extends 'string' ? string : number;
-export type Unit<N extends string = string, V = string | number | boolean> = { name: N; value: V };
+type Unit<N extends string = string, V = string | number | boolean> = { name: N; value: V };
 
-export type AsyncGetter<U extends Unit, T extends OSCDataType> = {
+type AsyncGetter<U extends Unit, T extends OSCDataType> = {
   (): Promise<OSCValue<T>>;
   (unit: U['name']): Promise<U['value']>;
 };
 
-export type AsyncSetter<U extends Unit, T extends OSCDataType> = {
+type AsyncSetter<U extends Unit, T extends OSCDataType> = {
   (value: OSCValue<T>): Promise<void>;
   (value: U['value'], unit: U['name']): Promise<void>;
 };

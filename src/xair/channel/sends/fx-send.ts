@@ -1,5 +1,5 @@
 import { OSCClient } from '../../../osc/client.js';
-import { AsyncGetter, AsyncSetter, createOSCParameterFactory, Unit } from '../../osc-parameter.js';
+import { createOSCParameterFactory } from '../../osc-parameter.js';
 import { levelParamaterConfig } from '../../mapper/level.js';
 import { ChannelFxSendLabel, mapChannelFxSendLabelToNumber } from './mapper/fx-send.js';
 import { FxSendTap, fxSendTapParameterConfig } from './mapper/fx-tap.js';
@@ -7,103 +7,124 @@ import { onOffParameterConfig } from '../../mapper/on-off.js';
 
 export type ChannelFxSend = {
   /**
-   * Fetches the current FX send group enable/disable status.
-   *
-   * @returns Promise resolving to the group enable state. Returns boolean (true=enabled, false=disabled) or raw OSC integer (0=disabled, 1=enabled).
-   *
+   * Fetch the current FX send group enabled state as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
    * @example
-   * ```typescript
-   * // Get as boolean
-   * const isEnabled = await fxSend.fetchIsGroupEnabled();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await fxSend.fetchIsGroupEnabled();
-   * ```
+   * // Get raw OSC value
+   * const rawEnabled = await fxSend.fetchIsGroupEnabled();
    */
-  fetchIsGroupEnabled: AsyncGetter<Unit<'flag', boolean>, 'integer'>;
+  fetchIsGroupEnabled(): Promise<number>;
 
   /**
-   * Updates the FX send group enable/disable status.
-   *
-   * @param enabled - Group enable state. Either a boolean (true=enabled, false=disabled) or a raw OSC integer (0=disabled, 1=enabled).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current FX send group enabled state as boolean
+   * @param unit - Must be 'flag' to get boolean value
+   * @returns Promise that resolves to boolean value
    * @example
-   * ```typescript
-   * // Using boolean value
-   * await fxSend.updateGroupEnabled(true);
-   *
-   * // Using raw OSC value
+   * // Get boolean value
+   * const isEnabled = await fxSend.fetchIsGroupEnabled('flag');
+   */
+  fetchIsGroupEnabled(unit: 'flag'): Promise<boolean>;
+
+  /**
+   * Update the FX send group enabled state using raw OSC value
+   * @param value - The enabled state as raw OSC integer (0 = disabled, 1 = enabled)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await fxSend.updateGroupEnabled(1);
-   * ```
    */
-  updateGroupEnabled: AsyncSetter<Unit<'flag', boolean>, 'integer'>;
+  updateGroupEnabled(value: number): Promise<void>;
 
   /**
-   * Fetches the current FX send level.
-   *
-   * @returns Promise resolving to the send level. Returns level in decibels (-∞ to +10dB) or raw OSC float (0.0-1.0).
-   *
+   * Update the FX send group enabled state using boolean
+   * @param value - The enabled state as boolean
+   * @param unit - Must be 'flag' when using boolean value
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get level in dB
-   * const level = await fxSend.fetchLevel();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await fxSend.fetchLevel();
-   * ```
+   * // Set using boolean
+   * await fxSend.updateGroupEnabled(true, 'flag');
    */
-  fetchLevel: AsyncGetter<Unit<'decibels', number>, 'float'>;
+  updateGroupEnabled(value: boolean, unit: 'flag'): Promise<void>;
 
   /**
-   * Updates the FX send level.
-   *
-   * @param level - Send level. Either in decibels (-∞ to +10dB) or as a raw OSC float (0.0-1.0).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current FX send level as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
    * @example
-   * ```typescript
-   * // Using level in dB
-   * await fxSend.updateLevel(-20);
-   *
-   * // Using raw OSC value
+   * // Get raw OSC value
+   * const rawLevel = await fxSend.fetchLevel();
+   */
+  fetchLevel(): Promise<number>;
+
+  /**
+   * Fetch the current FX send level in decibels
+   * @param unit - Must be 'decibels' to get level in dB
+   * @returns Promise that resolves to level in dB (-∞ to +10dB)
+   * @example
+   * // Get level in decibels
+   * const levelDb = await fxSend.fetchLevel('decibels');
+   */
+  fetchLevel(unit: 'decibels'): Promise<number>;
+
+  /**
+   * Update the FX send level using raw OSC value
+   * @param value - The level as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value
    * await fxSend.updateLevel(0.5);
-   * ```
    */
-  updateLevel: AsyncSetter<Unit<'decibels', number>, 'float'>;
+  updateLevel(value: number): Promise<void>;
 
   /**
-   * Fetches the current FX send tap point.
-   *
-   * @returns Promise resolving to the tap point. Returns string literal ('IN', 'PREEQ', 'POSTEQ', 'PRE', 'POST') or raw OSC integer (0-4).
-   *
+   * Update the FX send level using decibels
+   * @param value - The level in dB (-∞ to +10dB)
+   * @param unit - Must be 'decibels' when using dB values
+   * @returns Promise that resolves when the update is complete
    * @example
-   * ```typescript
-   * // Get as tap point literal
-   * const tap = await fxSend.fetchTap();
-   *
-   * // Get as raw OSC value
-   * const oscValue = await fxSend.fetchTap();
-   * ```
+   * // Set using level in dB
+   * await fxSend.updateLevel(-20, 'decibels');
    */
-  fetchTap: AsyncGetter<Unit<'tap', FxSendTap>, 'integer'>;
+  updateLevel(value: number, unit: 'decibels'): Promise<void>;
 
   /**
-   * Updates the FX send tap point.
-   *
-   * @param tap - Tap point. Either a string literal ('IN', 'PREEQ', 'POSTEQ', 'PRE', 'POST') or a raw OSC integer (0-4).
-   * @returns Promise that resolves when the operation completes.
-   *
+   * Fetch the current FX send tap point as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0-4)
    * @example
-   * ```typescript
-   * // Using tap point literal
-   * await fxSend.updateTap('PRE');
-   *
-   * // Using raw OSC value
+   * // Get raw OSC value
+   * const rawTap = await fxSend.fetchTap();
+   */
+  fetchTap(): Promise<number>;
+
+  /**
+   * Fetch the current FX send tap point as tap string
+   * @param unit - Must be 'tap' to get tap string
+   * @returns Promise that resolves to tap string ('IN', 'PREEQ', 'POSTEQ', 'PRE', 'POST')
+   * @example
+   * // Get tap point string
+   * const tap = await fxSend.fetchTap('tap');
+   */
+  fetchTap(unit: 'tap'): Promise<FxSendTap>;
+
+  /**
+   * Update the FX send tap point using raw OSC value
+   * @param value - The tap point as raw OSC integer (0-4)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value (3 = 'PRE')
    * await fxSend.updateTap(3);
-   * ```
    */
-  updateTap: AsyncSetter<Unit<'tap', FxSendTap>, 'integer'>;
+  updateTap(value: number): Promise<void>;
+
+  /**
+   * Update the FX send tap point using tap string
+   * @param value - The tap point as tap string ('IN', 'PREEQ', 'POSTEQ', 'PRE', 'POST')
+   * @param unit - Must be 'tap' when using tap string
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using tap point string
+   * await fxSend.updateTap('PRE', 'tap');
+   */
+  updateTap(value: FxSendTap, unit: 'tap'): Promise<void>;
 };
 
 type ChannelFxSendDependencies = {
@@ -121,7 +142,7 @@ export const createChannelFxSend = (dependencies: ChannelFxSendDependencies): Ch
     `${oscBasePath}/grpon`,
     onOffParameterConfig,
   );
-  const level = oscParameterFactory.createOSCParameter<Unit<'decibels', number>, 'float'>(
+  const level = oscParameterFactory.createOSCParameter(
     `${oscBasePath}/level`,
     levelParamaterConfig,
   );

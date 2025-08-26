@@ -9,123 +9,122 @@ import { CompressorMode, compressorModeParameterConfig } from './parameter/mode.
 import { CompressorRatio, compressorRatioParameterConfig } from './parameter/ratio.js';
 import { DynamicsFilter, createDynamicsFilter } from '../filter/filter.js';
 import { OSCClient } from '../../../../osc/client.js';
-import {
-  AsyncGetter,
-  AsyncSetter,
-  createOSCParameterFactory,
-  Unit,
-} from '../../../osc-parameter.js';
+import { createOSCParameterFactory } from '../../../osc-parameter.js';
 import { createLogarithmicParameterConfig } from '../../../mapper/log.js';
 import { onOffParameterConfig } from '../../../mapper/on-off.js';
 
 export type ChannelCompressor = {
   /**
-   * Fetch the current auto time enabled state
-   * @param unit - Optional unit parameter. If 'flag' is provided, returns boolean value
-   * @returns Promise that resolves to either raw OSC integer (0/1) or boolean
-   * @example
-   * // Get raw OSC value (0 = disabled, 1 = enabled)
-   * const rawEnabled = await compressor.fetchIsAutoTimeEnabled();
-   *
-   * // Get boolean value
-   * const isEnabled = await compressor.fetchIsAutoTimeEnabled('flag');
+   * Fetch the current auto time enabled state as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
    */
-  fetchIsAutoTimeEnabled: AsyncGetter<Unit<'flag', boolean>, 'integer'>;
+  fetchIsAutoTimeEnabled(): Promise<number>;
 
   /**
-   * Update the auto time enabled state
-   * @param value - The enabled state: raw OSC integer (0/1) or boolean
-   * @param unit - Optional unit parameter. If 'flag' is provided, value should be boolean
+   * Fetch the current auto time enabled state as boolean
+   * @param unit - Must be 'flag' to get boolean value
+   * @returns Promise that resolves to boolean value
+   */
+  fetchIsAutoTimeEnabled(unit: 'flag'): Promise<boolean>;
+
+  /**
+   * Update the auto time enabled state using raw OSC value
+   * @param value - The enabled state as raw OSC integer (0 = disabled, 1 = enabled)
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0 = disabled, 1 = enabled)
-   * await compressor.updateAutoTimeEnabled(1);
-   *
-   * // Set using boolean
-   * await compressor.updateAutoTimeEnabled(true, 'flag');
    */
-  updateAutoTimeEnabled: AsyncSetter<Unit<'flag', boolean>, 'integer'>;
+  updateAutoTimeEnabled(value: number): Promise<void>;
 
   /**
-   * Update the attack time
-   * @param value - The attack time: raw OSC float (0.0-1.0) or time in milliseconds (0.0-120.0ms)
-   * @param unit - Optional unit parameter. If 'milliseconds' is provided, value should be in ms
+   * Update the auto time enabled state using boolean
+   * @param value - The enabled state as boolean
+   * @param unit - Must be 'flag' when using boolean value
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0.0 to 1.0)
-   * await compressor.updateAttack(0.3);
-   *
-   * // Set using milliseconds (0.0 to 120.0ms)
-   * await compressor.updateAttack(10, 'milliseconds');
    */
-  updateAttack: AsyncSetter<Unit<'milliseconds', number>, 'float'>;
+  updateAutoTimeEnabled(value: boolean, unit: 'flag'): Promise<void>;
 
   /**
-   * Fetch the current attack time
-   * @param unit - Optional unit parameter. If 'milliseconds' is provided, returns time in ms
-   * @returns Promise that resolves to either raw OSC float (0.0-1.0) or time in milliseconds (0.0-120.0ms)
-   * @example
-   * // Get raw OSC value (0.0 to 1.0)
-   * const rawAttack = await compressor.fetchAttack();
-   *
-   * // Get attack time in milliseconds (0.0 to 120.0ms)
-   * const attackMs = await compressor.fetchAttack('milliseconds');
-   */
-  fetchAttack: AsyncGetter<Unit<'milliseconds', number>, 'float'>;
-
-  /**
-   * Update the detection mode
-   * @param value - The detection mode: raw OSC integer (0/1) or mode string ('PEAK', 'RMS')
-   * @param unit - Optional unit parameter. If 'detectionMode' is provided, value should be mode string
+   * Update the attack time using raw OSC value
+   * @param value - The attack time as raw OSC float (0.0-1.0)
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0 = 'PEAK', 1 = 'RMS')
-   * await compressor.updateDetectionMode(0);
-   *
-   * // Set using mode string
-   * await compressor.updateDetectionMode('PEAK', 'detectionMode');
    */
-  updateDetectionMode: AsyncSetter<Unit<'detectionMode', CompressorDetectionMode>, 'integer'>;
+  updateAttack(value: number): Promise<void>;
 
   /**
-   * Fetch the current detection mode
-   * @param unit - Optional unit parameter. If 'detectionMode' is provided, returns mode string
-   * @returns Promise that resolves to either raw OSC integer (0/1) or mode string ('PEAK', 'RMS')
-   * @example
-   * // Get raw OSC value (0 = 'PEAK', 1 = 'RMS')
-   * const rawMode = await compressor.fetchDetectionMode();
-   *
-   * // Get mode string ('PEAK' or 'RMS')
-   * const mode = await compressor.fetchDetectionMode('detectionMode');
-   */
-  fetchDetectionMode: AsyncGetter<Unit<'detectionMode', CompressorDetectionMode>, 'integer'>;
-
-  /**
-   * Update the envelope setting
-   * @param value - The envelope: raw OSC integer (0/1) or envelope string ('LIN', 'LOG')
-   * @param unit - Optional unit parameter. If 'envelope' is provided, value should be envelope string
+   * Update the attack time using milliseconds
+   * @param value - The attack time in milliseconds (0.0-120.0ms)
+   * @param unit - Must be 'milliseconds' when using millisecond values
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0 = 'LIN', 1 = 'LOG')
-   * await compressor.updateEnvelope(0);
-   *
-   * // Set using envelope string
-   * await compressor.updateEnvelope('LIN', 'envelope');
    */
-  updateEnvelope: AsyncSetter<Unit<'envelope', CompressorEnvelope>, 'integer'>;
+  updateAttack(value: number, unit: 'milliseconds'): Promise<void>;
 
   /**
-   * Fetch the current envelope setting
-   * @param unit - Optional unit parameter. If 'envelope' is provided, returns envelope string
-   * @returns Promise that resolves to either raw OSC integer (0/1) or envelope string ('LIN', 'LOG')
-   * @example
-   * // Get raw OSC value (0 = 'LIN', 1 = 'LOG')
-   * const rawEnvelope = await compressor.fetchEnvelope();
-   *
-   * // Get envelope string ('LIN' or 'LOG')
-   * const envelope = await compressor.fetchEnvelope('envelope');
+   * Fetch the current attack time as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
    */
-  fetchEnvelope: AsyncGetter<Unit<'envelope', CompressorEnvelope>, 'integer'>;
+  fetchAttack(): Promise<number>;
+
+  /**
+   * Fetch the current attack time in milliseconds
+   * @param unit - Must be 'milliseconds' to get time in ms
+   * @returns Promise that resolves to time in milliseconds (0.0-120.0ms)
+   */
+  fetchAttack(unit: 'milliseconds'): Promise<number>;
+
+  /**
+   * Update the detection mode using raw OSC value
+   * @param value - The detection mode as raw OSC integer (0 = 'PEAK', 1 = 'RMS')
+   * @returns Promise that resolves when the update is complete
+   */
+  updateDetectionMode(value: number): Promise<void>;
+
+  /**
+   * Update the detection mode using mode string
+   * @param value - The detection mode as mode string ('PEAK', 'RMS')
+   * @param unit - Must be 'detectionMode' when using mode string
+   * @returns Promise that resolves when the update is complete
+   */
+  updateDetectionMode(value: CompressorDetectionMode, unit: 'detectionMode'): Promise<void>;
+
+  /**
+   * Fetch the current detection mode as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = 'PEAK', 1 = 'RMS')
+   */
+  fetchDetectionMode(): Promise<number>;
+
+  /**
+   * Fetch the current detection mode as mode string
+   * @param unit - Must be 'detectionMode' to get mode string
+   * @returns Promise that resolves to mode string ('PEAK', 'RMS')
+   */
+  fetchDetectionMode(unit: 'detectionMode'): Promise<CompressorDetectionMode>;
+
+  /**
+   * Update the envelope setting using raw OSC value
+   * @param value - The envelope as raw OSC integer (0 = 'LIN', 1 = 'LOG')
+   * @returns Promise that resolves when the update is complete
+   */
+  updateEnvelope(value: number): Promise<void>;
+
+  /**
+   * Update the envelope setting using envelope string
+   * @param value - The envelope as envelope string ('LIN', 'LOG')
+   * @param unit - Must be 'envelope' when using envelope string
+   * @returns Promise that resolves when the update is complete
+   */
+  updateEnvelope(value: CompressorEnvelope, unit: 'envelope'): Promise<void>;
+
+  /**
+   * Fetch the current envelope setting as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = 'LIN', 1 = 'LOG')
+   */
+  fetchEnvelope(): Promise<number>;
+
+  /**
+   * Fetch the current envelope setting as envelope string
+   * @param unit - Must be 'envelope' to get envelope string
+   * @returns Promise that resolves to envelope string ('LIN', 'LOG')
+   */
+  fetchEnvelope(unit: 'envelope'): Promise<CompressorEnvelope>;
 
   /**
    * Get access to the compressor's sidechain filter
@@ -134,262 +133,284 @@ export type ChannelCompressor = {
   getFilter: () => DynamicsFilter;
 
   /**
-   * Update the hold time
-   * @param value - The hold time: raw OSC float (0.0-1.0) or time in milliseconds (0.02-2000ms)
-   * @param unit - Optional unit parameter. If 'milliseconds' is provided, value should be in ms
-   * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0.0 to 1.0)
-   * await compressor.updateHold(0.1);
-   *
-   * // Set using milliseconds (0.02 to 2000ms)
-   * await compressor.updateHold(50, 'milliseconds');
-   */
-  updateHold: AsyncSetter<Unit<'milliseconds', number>, 'float'>;
-
-  /**
-   * Fetch the current hold time
-   * @param unit - Optional unit parameter. If 'milliseconds' is provided, returns time in ms
-   * @returns Promise that resolves to either raw OSC float (0.0-1.0) or time in milliseconds (0.02-2000ms)
-   * @example
-   * // Get raw OSC value (0.0 to 1.0)
-   * const rawHold = await compressor.fetchHold();
-   *
-   * // Get hold time in milliseconds (0.02 to 2000ms)
-   * const holdMs = await compressor.fetchHold('milliseconds');
-   */
-  fetchHold: AsyncGetter<Unit<'milliseconds', number>, 'float'>;
-
-  /**
-   * Update the key source for sidechain
-   * @param value - The key source: raw OSC integer or source string
-   * @param unit - Optional unit parameter. If 'keySource' is provided, value should be source string
+   * Update the hold time using raw OSC value
+   * @param value - The hold time as raw OSC float (0.0-1.0)
    * @returns Promise that resolves when the update is complete
    */
-  updateKeySource: AsyncSetter<Unit<'keySource', DynamicsKeySource>, 'integer'>;
+  updateHold(value: number): Promise<void>;
 
   /**
-   * Fetch the current key source
-   * @param unit - Optional unit parameter. If 'keySource' is provided, returns source string
-   * @returns Promise that resolves to either raw OSC integer or source string
-   */
-  fetchKeySource: AsyncGetter<Unit<'keySource', DynamicsKeySource>, 'integer'>;
-
-  /**
-   * Update the knee setting
-   * @param value - The knee value: raw OSC float (0.0-1.0) or knee value (0-5)
-   * @param unit - Optional unit parameter. If 'number' is provided, value should be knee number
+   * Update the hold time using milliseconds
+   * @param value - The hold time in milliseconds (0.02-2000ms)
+   * @param unit - Must be 'milliseconds' when using millisecond values
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0.0 to 1.0)
-   * await compressor.updateKnee(0.5);
-   *
-   * // Set using knee value (0 to 5)
-   * await compressor.updateKnee(3, 'number');
    */
-  updateKnee: AsyncSetter<Unit<'number', number>, 'float'>;
+  updateHold(value: number, unit: 'milliseconds'): Promise<void>;
 
   /**
-   * Fetch the current knee setting
-   * @param unit - Optional unit parameter. If 'number' is provided, returns knee value
-   * @returns Promise that resolves to either raw OSC float (0.0-1.0) or knee value (0-5)
-   * @example
-   * // Get raw OSC value (0.0 to 1.0)
-   * const rawKnee = await compressor.fetchKnee();
-   *
-   * // Get knee value (0 to 5)
-   * const knee = await compressor.fetchKnee('number');
+   * Fetch the current hold time as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
    */
-  fetchKnee: AsyncGetter<Unit<'number', number>, 'float'>;
+  fetchHold(): Promise<number>;
 
   /**
-   * Update the makeup gain
-   * @param value - The gain value: raw OSC float (0.0-1.0) or level in dB (0-24dB)
-   * @param unit - Optional unit parameter. If 'decibels' is provided, value should be in dB
+   * Fetch the current hold time in milliseconds
+   * @param unit - Must be 'milliseconds' to get time in ms
+   * @returns Promise that resolves to time in milliseconds (0.02-2000ms)
+   */
+  fetchHold(unit: 'milliseconds'): Promise<number>;
+
+  /**
+   * Update the key source for sidechain using raw OSC value
+   * @param value - The key source as raw OSC integer
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0.0 to 1.0)
-   * await compressor.updateGain(0.7);
-   *
-   * // Set using decibels (0 to 24dB)
-   * await compressor.updateGain(12, 'decibels');
    */
-  updateGain: AsyncSetter<Unit<'decibels', number>, 'float'>;
+  updateKeySource(value: number): Promise<void>;
 
   /**
-   * Fetch the current makeup gain
-   * @param unit - Optional unit parameter. If 'decibels' is provided, returns level in dB
-   * @returns Promise that resolves to either raw OSC float (0.0-1.0) or level in dB (0-24dB)
-   * @example
-   * // Get raw OSC value (0.0 to 1.0)
-   * const rawGain = await compressor.fetchGain();
-   *
-   * // Get gain level in dB (0 to 24dB)
-   * const gainDb = await compressor.fetchGain('decibels');
-   */
-  fetchGain: AsyncGetter<Unit<'decibels', number>, 'float'>;
-
-  /**
-   * Update the wet/dry mix
-   * @param value - The mix value: raw OSC float (0.0-1.0) or percentage
-   * @param unit - Optional unit parameter. If 'percent' is provided, value should be percentage
+   * Update the key source for sidechain using source string
+   * @param value - The key source as source string
+   * @param unit - Must be 'keySource' when using source string
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0.0 to 1.0)
-   * await compressor.updateMix(0.8);
-   *
-   * // Set using percentage (0-100%)
-   * await compressor.updateMix(80, 'percent');
    */
-  updateMix: AsyncSetter<Unit<'percent', number>, 'float'>;
+  updateKeySource(value: DynamicsKeySource, unit: 'keySource'): Promise<void>;
 
   /**
-   * Fetch the current wet/dry mix
-   * @param unit - Optional unit parameter. If 'percent' is provided, returns percentage
-   * @returns Promise that resolves to either raw OSC float (0.0-1.0) or percentage
-   * @example
-   * // Get raw OSC value (0.0 to 1.0)
-   * const rawMix = await compressor.fetchMix();
-   *
-   * // Get mix percentage
-   * const mixPercent = await compressor.fetchMix('percent');
+   * Fetch the current key source as raw OSC value
+   * @returns Promise that resolves to raw OSC integer
    */
-  fetchMix: AsyncGetter<Unit<'percent', number>, 'float'>;
+  fetchKeySource(): Promise<number>;
 
   /**
-   * Update the compressor mode
-   * @param value - The mode: raw OSC integer (0/1) or mode string ('COMP', 'EXP')
-   * @param unit - Optional unit parameter. If 'mode' is provided, value should be mode string
+   * Fetch the current key source as source string
+   * @param unit - Must be 'keySource' to get source string
+   * @returns Promise that resolves to source string
+   */
+  fetchKeySource(unit: 'keySource'): Promise<DynamicsKeySource>;
+
+  /**
+   * Update the knee setting using raw OSC value
+   * @param value - The knee value as raw OSC float (0.0-1.0)
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0 = 'COMP', 1 = 'EXP')
-   * await compressor.updateMode(0);
-   *
-   * // Set using mode string
-   * await compressor.updateMode('COMP', 'mode');
    */
-  updateMode: AsyncSetter<Unit<'mode', CompressorMode>, 'integer'>;
+  updateKnee(value: number): Promise<void>;
 
   /**
-   * Fetch the current compressor mode
-   * @param unit - Optional unit parameter. If 'mode' is provided, returns mode string
-   * @returns Promise that resolves to either raw OSC integer (0/1) or mode string ('COMP', 'EXP')
-   * @example
-   * // Get raw OSC value (0 = 'COMP', 1 = 'EXP')
-   * const rawMode = await compressor.fetchMode();
-   *
-   * // Get mode string ('COMP' or 'EXP')
-   * const mode = await compressor.fetchMode('mode');
-   */
-  fetchMode: AsyncGetter<Unit<'mode', CompressorMode>, 'integer'>;
-
-  /**
-   * Update the compressor enabled state
-   * @param value - The enabled state: raw OSC integer (0/1) or boolean
-   * @param unit - Optional unit parameter. If 'flag' is provided, value should be boolean
+   * Update the knee setting using knee number
+   * @param value - The knee value (0-5)
+   * @param unit - Must be 'number' when using knee number
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0 = disabled, 1 = enabled)
-   * await compressor.updateEnabled(1);
-   *
-   * // Set using boolean
-   * await compressor.updateEnabled(true, 'flag');
    */
-  updateEnabled: AsyncSetter<Unit<'flag', boolean>, 'integer'>;
+  updateKnee(value: number, unit: 'number'): Promise<void>;
 
   /**
-   * Fetch the current compressor enabled state
-   * @param unit - Optional unit parameter. If 'flag' is provided, returns boolean value
-   * @returns Promise that resolves to either raw OSC integer (0/1) or boolean
-   * @example
-   * // Get raw OSC value (0 = disabled, 1 = enabled)
-   * const rawEnabled = await compressor.fetchIsEnabled();
-   *
-   * // Get boolean value
-   * const isEnabled = await compressor.fetchIsEnabled('flag');
+   * Fetch the current knee setting as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
    */
-  fetchIsEnabled: AsyncGetter<Unit<'flag', boolean>, 'integer'>;
+  fetchKnee(): Promise<number>;
 
   /**
-   * Update the compression ratio
-   * @param value - The ratio: raw OSC integer (0-11) or ratio string ('1.1', '1.3', '1.5', '2.0', '2.5', '3.0', '4.0', '5.0', '7.0', '10', '20', '100')
-   * @param unit - Optional unit parameter. If 'ratio' is provided, value should be ratio string
+   * Fetch the current knee setting as knee number
+   * @param unit - Must be 'number' to get knee value
+   * @returns Promise that resolves to knee value (0-5)
+   */
+  fetchKnee(unit: 'number'): Promise<number>;
+
+  /**
+   * Update the makeup gain using raw OSC value
+   * @param value - The gain value as raw OSC float (0.0-1.0)
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0 = '1.1', 3 = '2.0', 11 = '100')
-   * await compressor.updateRatio(3);
-   *
-   * // Set using ratio string
-   * await compressor.updateRatio('2.0', 'ratio');
    */
-  updateRatio: AsyncSetter<Unit<'ratio', CompressorRatio>, 'integer'>;
+  updateGain(value: number): Promise<void>;
 
   /**
-   * Fetch the current compression ratio
-   * @param unit - Optional unit parameter. If 'ratio' is provided, returns ratio string
-   * @returns Promise that resolves to either raw OSC integer (0-11) or ratio string ('1.1', '1.3', '1.5', '2.0', '2.5', '3.0', '4.0', '5.0', '7.0', '10', '20', '100')
-   * @example
-   * // Get raw OSC value (0-11)
-   * const rawRatio = await compressor.fetchRatio();
-   *
-   * // Get ratio string ('1.1', '2.0', '100', etc.)
-   * const ratio = await compressor.fetchRatio('ratio');
-   */
-  fetchRatio: AsyncGetter<Unit<'ratio', CompressorRatio>, 'integer'>;
-
-  /**
-   * Update the release time
-   * @param value - The release time: raw OSC float (0.0-1.0) or time in milliseconds (5-4000ms)
-   * @param unit - Optional unit parameter. If 'milliseconds' is provided, value should be in ms
+   * Update the makeup gain using decibels
+   * @param value - The gain level in dB (0-24dB)
+   * @param unit - Must be 'decibels' when using dB values
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0.0 to 1.0)
-   * await compressor.updateRelease(0.4);
-   *
-   * // Set using milliseconds (5 to 4000ms)
-   * await compressor.updateRelease(200, 'milliseconds');
    */
-  updateRelease: AsyncSetter<Unit<'milliseconds', number>, 'float'>;
+  updateGain(value: number, unit: 'decibels'): Promise<void>;
 
   /**
-   * Fetch the current release time
-   * @param unit - Optional unit parameter. If 'milliseconds' is provided, returns time in ms
-   * @returns Promise that resolves to either raw OSC float (0.0-1.0) or time in milliseconds (5-4000ms)
-   * @example
-   * // Get raw OSC value (0.0 to 1.0)
-   * const rawRelease = await compressor.fetchRelease();
-   *
-   * // Get release time in milliseconds (5 to 4000ms)
-   * const releaseMs = await compressor.fetchRelease('milliseconds');
+   * Fetch the current makeup gain as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
    */
-  fetchRelease: AsyncGetter<Unit<'milliseconds', number>, 'float'>;
+  fetchGain(): Promise<number>;
 
   /**
-   * Update the threshold level
-   * @param value - The threshold: raw OSC float (0.0-1.0) or level in dB (-60 to 0dB)
-   * @param unit - Optional unit parameter. If 'decibels' is provided, value should be in dB
+   * Fetch the current makeup gain in decibels
+   * @param unit - Must be 'decibels' to get level in dB
+   * @returns Promise that resolves to level in dB (0-24dB)
+   */
+  fetchGain(unit: 'decibels'): Promise<number>;
+
+  /**
+   * Update the wet/dry mix using raw OSC value
+   * @param value - The mix value as raw OSC float (0.0-1.0)
    * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0.0 to 1.0)
-   * await compressor.updateThreshold(0.6);
-   *
-   * // Set using decibels (-60 to 0dB)
-   * await compressor.updateThreshold(-12, 'decibels');
    */
-  updateThreshold: AsyncSetter<Unit<'decibels', number>, 'float'>;
+  updateMix(value: number): Promise<void>;
 
   /**
-   * Fetch the current threshold level
-   * @param unit - Optional unit parameter. If 'decibels' is provided, returns level in dB
-   * @returns Promise that resolves to either raw OSC float (0.0-1.0) or level in dB (-60 to 0dB)
-   * @example
-   * // Get raw OSC value (0.0 to 1.0)
-   * const rawThreshold = await compressor.fetchThreshold();
-   *
-   * // Get threshold level in dB (-60 to 0dB)
-   * const thresholdDb = await compressor.fetchThreshold('decibels');
+   * Update the wet/dry mix using percentage
+   * @param value - The mix value as percentage (0-100%)
+   * @param unit - Must be 'percent' when using percentage values
+   * @returns Promise that resolves when the update is complete
    */
-  fetchThreshold: AsyncGetter<Unit<'decibels', number>, 'float'>;
+  updateMix(value: number, unit: 'percent'): Promise<void>;
+
+  /**
+   * Fetch the current wet/dry mix as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   */
+  fetchMix(): Promise<number>;
+
+  /**
+   * Fetch the current wet/dry mix as percentage
+   * @param unit - Must be 'percent' to get percentage
+   * @returns Promise that resolves to percentage (0-100%)
+   */
+  fetchMix(unit: 'percent'): Promise<number>;
+
+  /**
+   * Update the compressor mode using raw OSC value
+   * @param value - The mode as raw OSC integer (0 = 'COMP', 1 = 'EXP')
+   * @returns Promise that resolves when the update is complete
+   */
+  updateMode(value: number): Promise<void>;
+
+  /**
+   * Update the compressor mode using mode string
+   * @param value - The mode as mode string ('COMP', 'EXP')
+   * @param unit - Must be 'mode' when using mode string
+   * @returns Promise that resolves when the update is complete
+   */
+  updateMode(value: CompressorMode, unit: 'mode'): Promise<void>;
+
+  /**
+   * Fetch the current compressor mode as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = 'COMP', 1 = 'EXP')
+   */
+  fetchMode(): Promise<number>;
+
+  /**
+   * Fetch the current compressor mode as mode string
+   * @param unit - Must be 'mode' to get mode string
+   * @returns Promise that resolves to mode string ('COMP', 'EXP')
+   */
+  fetchMode(unit: 'mode'): Promise<CompressorMode>;
+
+  /**
+   * Update the compressor enabled state using raw OSC value
+   * @param value - The enabled state as raw OSC integer (0 = disabled, 1 = enabled)
+   * @returns Promise that resolves when the update is complete
+   */
+  updateEnabled(value: number): Promise<void>;
+
+  /**
+   * Update the compressor enabled state using boolean
+   * @param value - The enabled state as boolean
+   * @param unit - Must be 'flag' when using boolean value
+   * @returns Promise that resolves when the update is complete
+   */
+  updateEnabled(value: boolean, unit: 'flag'): Promise<void>;
+
+  /**
+   * Fetch the current compressor enabled state as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
+   */
+  fetchIsEnabled(): Promise<number>;
+
+  /**
+   * Fetch the current compressor enabled state as boolean
+   * @param unit - Must be 'flag' to get boolean value
+   * @returns Promise that resolves to boolean value
+   */
+  fetchIsEnabled(unit: 'flag'): Promise<boolean>;
+
+  /**
+   * Update the compression ratio using raw OSC value
+   * @param value - The ratio as raw OSC integer (0-11)
+   * @returns Promise that resolves when the update is complete
+   */
+  updateRatio(value: number): Promise<void>;
+
+  /**
+   * Update the compression ratio using ratio string
+   * @param value - The ratio as ratio string ('1.1', '1.3', '1.5', '2.0', '2.5', '3.0', '4.0', '5.0', '7.0', '10', '20', '100')
+   * @param unit - Must be 'ratio' when using ratio string
+   * @returns Promise that resolves when the update is complete
+   */
+  updateRatio(value: CompressorRatio, unit: 'ratio'): Promise<void>;
+
+  /**
+   * Fetch the current compression ratio as raw OSC value
+   * @returns Promise that resolves to raw OSC integer (0-11)
+   */
+  fetchRatio(): Promise<number>;
+
+  /**
+   * Fetch the current compression ratio as ratio string
+   * @param unit - Must be 'ratio' to get ratio string
+   * @returns Promise that resolves to ratio string ('1.1', '1.3', '1.5', '2.0', '2.5', '3.0', '4.0', '5.0', '7.0', '10', '20', '100')
+   */
+  fetchRatio(unit: 'ratio'): Promise<CompressorRatio>;
+
+  /**
+   * Update the release time using raw OSC value
+   * @param value - The release time as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
+   */
+  updateRelease(value: number): Promise<void>;
+
+  /**
+   * Update the release time using milliseconds
+   * @param value - The release time in milliseconds (5-4000ms)
+   * @param unit - Must be 'milliseconds' when using millisecond values
+   * @returns Promise that resolves when the update is complete
+   */
+  updateRelease(value: number, unit: 'milliseconds'): Promise<void>;
+
+  /**
+   * Fetch the current release time as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   */
+  fetchRelease(): Promise<number>;
+
+  /**
+   * Fetch the current release time in milliseconds
+   * @param unit - Must be 'milliseconds' to get time in ms
+   * @returns Promise that resolves to time in milliseconds (5-4000ms)
+   */
+  fetchRelease(unit: 'milliseconds'): Promise<number>;
+
+  /**
+   * Update the threshold level using raw OSC value
+   * @param value - The threshold as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
+   */
+  updateThreshold(value: number): Promise<void>;
+
+  /**
+   * Update the threshold level using decibels
+   * @param value - The threshold level in dB (-60 to 0dB)
+   * @param unit - Must be 'decibels' when using dB values
+   * @returns Promise that resolves when the update is complete
+   */
+  updateThreshold(value: number, unit: 'decibels'): Promise<void>;
+
+  /**
+   * Fetch the current threshold level as raw OSC value
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   */
+  fetchThreshold(): Promise<number>;
+
+  /**
+   * Fetch the current threshold level in decibels
+   * @param unit - Must be 'decibels' to get level in dB
+   * @returns Promise that resolves to level in dB (-60 to 0dB)
+   */
+  fetchThreshold(unit: 'decibels'): Promise<number>;
 };
 
 type ChannelCompressorDependencies = {
