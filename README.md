@@ -148,7 +148,7 @@ await gate.updateRange(40, 'decibels');
 
 ```typescript
 // Aux send to Bus 1
-const bus1Send = channel.getSendBus('BUS01');
+const bus1Send = channel.getSendBus('Bus1');
 await bus1Send.updateLevel(-10, 'decibels');
 await bus1Send.updateTap('POST', 'tap');
 
@@ -158,8 +158,8 @@ await fx1Send.updateLevel(-15, 'decibels');
 await fx1Send.updateTap('PRE', 'tap');
 
 // DCA and Mute group assignment
-await channel.getDCAGroup().updateAssignment(1, true, 'flag');
-await channel.getMuteGroup().updateAssignment(2, true, 'flag');
+await channel.getDCAGroup().updateEnabled(1);
+await channel.getMuteGroup().updateEnabled(2);
 ```
 
 ### Main LR Bus Control
@@ -197,14 +197,14 @@ await lrCompressor.updateRatio('3', 'ratio');
 // Insert effects support
 const lrInsert = lrCompressor.getInsert();
 await lrInsert.updateEnabled(true, 'flag');
-await lrInsert.updateSlot('FX1A', 'slot');
+await lrInsert.updateFxSlot('FX1A', 'slot');
 ```
 
 ### Auxiliary Bus Control
 
 ```typescript
 // Access an auxiliary bus (Bus 1-6)
-const bus1 = mixer.getBus('BUS01');
+const bus1 = mixer.getBus('Bus1');
 
 // Mix controls
 await bus1.getMix().updateFader(-8, 'decibels');
@@ -236,13 +236,13 @@ await busCompressor.updateThreshold(-12, 'decibels');
 await busCompressor.updateRatio('2', 'ratio');
 
 // Group assignments
-await bus1.getDCAGroup().updateAssignment(3, true, 'flag');
-await bus1.getMuteGroup().updateAssignment(1, true, 'flag');
+await bus1.getDCAGroup().updateEnabled(3);
+await bus1.getMuteGroup().updateEnabled(1);
 
 // Insert effects
 const busInsert = bus1.getInsert();
 await busInsert.updateEnabled(true, 'flag');
-await busInsert.updateSlot('FX2A', 'slot');
+await busInsert.updateFxSlot('FX2A', 'slot');
 ```
 
 ### Reading Current Values
@@ -324,14 +324,19 @@ _Future versions will support additional mixer brands and models._
 
 #### Sends
 
-- `getSendBus('BUS01'-'BUS06')` - Aux bus sends
+- `getSendBus('Bus1'-'Bus6')` - Aux bus sends
 - `getSendFx('FX1'-'FX4')` - Effects sends
 - Level, tap point (PRE/POST), and group enable control
 
 #### Groups and Routing
 
 - `getDCAGroup()` / `getMuteGroup()` - DCA and mute group assignments
+  - `updateEnabled(groupNumber)` - Assign to group
+  - `updateDisabled(groupNumber)` - Remove from group  
+  - `isEnabled(groupNumber)` - Check group assignment
 - `getInsert()` - Insert effect slot assignment
+  - `updateEnabled(enabled)` / `fetchIsEnabled()` - Insert on/off
+  - `updateFxSlot(slot)` / `fetchFxSlot()` - FX slot assignment
 - `getAutomix()` - Automix group and weight
 
 ### Main LR Bus Features
@@ -360,36 +365,41 @@ _Future versions will support additional mixer brands and models._
 - Full dynamics control (threshold, ratio, attack, release, etc.)
 - `getInsert()` - Access insert effects slot
   - `updateEnabled(enabled)` / `fetchIsEnabled()` - Insert on/off
-  - `updateSlot(slot)` / `fetchSlot()` - FX slot assignment
+  - `updateFxSlot(slot)` / `fetchFxSlot()` - FX slot assignment
 
 ### Auxiliary Bus Features (Bus 1-6)
 
-#### Configuration (`mixer.getBus('BUS01').getConfig()`)
+#### Configuration (`mixer.getBus('Bus1').getConfig()`)
 
 - `updateName(name)` / `fetchName()` - Bus name
 - `updateColor(color)` / `fetchColor()` - Color assignment
 
-#### Mix (`mixer.getBus('BUS01').getMix()`)
+#### Mix (`mixer.getBus('Bus1').getMix()`)
 
 - `updateFader(level, 'decibels')` / `fetchFader()` - Bus fader (-∞ to +10dB)
 - `updateMuted(muted)` / `fetchIsMuted()` - Bus mute
 
-#### 6-Band EQ (`mixer.getBus('BUS01').getEqualizer()`)
+#### 6-Band EQ (`mixer.getBus('Bus1').getEqualizer()`)
 
 - `updateEnabled(enabled)` / `fetchIsEnabled()` - EQ on/off
 - `getBand(1-6)` - Access individual EQ bands
   - Full parametric control (frequency, gain, Q, type)
   - Same interface as channel EQ bands
 
-#### Compressor (`mixer.getBus('BUS01').getCompressor()`)
+#### Compressor (`mixer.getBus('Bus1').getCompressor()`)
 
 - Full dynamics control (threshold, ratio, attack, release, etc.)
 - Same interface as channel compressor
 
 #### Groups and Routing
 
-- `getDCAGroup()` / `getMuteGroup()` - DCA and mute group assignments  
+- `getDCAGroup()` / `getMuteGroup()` - DCA and mute group assignments
+  - `updateEnabled(groupNumber)` - Assign to group
+  - `updateDisabled(groupNumber)` - Remove from group
+  - `isEnabled(groupNumber)` - Check group assignment
 - `getInsert()` - Insert effect slot assignment
+  - `updateEnabled(enabled)` / `fetchIsEnabled()` - Insert on/off
+  - `updateFxSlot(slot)` / `fetchFxSlot()` - FX slot assignment
 
 ## 🏗️ Architecture Highlights
 
