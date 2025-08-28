@@ -1,6 +1,6 @@
 import { createLiteralParameterConfig } from '../../mapper/literal.js';
 
-const insertFxSlotMap = [
+const insertFxSlotChannelMap = [
   'OFF',
   'Fx1A',
   'Fx1B',
@@ -12,7 +12,7 @@ const insertFxSlotMap = [
   'Fx4B',
 ] as const;
 
-export type InsertFxSlot = (typeof insertFxSlotMap)[number];
+export type InsertFxSlot = (typeof insertFxSlotChannelMap)[number];
 export const insertFxSlotParameterConfig = createLiteralParameterConfig<'slot', InsertFxSlot>(
-  insertFxSlotMap,
+  insertFxSlotChannelMap,
 );

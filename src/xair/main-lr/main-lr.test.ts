@@ -7,6 +7,7 @@ import { Config } from '../config/config.js';
 import { LRMix } from '../mix/lr-mix.js';
 import { MainLREqualizer } from './equalizer/equalizer.js';
 import { Compressor } from '../dynamics/compressor/compressor.js';
+import { MainLRInsert } from './insert/insert.js';
 
 suite('MainLR', () => {
   test('creates the config correctly', () => {
@@ -17,7 +18,7 @@ suite('MainLR', () => {
       createConfig,
       createLRMix: fake(),
       createCompressor: fake(),
-      createInsert: fake(),
+      createMainLRInsert: fake(),
       createDynamicsFilter: fake(),
       createMainLREqualizer: fake(),
       createEqualizer: fake(),
@@ -35,7 +36,7 @@ suite('MainLR', () => {
       createConfig: fake(),
       createLRMix,
       createCompressor: fake(),
-      createInsert: fake(),
+      createMainLRInsert: fake(),
       createDynamicsFilter: fake(),
       createMainLREqualizer: fake(),
       createEqualizer: fake(),
@@ -48,14 +49,14 @@ suite('MainLR', () => {
   test('creates the compressor correctly', () => {
     const oscClient = oscClientFactory.build();
     const createCompressor = fake.returns('compressor' as unknown as Compressor);
-    const createInsert = fake();
+    const createMainLRInsert = fake();
     const createDynamicsFilter = fake();
     const mainLR = createMainLR({
       oscClient,
       createConfig: fake(),
       createLRMix: fake(),
       createCompressor,
-      createInsert,
+      createMainLRInsert,
       createDynamicsFilter,
       createMainLREqualizer: fake(),
       createEqualizer: fake(),
@@ -82,7 +83,7 @@ suite('MainLR', () => {
       createConfig: fake(),
       createLRMix: fake(),
       createCompressor: fake(),
-      createInsert: fake(),
+      createMainLRInsert: fake(),
       createDynamicsFilter: fake(),
       createMainLREqualizer,
       createEqualizer,
@@ -95,6 +96,27 @@ suite('MainLR', () => {
         createEqualizerBand,
         oscClient,
       }),
+      true,
+    );
+  });
+
+  test('creates the insert correctly', () => {
+    const oscClient = oscClientFactory.build();
+    const createMainLRInsert = fake.returns('insert' as unknown as MainLRInsert);
+    const mainLR = createMainLR({
+      oscClient,
+      createConfig: fake(),
+      createLRMix: fake(),
+      createCompressor: fake(),
+      createMainLRInsert,
+      createDynamicsFilter: fake(),
+      createMainLREqualizer: fake(),
+      createEqualizer: fake(),
+      createEqualizerBand: fake(),
+    });
+    assert.strictEqual(mainLR.getInsert(), 'insert');
+    assert.strictEqual(
+      createMainLRInsert.calledOnceWithExactly({ oscClient, oscBasePath: '/lr' }),
       true,
     );
   });

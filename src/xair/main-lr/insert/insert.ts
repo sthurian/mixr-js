@@ -1,9 +1,9 @@
-import { OSCClient } from '../../osc/client.js';
-import { onOffParameterConfig } from '../mapper/on-off.js';
-import { createOSCParameterFactory } from '../osc-parameter.js';
-import { InsertFxSlot, insertFxSlotParameterConfig } from './parameter/fx-slot.js';
+import { OSCClient } from '../../../osc/client.js';
+import { onOffParameterConfig } from '../../mapper/on-off.js';
+import { createOSCParameterFactory } from '../../osc-parameter.js';
+import { MainLRInsertFxSlot, mainLRInsertFxSlotParameterConfig } from './parameter/fx-slot.js';
 
-export type Insert = {
+export type MainLRInsert = {
   /**
    * Fetch the current insert enabled state as raw OSC value
    * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
@@ -61,7 +61,7 @@ export type Insert = {
    * // Get FX slot string
    * const slot = await insert.fetchFxSlot('slot');
    */
-  fetchFxSlot(unit: 'slot'): Promise<InsertFxSlot>;
+  fetchFxSlot(unit: 'slot'): Promise<MainLRInsertFxSlot>;
 
   /**
    * Update the insert FX slot assignment using raw OSC value
@@ -82,21 +82,21 @@ export type Insert = {
    * // Set using FX slot string
    * await insert.updateFxSlot('Fx1A', 'slot');
    */
-  updateFxSlot(value: InsertFxSlot, unit: 'slot'): Promise<void>;
+  updateFxSlot(value: MainLRInsertFxSlot, unit: 'slot'): Promise<void>;
 };
 
-export type InsertDependencies = {
+export type MainLRInsertDependencies = {
   oscBasePath: string;
   oscClient: OSCClient;
 };
 
-export const createInsert = (dependencies: InsertDependencies): Insert => {
+export const createMainLRInsert = (dependencies: MainLRInsertDependencies): MainLRInsert => {
   const { oscBasePath, oscClient } = dependencies;
   const oscBaseAddress = `${oscBasePath}/insert`;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const fxslot = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/sel`,
-    insertFxSlotParameterConfig,
+    mainLRInsertFxSlotParameterConfig,
   );
   const enabled = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/on`,

@@ -24,6 +24,7 @@ import { MuteGroup, MuteGroupDependencies } from './mute/mute-group.js';
 import { MainLREqualizer, MainLREqualizerDependencies } from './main-lr/equalizer/equalizer.js';
 import { Bus, BusDependencies } from './bus/bus.js';
 import { Compressor, CompressorDependencies } from './dynamics/compressor/compressor.js';
+import { MainLRInsert, MainLRInsertDependencies } from './main-lr/insert/insert.js';
 export type Mixer<M extends MixerModel> = {
   getChannel(channel: MixerModelMap[M]['channel']): Channel;
   getBus(bus: MixerModelMap[M]['bus']): Bus;
@@ -43,6 +44,7 @@ type MixerDependencies = {
   createEqualizer: <T extends 4 | 6>(dependencies: EqualizerDependencies<T>) => Equalizer<T>;
   createChannelGate: (dependencies: ChannelGateDependencies) => ChannelGate;
   createInsert: (dependencies: InsertDependencies) => Insert;
+  createMainLRInsert: (dependencies: MainLRInsertDependencies) => MainLRInsert;
   createDCAGroup: (dependencies: DCAGroupDependencies) => DCAGroup;
   createMuteGroup: (dependencies: MuteGroupDependencies) => MuteGroup;
   createMix: (dependencies: MixDependencies) => Mix;
@@ -67,6 +69,7 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
     createEqualizer,
     createChannelGate,
     createInsert,
+    createMainLRInsert,
     createDCAGroup,
     createMuteGroup,
     createMix,
@@ -123,7 +126,7 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
         oscClient,
         createConfig,
         createLRMix,
-        createInsert,
+        createMainLRInsert,
         createCompressor,
         createDynamicsFilter,
         createEqualizer,

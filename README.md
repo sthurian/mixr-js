@@ -27,7 +27,8 @@ A comprehensive TypeScript/JavaScript client library for controlling **digital m
 - **Mix Controls**: Master fader, mute, pan control
 - **Configuration**: Name and color assignment
 - **6-Band Parametric EQ**: Full frequency control with mode selection (PEQ/GEQ/TEQ)
-- **Dynamics**: Professional compressor with insert effects support
+- **Dynamics**: Professional compressor processing
+- **Insert Effects**: FX slot assignment and processing
 - **Audio Processing**: Complete signal path control for main outputs
 
 ### 🚌 Auxiliary Bus Control (Bus 1-6)
@@ -195,9 +196,9 @@ await lrCompressor.updateThreshold(-6, 'decibels');
 await lrCompressor.updateRatio('3', 'ratio');
 
 // Insert effects support
-const lrInsert = lrCompressor.getInsert();
+const lrInsert = mainLR.getInsert();
 await lrInsert.updateEnabled(true, 'flag');
-await lrInsert.updateFxSlot('FX1A', 'slot');
+await lrInsert.updateFxSlot('FX1', 'slot');
 ```
 
 ### Auxiliary Bus Control
@@ -363,9 +364,36 @@ _Future versions will support additional mixer brands and models._
 #### Compressor (`mixer.getMainLR().getCompressor()`)
 
 - Full dynamics control (threshold, ratio, attack, release, etc.)
-- `getInsert()` - Access insert effects slot
-  - `updateEnabled(enabled)` / `fetchIsEnabled()` - Insert on/off
-  - `updateFxSlot(slot)` / `fetchFxSlot()` - FX slot assignment
+
+#### Insert Effects (`mixer.getMainLR().getInsert()`)
+
+The main LR bus supports insert effects with simplified slot assignments:
+
+```javascript
+const insert = mixer.getMainLR().getInsert();
+
+// Get current insert enabled state
+const isEnabled = await insert.fetchIsEnabled('flag');
+
+// Enable/disable insert
+await insert.updateEnabled(true, 'flag');
+
+// Get current FX slot assignment
+const currentSlot = await insert.fetchFxSlot('slot');
+
+// Set FX slot assignment
+await insert.updateFxSlot('FX2', 'slot');
+```
+
+**Available FX Slots:**
+
+- `'OFF'` - Insert disabled
+- `'FX1'` - FX1 slot
+- `'FX2'` - FX2 slot
+- `'FX3'` - FX3 slot
+- `'FX4'` - FX4 slot
+
+_Note: MainLR insert uses simplified slot names ('FX1', 'FX2', etc.) unlike channel inserts which use A/B variants ('Fx1A', 'Fx1B', etc.)_
 
 ### Auxiliary Bus Features (Bus 1-6)
 

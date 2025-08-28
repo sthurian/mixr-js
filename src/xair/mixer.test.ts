@@ -19,6 +19,7 @@ suite('Mixer', () => {
     const createEqualizer = fake();
     const createChannelGate = fake();
     const createInsert = fake();
+    const createMainLRInsert = fake();
     const createDCAGroup = fake();
     const createMuteGroup = fake();
     const createMix = fake();
@@ -42,6 +43,7 @@ suite('Mixer', () => {
       createEqualizer,
       createChannelGate,
       createInsert,
+      createMainLRInsert,
       createDCAGroup,
       createMuteGroup,
       createMix,
@@ -90,6 +92,7 @@ suite('Mixer', () => {
     const createEqualizerBand = fake();
     const createDCAGroup = fake();
     const createInsert = fake();
+    const createMainLRInsert = fake();
     const createMix = fake();
     const createMuteGroup = fake();
     const mixer = createMixer({
@@ -103,6 +106,7 @@ suite('Mixer', () => {
       createEqualizer,
       createChannelGate: fake(),
       createInsert,
+      createMainLRInsert,
       createDCAGroup,
       createMuteGroup,
       createMix,
@@ -147,6 +151,7 @@ suite('Mixer', () => {
     const createMainLREqualizer = fake();
     const createEqualizer = fake();
     const createEqualizerBand = fake();
+    const createMainLRInsert = fake();
     const mixer = createMixer({
       oscClient,
       createChannel: fake(),
@@ -158,6 +163,7 @@ suite('Mixer', () => {
       createEqualizer,
       createChannelGate: fake(),
       createInsert,
+      createMainLRInsert,
       createDCAGroup: fake(),
       createMuteGroup: fake(),
       createMix: fake(),
@@ -178,7 +184,7 @@ suite('Mixer', () => {
         oscClient,
         createConfig,
         createLRMix,
-        createInsert,
+        createMainLRInsert,
         createCompressor,
         createDynamicsFilter,
         createEqualizer,
@@ -204,6 +210,7 @@ suite('Mixer', () => {
       createEqualizer: fake(),
       createChannelGate: fake(),
       createInsert: fake(),
+      createMainLRInsert: fake(),
       createDCAGroup: fake(),
       createMuteGroup: fake(),
       createMix: fake(),
