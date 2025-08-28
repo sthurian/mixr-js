@@ -27,7 +27,7 @@ suite('Mixer', () => {
     const createChannelSendBus = fake();
     const createConfig = fake();
     const createLRMix = fake();
-    const createMainLRCompressor = fake();
+    const createCompressor = fake();
     const createMainLREqualizer = fake();
     const createMainLR = fake();
     const createBus = fake();
@@ -50,7 +50,7 @@ suite('Mixer', () => {
       createChannelSendBus,
       createConfig,
       createLRMix,
-      createMainLRCompressor,
+      createCompressor,
       createMainLR,
       createMainLREqualizer,
       createBus,
@@ -111,7 +111,7 @@ suite('Mixer', () => {
       createChannelSendBus: fake(),
       createConfig,
       createLRMix: fake(),
-      createMainLRCompressor: fake(),
+      createCompressor: fake(),
       createMainLR: fake(),
       createMainLREqualizer: fake(),
       createBus,
@@ -142,7 +142,7 @@ suite('Mixer', () => {
     const createConfig = fake();
     const createLRMix = fake();
     const createInsert = fake();
-    const createMainLRCompressor = fake();
+    const createCompressor = fake();
     const createDynamicsFilter = fake();
     const createMainLREqualizer = fake();
     const createEqualizer = fake();
@@ -167,7 +167,7 @@ suite('Mixer', () => {
       createBus: fake(),
       createConfig,
       createLRMix,
-      createMainLRCompressor,
+      createCompressor,
       createMainLR,
       createMainLREqualizer,
     });
@@ -179,7 +179,7 @@ suite('Mixer', () => {
         createConfig,
         createLRMix,
         createInsert,
-        createMainLRCompressor,
+        createCompressor,
         createDynamicsFilter,
         createEqualizer,
         createEqualizerBand,
@@ -212,7 +212,7 @@ suite('Mixer', () => {
       createChannelSendBus: fake(),
       createConfig: fake(),
       createLRMix: fake(),
-      createMainLRCompressor: fake(),
+      createCompressor: fake(),
       createMainLR: fake(),
       createMainLREqualizer: fake(),
       createBus: fake(),

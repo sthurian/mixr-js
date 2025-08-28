@@ -384,7 +384,7 @@ export type Compressor = {
   fetchThreshold(unit: 'decibels'): Promise<number>;
 };
 
-type CompressorDependencies = {
+export type CompressorDependencies = {
   oscClient: OSCClient;
   oscBasePath: string;
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;

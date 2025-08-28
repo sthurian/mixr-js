@@ -33,7 +33,7 @@ A comprehensive TypeScript/JavaScript client library for controlling **digital m
 ### 🚌 Auxiliary Bus Control (Bus 1-6)
 
 - **Mix Controls**: Bus level, mute control
-- **Configuration**: Bus name and color assignment  
+- **Configuration**: Bus name and color assignment
 - **6-Band Parametric EQ**: Complete frequency shaping per bus
 - **Dynamics**: Full compressor processing per bus
 - **Group Assignments**: DCA and mute group integration
@@ -332,7 +332,7 @@ _Future versions will support additional mixer brands and models._
 
 - `getDCAGroup()` / `getMuteGroup()` - DCA and mute group assignments
   - `updateEnabled(groupNumber)` - Assign to group
-  - `updateDisabled(groupNumber)` - Remove from group  
+  - `updateDisabled(groupNumber)` - Remove from group
   - `isEnabled(groupNumber)` - Check group assignment
 - `getInsert()` - Insert effect slot assignment
   - `updateEnabled(enabled)` / `fetchIsEnabled()` - Insert on/off
@@ -477,6 +477,7 @@ This library currently implements comprehensive **channel-level control**, **mai
 ### Recent Updates
 
 **Auxiliary Bus Implementation (Latest)**: Complete auxiliary bus control (Bus 1-6) including:
+
 - Mix controls (fader, mute)
 - Configuration (name, color)
 - 6-band parametric EQ with full frequency control

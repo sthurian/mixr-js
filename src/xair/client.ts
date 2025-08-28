@@ -21,11 +21,11 @@ import { createChannelFxSend } from './channel/sends/fx-send.js';
 import { createChannelSendBus } from './channel/sends/send-bus.js';
 import { createConfig } from './config/config.js';
 import { createLRMix } from './mix/lr-mix.js';
-import { createMainLRCompressor } from './main-lr/compressor/compressor.js';
 import { createChannel } from './channel/channel.js';
 import { createMainLR } from './main-lr/main-lr.js';
 import { createMainLREqualizer } from './main-lr/equalizer/equalizer.js';
 import { createBus } from './bus/bus.js';
+import { createCompressor } from './dynamics/compressor/compressor.js';
 export const connectToMixer = async <M extends MixerModel>(
   options: MixerConnectionInformation & { model: M },
 ): Promise<Mixer<M>> => {
@@ -61,7 +61,7 @@ export const connectToMixer = async <M extends MixerModel>(
     createConfig,
     createMainLR,
     createLRMix,
-    createMainLRCompressor,
+    createCompressor,
     createMainLREqualizer,
     createBus,
   });

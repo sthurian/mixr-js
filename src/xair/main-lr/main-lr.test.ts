@@ -4,9 +4,9 @@ import { oscClientFactory } from '../../osc/test-factories/client.js';
 import { fake } from 'sinon';
 import assert from 'node:assert';
 import { Config } from '../config/config.js';
-import { MainLRCompressor } from './compressor/compressor.js';
 import { LRMix } from '../mix/lr-mix.js';
 import { MainLREqualizer } from './equalizer/equalizer.js';
+import { Compressor } from '../dynamics/compressor/compressor.js';
 
 suite('MainLR', () => {
   test('creates the config correctly', () => {
@@ -16,7 +16,7 @@ suite('MainLR', () => {
       oscClient,
       createConfig,
       createLRMix: fake(),
-      createMainLRCompressor: fake(),
+      createCompressor: fake(),
       createInsert: fake(),
       createDynamicsFilter: fake(),
       createMainLREqualizer: fake(),
@@ -34,7 +34,7 @@ suite('MainLR', () => {
       oscClient,
       createConfig: fake(),
       createLRMix,
-      createMainLRCompressor: fake(),
+      createCompressor: fake(),
       createInsert: fake(),
       createDynamicsFilter: fake(),
       createMainLREqualizer: fake(),
@@ -47,14 +47,14 @@ suite('MainLR', () => {
 
   test('creates the compressor correctly', () => {
     const oscClient = oscClientFactory.build();
-    const createMainLRCompressor = fake.returns('compressor' as unknown as MainLRCompressor);
+    const createCompressor = fake.returns('compressor' as unknown as Compressor);
     const createInsert = fake();
     const createDynamicsFilter = fake();
     const mainLR = createMainLR({
       oscClient,
       createConfig: fake(),
       createLRMix: fake(),
-      createMainLRCompressor,
+      createCompressor,
       createInsert,
       createDynamicsFilter,
       createMainLREqualizer: fake(),
@@ -63,9 +63,9 @@ suite('MainLR', () => {
     });
     assert.strictEqual(mainLR.getCompressor(), 'compressor');
     assert.strictEqual(
-      createMainLRCompressor.calledOnceWithExactly({
+      createCompressor.calledOnceWithExactly({
         oscClient,
-        createInsert,
+        oscBasePath: '/lr',
         createDynamicsFilter,
       }),
       true,
@@ -81,7 +81,7 @@ suite('MainLR', () => {
       oscClient,
       createConfig: fake(),
       createLRMix: fake(),
-      createMainLRCompressor: fake(),
+      createCompressor: fake(),
       createInsert: fake(),
       createDynamicsFilter: fake(),
       createMainLREqualizer,

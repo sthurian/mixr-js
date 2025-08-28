@@ -3,7 +3,6 @@ import { Channel, ChannelDependencies } from './channel/channel.js';
 import { MainLR, MainLRDependencies } from './main-lr/main-lr.js';
 import { LRMix } from './mix/lr-mix.js';
 import { MixerModel, MixerModelMap } from './models.js';
-import { MainLRCompressor, MainLRCompressorDependencies } from './main-lr/compressor/compressor.js';
 import { Config } from './config/config.js';
 import { Insert, InsertDependencies } from './insert/insert.js';
 import { DynamicsFilter, DynamicsFilterDependencies } from './dynamics/filter/filter.js';
@@ -24,6 +23,7 @@ import { Mix, MixDependencies } from './mix/mix.js';
 import { MuteGroup, MuteGroupDependencies } from './mute/mute-group.js';
 import { MainLREqualizer, MainLREqualizerDependencies } from './main-lr/equalizer/equalizer.js';
 import { Bus, BusDependencies } from './bus/bus.js';
+import { Compressor, CompressorDependencies } from './dynamics/compressor/compressor.js';
 export type Mixer<M extends MixerModel> = {
   getChannel(channel: MixerModelMap[M]['channel']): Channel;
   getBus(bus: MixerModelMap[M]['bus']): Bus;
@@ -36,6 +36,7 @@ type MixerDependencies = {
   createChannel: (dependencies: ChannelDependencies) => Channel;
   createChannelConfig: (dependencies: ChannelConfigDependencies) => ChannelConfig;
   createChannelCompressor: (dependencies: ChannelCompressorDependencies) => ChannelCompressor;
+  createCompressor: (dependencies: CompressorDependencies) => Compressor;
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
   createChannelAutomix: (dependencies: ChannelAutomixDependencies) => ChannelAutomix;
@@ -51,7 +52,6 @@ type MixerDependencies = {
   createConfig: (dependencies: { oscClient: OSCClient; oscBasePath: string }) => Config;
   createMainLR: (dependencies: MainLRDependencies) => MainLR;
   createLRMix: (dependencies: { oscClient: OSCClient; oscBasePath: string }) => LRMix;
-  createMainLRCompressor: (dependencies: MainLRCompressorDependencies) => MainLRCompressor;
   createMainLREqualizer: (dependencies: MainLREqualizerDependencies) => MainLREqualizer;
   createBus: (dependencies: BusDependencies) => Bus;
 };
@@ -76,9 +76,9 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
     createConfig,
     createMainLR,
     createLRMix,
-    createMainLRCompressor,
     createMainLREqualizer,
     createBus,
+    createCompressor,
   } = dependencies;
   return {
     getChannel: (channel: MixerModelMap[M]['channel']): Channel => {
@@ -124,7 +124,7 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
         createConfig,
         createLRMix,
         createInsert,
-        createMainLRCompressor,
+        createCompressor,
         createDynamicsFilter,
         createEqualizer,
         createEqualizerBand,
