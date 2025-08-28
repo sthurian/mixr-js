@@ -30,6 +30,15 @@ A comprehensive TypeScript/JavaScript client library for controlling **digital m
 - **Dynamics**: Professional compressor with insert effects support
 - **Audio Processing**: Complete signal path control for main outputs
 
+### 🚌 Auxiliary Bus Control (Bus 1-6)
+
+- **Mix Controls**: Bus level, mute control
+- **Configuration**: Bus name and color assignment  
+- **6-Band Parametric EQ**: Complete frequency shaping per bus
+- **Dynamics**: Full compressor processing per bus
+- **Group Assignments**: DCA and mute group integration
+- **Insert Effects**: Per-bus insert processing
+
 ### 🔄 Dual API Design
 
 - **Raw Protocol Values**: Direct control using underlying protocol values for power users
@@ -191,6 +200,51 @@ await lrInsert.updateEnabled(true, 'flag');
 await lrInsert.updateSlot('FX1A', 'slot');
 ```
 
+### Auxiliary Bus Control
+
+```typescript
+// Access an auxiliary bus (Bus 1-6)
+const bus1 = mixer.getBus('BUS01');
+
+// Mix controls
+await bus1.getMix().updateFader(-8, 'decibels');
+await bus1.getMix().updateMuted(false, 'flag');
+
+// Configuration
+await bus1.getConfig().updateName('Monitor 1');
+await bus1.getConfig().updateColor('Blue', 'color');
+
+// 6-band EQ control
+const busEQ = bus1.getEqualizer();
+await busEQ.updateEnabled(true, 'flag');
+
+// Configure EQ bands for monitor mix
+const lowBand = busEQ.getBand(1);
+await lowBand.updateFrequency(80, 'hertz');
+await lowBand.updateGain(-2, 'decibels');
+await lowBand.updateType('HPF', 'type');
+
+const midBand = busEQ.getBand(3);
+await midBand.updateFrequency(2500, 'hertz');
+await midBand.updateGain(1, 'decibels');
+await midBand.updateQ(1.5, 'number');
+
+// Compressor for bus dynamics
+const busCompressor = bus1.getCompressor();
+await busCompressor.updateEnabled(true, 'flag');
+await busCompressor.updateThreshold(-12, 'decibels');
+await busCompressor.updateRatio('2', 'ratio');
+
+// Group assignments
+await bus1.getDCAGroup().updateAssignment(3, true, 'flag');
+await bus1.getMuteGroup().updateAssignment(1, true, 'flag');
+
+// Insert effects
+const busInsert = bus1.getInsert();
+await busInsert.updateEnabled(true, 'flag');
+await busInsert.updateSlot('FX2A', 'slot');
+```
+
 ### Reading Current Values
 
 ```typescript
@@ -308,6 +362,35 @@ _Future versions will support additional mixer brands and models._
   - `updateEnabled(enabled)` / `fetchIsEnabled()` - Insert on/off
   - `updateSlot(slot)` / `fetchSlot()` - FX slot assignment
 
+### Auxiliary Bus Features (Bus 1-6)
+
+#### Configuration (`mixer.getBus('BUS01').getConfig()`)
+
+- `updateName(name)` / `fetchName()` - Bus name
+- `updateColor(color)` / `fetchColor()` - Color assignment
+
+#### Mix (`mixer.getBus('BUS01').getMix()`)
+
+- `updateFader(level, 'decibels')` / `fetchFader()` - Bus fader (-∞ to +10dB)
+- `updateMuted(muted)` / `fetchIsMuted()` - Bus mute
+
+#### 6-Band EQ (`mixer.getBus('BUS01').getEqualizer()`)
+
+- `updateEnabled(enabled)` / `fetchIsEnabled()` - EQ on/off
+- `getBand(1-6)` - Access individual EQ bands
+  - Full parametric control (frequency, gain, Q, type)
+  - Same interface as channel EQ bands
+
+#### Compressor (`mixer.getBus('BUS01').getCompressor()`)
+
+- Full dynamics control (threshold, ratio, attack, release, etc.)
+- Same interface as channel compressor
+
+#### Groups and Routing
+
+- `getDCAGroup()` / `getMuteGroup()` - DCA and mute group assignments  
+- `getInsert()` - Insert effect slot assignment
+
 ## 🏗️ Architecture Highlights
 
 ### Type System
@@ -349,7 +432,7 @@ await channel.getMix().updateFader(0.75);
 
 ## 🧪 Testing
 
-The library includes comprehensive test coverage (100%) with 304+ tests:
+The library includes comprehensive test coverage (100%) with 315 tests:
 
 ```bash
 npm test                    # Run all tests
@@ -375,16 +458,24 @@ npm run format
 
 ## 📋 Current Status & Limitations
 
-This library currently implements comprehensive **channel-level control** and **main LR bus control**. Some mixer-wide features are not yet implemented:
+This library currently implements comprehensive **channel-level control**, **main LR bus control**, and **auxiliary bus control**. Some mixer-wide features are not yet implemented:
 
-- Auxiliary bus processing (Bus 1-6)
 - Effects rack control (FX1-FX4)
 - System-level actions (snapshots, global mute)
 - Advanced routing matrix
 
 ### Recent Updates
 
-**Main LR Bus Implementation (Latest)**: Complete main output control including:
+**Auxiliary Bus Implementation (Latest)**: Complete auxiliary bus control (Bus 1-6) including:
+- Mix controls (fader, mute)
+- Configuration (name, color)
+- 6-band parametric EQ with full frequency control
+- Compressor dynamics processing
+- DCA and mute group assignments
+- Insert effects routing
+
+**Main LR Bus Implementation**: Complete main output control including:
+
 - Mix controls (fader, mute, pan)
 - 6-band parametric EQ with mode selection
 - Professional compressor with insert effects

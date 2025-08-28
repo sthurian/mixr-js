@@ -3,7 +3,11 @@ import { onOffParameterConfig } from '../mapper/on-off.js';
 import { createOSCParameterFactory } from '../osc-parameter.js';
 import { EqualizerBand, EqualizerBandDependencies } from './band/eq-band.js';
 
-export type Equalizer = {
+type BandNumberChannel = 1 | 2 | 3 | 4;
+type BandNumberBus = 1 | 2 | 3 | 4 | 5 | 6;
+type BandNumber<T extends 4 | 6> = T extends 4 ? BandNumberChannel : BandNumberBus;
+
+export type Equalizer<T extends 4 | 6> = {
   /**
    * Update the equalizer enabled state
    */
@@ -24,26 +28,33 @@ export type Equalizer = {
 
   /**
    * Get access to a specific equalizer band
-   * @param band - The band number (1-4 for channels, 1-6 for LR)
-   * @returns ChannelEqualizerBand object for the specified band
+   * @param band - The band number (1-4 for 4-band EQ, 1-6 for 6-band EQ)
+   * @returns EqualizerBand object for the specified band
    * @example
-   * // Get band 1 (low frequency)
-   * const lowBand = equalizer.getBand(1);
+   * // For a 4-band equalizer
+   * const fourBandEQ = createEqualizer({ ..., numberOfBands: 4 });
+   * const lowBand = fourBandEQ.getBand(1);   // Valid: 1-4
+   * const highBand = fourBandEQ.getBand(4);  // Valid: 1-4
    *
-   * // Get band 4 (high frequency)
-   * const highBand = equalizer.getBand(4);
+   * // For a 6-band equalizer
+   * const sixBandEQ = createEqualizer({ ..., numberOfBands: 6 });
+   * const midBand = sixBandEQ.getBand(5);    // Valid: 1-6
+   * const topBand = sixBandEQ.getBand(6);    // Valid: 1-6
    */
-  getBand: (band: number) => EqualizerBand;
+  getBand: (band: BandNumber<T>) => EqualizerBand;
 };
 
-export type EqualizerDependencies = {
+export type EqualizerDependencies<T extends 4 | 6> = {
   oscBasePath: string;
   oscClient: OSCClient;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
+  numberOfBands: T;
 };
 
-export const createEqualizer = (dependencies: EqualizerDependencies): Equalizer => {
-  const { oscBasePath, oscClient, createEqualizerBand } = dependencies;
+export const createEqualizer = <T extends 4 | 6>(
+  dependencies: EqualizerDependencies<T>,
+): Equalizer<T> => {
+  const { oscBasePath, oscClient, createEqualizerBand, numberOfBands } = dependencies;
   const oscBaseAddress = `${oscBasePath}/eq`;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const enabled = oscParameterFactory.createOSCParameter(
@@ -54,6 +65,11 @@ export const createEqualizer = (dependencies: EqualizerDependencies): Equalizer 
   return {
     updateEnabled: enabled.update,
     fetchIsEnabled: enabled.fetch,
-    getBand: (band) => createEqualizerBand({ band, oscBasePath, oscClient }),
+    getBand: (band) => {
+      if (band > numberOfBands) {
+        throw new Error(`Invalid band number: ${band}. Max is ${numberOfBands}`);
+      }
+      return createEqualizerBand({ band, oscBasePath, oscClient });
+    },
   };
 };

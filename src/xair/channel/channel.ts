@@ -24,7 +24,7 @@ export type Channel = {
   getConfig(): ChannelConfig;
   getAutomix(): ChannelAutomix;
   getCompressor(): Compressor;
-  getEqualizer(): Equalizer;
+  getEqualizer(): Equalizer<4>;
   getGate(): ChannelGate;
   getInsert(): Insert;
   getSendBus(send: ChannelSendBusLabel): ChannelSendBus;
@@ -43,7 +43,7 @@ export type ChannelDependencies = {
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
   createChannelAutomix: (dependencies: ChannelAutomixDependencies) => ChannelAutomix;
-  createEqualizer: (dependencies: EqualizerDependencies) => Equalizer;
+  createEqualizer: <T extends 4>(dependencies: EqualizerDependencies<T>) => Equalizer<T>;
   createChannelGate: (dependencies: ChannelGateDependencies) => ChannelGate;
   createInsert: (dependencies: InsertDependencies) => Insert;
   createDCAGroup: (dependencies: DCAGroupDependencies) => DCAGroup;
@@ -75,9 +75,14 @@ export const createChannel = (dependencies: ChannelDependencies): Channel => {
   } = dependencies;
   const oscBasePath = `/ch/${channel.toString().padStart(2, '0')}`;
   const config = createChannelConfig({ channel, oscClient });
-  const compressor = createChannelCompressor({ channel, oscClient, createDynamicsFilter });
+  const compressor = createChannelCompressor({ oscBasePath, oscClient, createDynamicsFilter });
   const automix = createChannelAutomix({ channel, oscClient });
-  const equalizer = createEqualizer({ oscBasePath, oscClient, createEqualizerBand });
+  const equalizer = createEqualizer({
+    oscBasePath,
+    numberOfBands: 4,
+    oscClient,
+    createEqualizerBand,
+  });
   const gate = createChannelGate({ channel, oscClient, createDynamicsFilter });
   const insert = createInsert({ oscBasePath, oscClient });
   const dcaGroup = createDCAGroup({ oscBasePath, oscClient });

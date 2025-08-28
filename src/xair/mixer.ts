@@ -23,8 +23,10 @@ import { DCAGroup, DCAGroupDependencies } from './dca/dca-group.js';
 import { Mix, MixDependencies } from './mix/mix.js';
 import { MuteGroup, MuteGroupDependencies } from './mute/mute-group.js';
 import { MainLREqualizer, MainLREqualizerDependencies } from './main-lr/equalizer/equalizer.js';
+import { Bus, BusDependencies } from './bus/bus.js';
 export type Mixer<M extends MixerModel> = {
-  getChannel(channel: MixerModelMap[M]): Channel;
+  getChannel(channel: MixerModelMap[M]['channel']): Channel;
+  getBus(bus: MixerModelMap[M]['bus']): Bus;
   getMainLR(): MainLR;
   closeConnection(): Promise<void>;
 };
@@ -37,7 +39,7 @@ type MixerDependencies = {
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
   createChannelAutomix: (dependencies: ChannelAutomixDependencies) => ChannelAutomix;
-  createEqualizer: (dependencies: EqualizerDependencies) => Equalizer;
+  createEqualizer: <T extends 4 | 6>(dependencies: EqualizerDependencies<T>) => Equalizer<T>;
   createChannelGate: (dependencies: ChannelGateDependencies) => ChannelGate;
   createInsert: (dependencies: InsertDependencies) => Insert;
   createDCAGroup: (dependencies: DCAGroupDependencies) => DCAGroup;
@@ -51,6 +53,7 @@ type MixerDependencies = {
   createLRMix: (dependencies: { oscClient: OSCClient; oscBasePath: string }) => LRMix;
   createMainLRCompressor: (dependencies: MainLRCompressorDependencies) => MainLRCompressor;
   createMainLREqualizer: (dependencies: MainLREqualizerDependencies) => MainLREqualizer;
+  createBus: (dependencies: BusDependencies) => Bus;
 };
 export const createMixer = <M extends MixerModel>(dependencies: MixerDependencies): Mixer<M> => {
   const {
@@ -75,9 +78,10 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
     createLRMix,
     createMainLRCompressor,
     createMainLREqualizer,
+    createBus,
   } = dependencies;
   return {
-    getChannel: (channel: MixerModelMap[M]): Channel => {
+    getChannel: (channel: MixerModelMap[M]['channel']): Channel => {
       const channelNumber = parseInt(channel.replace('CH', ''), 10);
       return createChannel({
         channel: channelNumber,
@@ -92,6 +96,22 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
         createChannelSendBus,
         createChannelGate,
         createChannelPreamp,
+        createDCAGroup,
+        createInsert,
+        createMix,
+        createMuteGroup,
+      });
+    },
+    getBus: (bus: MixerModelMap[M]['bus']) => {
+      const busNumber = parseInt(bus.replace('Bus', ''), 10);
+      return createBus({
+        bus: busNumber,
+        oscClient,
+        createConfig,
+        createChannelCompressor,
+        createDynamicsFilter,
+        createEqualizer,
+        createEqualizerBand,
         createDCAGroup,
         createInsert,
         createMix,

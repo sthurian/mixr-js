@@ -25,6 +25,7 @@ import { createMainLRCompressor } from './main-lr/compressor/compressor.js';
 import { createChannel } from './channel/channel.js';
 import { createMainLR } from './main-lr/main-lr.js';
 import { createMainLREqualizer } from './main-lr/equalizer/equalizer.js';
+import { createBus } from './bus/bus.js';
 export const connectToMixer = async <M extends MixerModel>(
   options: MixerConnectionInformation & { model: M },
 ): Promise<Mixer<M>> => {
@@ -62,5 +63,6 @@ export const connectToMixer = async <M extends MixerModel>(
     createLRMix,
     createMainLRCompressor,
     createMainLREqualizer,
+    createBus,
   });
 };

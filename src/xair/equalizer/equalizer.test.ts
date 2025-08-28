@@ -13,6 +13,7 @@ suite('ChannelEqualizer', () => {
       oscBasePath: '/ch/01',
       oscClient,
       createEqualizerBand: fake(),
+      numberOfBands: 4,
     });
     const enabled = await eq.fetchIsEnabled('flag');
     assert.strictEqual(enabled, true);
@@ -26,6 +27,7 @@ suite('ChannelEqualizer', () => {
       oscBasePath: '/ch/01',
       oscClient,
       createEqualizerBand: fake(),
+      numberOfBands: 4,
     });
     await eq.updateEnabled(false, 'flag');
     assert.strictEqual(
@@ -41,6 +43,7 @@ suite('ChannelEqualizer', () => {
       oscBasePath: '/ch/03',
       oscClient,
       createEqualizerBand,
+      numberOfBands: 4,
     });
     const band = eq.getBand(2);
     assert.strictEqual(band, 'band');
@@ -48,5 +51,18 @@ suite('ChannelEqualizer', () => {
       createEqualizerBand.calledOnceWithExactly({ band: 2, oscBasePath: '/ch/03', oscClient }),
       true,
     );
+  });
+
+  test('getBand throws an error if the band is out of range', () => {
+    const oscClient = oscClientFactory.build();
+    const eq = createEqualizer({
+      oscBasePath: '/ch/03',
+      oscClient,
+      createEqualizerBand: fake(),
+      numberOfBands: 4,
+    });
+    assert.throws(() => eq.getBand(5 as 4), {
+      message: 'Invalid band number: 5. Max is 4',
+    });
   });
 });

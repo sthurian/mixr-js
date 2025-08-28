@@ -23,7 +23,7 @@ export type MainLRDependencies = {
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
   createMainLRCompressor: (dependencies: MainLRCompressorDependencies) => MainLRCompressor;
   createMainLREqualizer: (dependencies: MainLREqualizerDependencies) => MainLREqualizer;
-  createEqualizer: (dependencies: EqualizerDependencies) => Equalizer;
+  createEqualizer: <T extends 6>(dependencies: EqualizerDependencies<T>) => Equalizer<T>;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
 };
 

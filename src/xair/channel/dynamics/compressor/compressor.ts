@@ -38,7 +38,7 @@ export type ChannelCompressor = Compressor & {
 };
 
 export type ChannelCompressorDependencies = {
-  channel: number;
+  oscBasePath: string;
   oscClient: OSCClient;
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
 };
@@ -46,8 +46,7 @@ export type ChannelCompressorDependencies = {
 export const createChannelCompressor = (
   dependencies: ChannelCompressorDependencies,
 ): ChannelCompressor => {
-  const { channel, oscClient, createDynamicsFilter } = dependencies;
-  const oscBasePath = `/ch/${channel.toString().padStart(2, '0')}`;
+  const { oscBasePath, oscClient, createDynamicsFilter } = dependencies;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const compressor = createCompressor({ oscBasePath, oscClient, createDynamicsFilter });
 

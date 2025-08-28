@@ -13,7 +13,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -26,7 +26,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -44,7 +44,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -57,7 +57,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -75,7 +75,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -88,7 +88,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -106,7 +106,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -119,7 +119,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -137,7 +137,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -150,7 +150,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -168,7 +168,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -181,7 +181,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -199,7 +199,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -212,7 +212,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -229,7 +229,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -242,7 +242,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -260,7 +260,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -273,7 +273,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -291,7 +291,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -304,7 +304,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -322,7 +322,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -335,7 +335,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -353,7 +353,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -366,7 +366,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -384,7 +384,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -397,7 +397,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -414,7 +414,7 @@ suite('ChannelCompressor', () => {
     });
     const oscClient = oscClientFactory.build({ query });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });
@@ -427,7 +427,7 @@ suite('ChannelCompressor', () => {
     const set = fake();
     const oscClient = oscClientFactory.build({ set });
     const compressor = createChannelCompressor({
-      channel: 1,
+      oscBasePath: '/ch/01',
       oscClient,
       createDynamicsFilter: fake(),
     });

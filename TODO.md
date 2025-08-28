@@ -8,14 +8,14 @@ This document outlines the missing OSC parameters that need to be implemented ba
 
 - **Channel features**: Basic config (name, color, input source), preamp (gain, phantom, low-cut, polarity), 4-band EQ, compressor/gate dynamics, sends (FX/bus), mix controls, automix, DCA/mute groups, insert effects
 - **Main LR bus controls**: Full implementation with fader/mute/pan, compressor with insert, 6-band EQ with mode selection
+- **Auxiliary bus controls**: Complete implementation with config (name, color), mix controls (level, mute), 6-band EQ, compressor dynamics, DCA/mute groups, insert effects
 - **Dual API**: Raw OSC values + audio engineer units (dB, Hz, etc.)
 - **Type safety**: Branded types with comprehensive unit conversion
-- **Test coverage**: 100% coverage across 304 tests
+- **Test coverage**: 100% coverage across 315 tests
 
 ### ❌ Major Missing Categories
 
 - System-level controls (actions, preferences, monitoring)
-- Aux/Bus processing and routing
 - Effects rack and routing
 - Advanced channel features (graphics EQ, solo)
 - MIDI integration
@@ -76,7 +76,7 @@ This document outlines the missing OSC parameters that need to be implemented ba
 ### ✅ All LR Controls - COMPLETED
 
 - [x] `/lr/mix/fader` - Main LR fader level
-- [x] `/lr/mix/on` - Main LR mute  
+- [x] `/lr/mix/on` - Main LR mute
 - [x] `/lr/mix/pan` - Main LR pan control
 - [x] `/lr/dyn/*` - Main LR dynamics (compressor with insert)
 - [x] `/lr/eq/*` - Main LR 6-band EQ with mode selection
@@ -87,21 +87,24 @@ This document outlines the missing OSC parameters that need to be implemented ba
 
 ---
 
-## 4. Auxiliary Buses (`/bus/01-06/`)
+## 4. Auxiliary Buses (`/bus/01-06/`) ✅ IMPLEMENTED
 
-### Bus Processing ⭐ HIGH PRIORITY
+### Bus Processing ✅ COMPLETE
 
-- [ ] `/bus/xx/mix/fader` - Bus fader level
-- [ ] `/bus/xx/mix/on` - Bus mute
-- [ ] `/bus/xx/dyn/*` - Bus dynamics processing
-- [ ] `/bus/xx/eq/*` - Bus 6-band EQ
-- [ ] `/bus/xx/config/name` - Bus name
-- [ ] `/bus/xx/config/color` - Bus color
+- ✅ `/bus/xx/mix/fader` - Bus fader level
+- ✅ `/bus/xx/mix/on` - Bus mute
+- ✅ `/bus/xx/dyn/*` - Bus dynamics processing (compressor with full parameter control)
+- ✅ `/bus/xx/eq/*` - Bus 6-band EQ
+- ✅ `/bus/xx/config/name` - Bus name
+- ✅ `/bus/xx/config/color` - Bus color
+- ✅ `/bus/xx/grp/dca` - Bus DCA group assignments
+- ✅ `/bus/xx/grp/mute` - Bus mute group assignments
+- ✅ `/bus/xx/insert/*` - Bus insert effects
 
-### Bus Routing
+### Bus Routing ⚠️ PARTIALLY IMPLEMENTED
 
 - [ ] `/bus/xx/mix/lr` - Bus to LR assignment
-- [ ] `/bus/xx/grp/*` - Bus group assignments
+- [ ] `/bus/xx/mix/pan` - Bus pan control
 
 ---
 

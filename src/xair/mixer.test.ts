@@ -5,6 +5,7 @@ import assert from 'node:assert';
 import { oscClientFactory } from '../osc/test-factories/client.js';
 import { Channel } from './channel/channel.js';
 import { MainLR } from './main-lr/main-lr.js';
+import { Bus } from './bus/bus.js';
 
 suite('Mixer', () => {
   test('creates the channel correctly', () => {
@@ -29,6 +30,7 @@ suite('Mixer', () => {
     const createMainLRCompressor = fake();
     const createMainLREqualizer = fake();
     const createMainLR = fake();
+    const createBus = fake();
     const mixer = createMixer({
       oscClient,
       createChannel,
@@ -51,6 +53,7 @@ suite('Mixer', () => {
       createMainLRCompressor,
       createMainLR,
       createMainLREqualizer,
+      createBus,
     });
     const channel = mixer.getChannel('CH01');
     assert.strictEqual(channel, 'channel');
@@ -68,6 +71,62 @@ suite('Mixer', () => {
         createChannelSendBus,
         createChannelGate,
         createChannelPreamp,
+        createDCAGroup,
+        createInsert,
+        createMix,
+        createMuteGroup,
+      }),
+      true,
+    );
+  });
+
+  test('create the bus correctly', () => {
+    const oscClient = oscClientFactory.build();
+    const createBus = fake.returns('bus' as unknown as Bus);
+    const createConfig = fake();
+    const createChannelCompressor = fake();
+    const createDynamicsFilter = fake();
+    const createEqualizer = fake();
+    const createEqualizerBand = fake();
+    const createDCAGroup = fake();
+    const createInsert = fake();
+    const createMix = fake();
+    const createMuteGroup = fake();
+    const mixer = createMixer({
+      oscClient,
+      createChannel: fake(),
+      createChannelConfig: fake(),
+      createChannelCompressor,
+      createDynamicsFilter,
+      createEqualizerBand,
+      createChannelAutomix: fake(),
+      createEqualizer,
+      createChannelGate: fake(),
+      createInsert,
+      createDCAGroup,
+      createMuteGroup,
+      createMix,
+      createChannelPreamp: fake(),
+      createChannelFxSend: fake(),
+      createChannelSendBus: fake(),
+      createConfig,
+      createLRMix: fake(),
+      createMainLRCompressor: fake(),
+      createMainLR: fake(),
+      createMainLREqualizer: fake(),
+      createBus,
+    });
+    const bus = mixer.getBus('Bus1');
+    assert.strictEqual(bus, 'bus');
+    assert.strictEqual(
+      createBus.calledOnceWithExactly({
+        bus: 1,
+        oscClient,
+        createConfig,
+        createChannelCompressor,
+        createDynamicsFilter,
+        createEqualizer,
+        createEqualizerBand,
         createDCAGroup,
         createInsert,
         createMix,
@@ -105,6 +164,7 @@ suite('Mixer', () => {
       createChannelPreamp: fake(),
       createChannelFxSend: fake(),
       createChannelSendBus: fake(),
+      createBus: fake(),
       createConfig,
       createLRMix,
       createMainLRCompressor,
@@ -155,6 +215,7 @@ suite('Mixer', () => {
       createMainLRCompressor: fake(),
       createMainLR: fake(),
       createMainLREqualizer: fake(),
+      createBus: fake(),
     });
     await mixer.closeConnection();
     assert.strictEqual(close.calledOnce, true);

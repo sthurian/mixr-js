@@ -19,7 +19,7 @@ suite('Channel', () => {
   test('creates the config correctly', () => {
     const oscClient = oscClientFactory.build();
     const createChannelConfig = fake.returns('config' as unknown as ChannelConfig);
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig,
       channel: 1,
@@ -37,7 +37,7 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    assert.strictEqual(mainLR.getConfig(), 'config');
+    assert.strictEqual(channel.getConfig(), 'config');
     assert.strictEqual(createChannelConfig.calledOnceWithExactly({ channel: 1, oscClient }), true);
   });
 
@@ -45,7 +45,7 @@ suite('Channel', () => {
     const oscClient = oscClientFactory.build();
     const createChannelCompressor = fake.returns('compressor' as unknown as ChannelCompressor);
     const createDynamicsFilter = fake();
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -63,10 +63,10 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    assert.strictEqual(mainLR.getCompressor(), 'compressor');
+    assert.strictEqual(channel.getCompressor(), 'compressor');
     assert.strictEqual(
       createChannelCompressor.calledOnceWithExactly({
-        channel: 1,
+        oscBasePath: '/ch/01',
         oscClient,
         createDynamicsFilter,
       }),
@@ -76,7 +76,7 @@ suite('Channel', () => {
   test('creates the fx send correctly', () => {
     const oscClient = oscClientFactory.build();
     const createChannelFxSend = fake.returns('fxSend' as unknown as ChannelFxSend);
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -94,7 +94,7 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    assert.strictEqual(mainLR.getSendFx('FX1'), 'fxSend');
+    assert.strictEqual(channel.getSendFx('FX1'), 'fxSend');
     assert.strictEqual(
       createChannelFxSend.calledOnceWithExactly({
         channel: 1,
@@ -107,7 +107,7 @@ suite('Channel', () => {
   test('creates the send bus correctly', () => {
     const oscClient = oscClientFactory.build();
     const createChannelSendBus = fake.returns('sendBus' as unknown as ChannelSendBus);
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -125,7 +125,7 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    assert.strictEqual(mainLR.getSendBus('Bus1'), 'sendBus');
+    assert.strictEqual(channel.getSendBus('Bus1'), 'sendBus');
     assert.strictEqual(
       createChannelSendBus.calledOnceWithExactly({
         channel: 1,
@@ -138,7 +138,7 @@ suite('Channel', () => {
   test('creates the automix correctly', () => {
     const oscClient = oscClientFactory.build();
     const createChannelAutomix = fake.returns('automix' as unknown as ChannelAutomix);
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -156,14 +156,14 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    assert.strictEqual(mainLR.getAutomix(), 'automix');
+    assert.strictEqual(channel.getAutomix(), 'automix');
     assert.strictEqual(createChannelAutomix.calledOnceWithExactly({ channel: 1, oscClient }), true);
   });
   test('creates the gate correctly', () => {
     const oscClient = oscClientFactory.build();
     const createChannelGate = fake.returns('gate' as unknown as ChannelGate);
     const createDynamicsFilter = fake();
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -181,7 +181,7 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    assert.strictEqual(mainLR.getGate(), 'gate');
+    assert.strictEqual(channel.getGate(), 'gate');
     assert.strictEqual(
       createChannelGate.calledOnceWithExactly({
         channel: 1,
@@ -194,7 +194,7 @@ suite('Channel', () => {
   test('creates the preamp correctly', () => {
     const oscClient = oscClientFactory.build();
     const createChannelPreamp = fake.returns('preamp' as unknown as ChannelPreamp);
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       channel: 1,
       createChannelConfig: fake(),
@@ -212,14 +212,14 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp,
     });
-    assert.strictEqual(mainLR.getPreAmp(), 'preamp');
+    assert.strictEqual(channel.getPreAmp(), 'preamp');
     assert.strictEqual(createChannelPreamp.calledOnceWithExactly({ channel: 1, oscClient }), true);
   });
   test('creates the equalizer correctly', () => {
     const oscClient = oscClientFactory.build();
-    const createEqualizer = fake.returns('equalizer' as unknown as Equalizer);
+    const createEqualizer = fake.returns('equalizer' as unknown as Equalizer<4>);
     const createEqualizerBand = fake();
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -237,11 +237,12 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    assert.strictEqual(mainLR.getEqualizer(), 'equalizer');
+    assert.strictEqual(channel.getEqualizer(), 'equalizer');
     assert.strictEqual(
       createEqualizer.calledOnceWithExactly({
         oscBasePath: '/ch/01',
         oscClient,
+        numberOfBands: 4,
         createEqualizerBand,
       }),
       true,
@@ -251,7 +252,7 @@ suite('Channel', () => {
   test('creates the insert correctly', () => {
     const oscClient = oscClientFactory.build();
     const createInsert = fake.returns('insert' as unknown as Insert);
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -269,7 +270,7 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    const insert = mainLR.getInsert();
+    const insert = channel.getInsert();
     assert.strictEqual(insert, 'insert');
     assert.strictEqual(
       createInsert.calledOnceWithExactly({
@@ -283,7 +284,7 @@ suite('Channel', () => {
   test('creates the mix correctly', () => {
     const oscClient = oscClientFactory.build();
     const createMix = fake.returns('mix' as unknown as Mix);
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -301,7 +302,7 @@ suite('Channel', () => {
       createMix,
       createChannelPreamp: fake(),
     });
-    const mix = mainLR.getMix();
+    const mix = channel.getMix();
     assert.strictEqual(mix, 'mix');
     assert.strictEqual(
       createMix.calledOnceWithExactly({
@@ -315,7 +316,7 @@ suite('Channel', () => {
   test('creates the dca group correctly', () => {
     const oscClient = oscClientFactory.build();
     const createDCAGroup = fake.returns('dcaGroup' as unknown as DCAGroup);
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -333,7 +334,7 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    const dcaGroup = mainLR.getDCAGroup();
+    const dcaGroup = channel.getDCAGroup();
     assert.strictEqual(dcaGroup, 'dcaGroup');
     assert.strictEqual(
       createDCAGroup.calledOnceWithExactly({
@@ -347,7 +348,7 @@ suite('Channel', () => {
   test('creates the mute group correctly', () => {
     const oscClient = oscClientFactory.build();
     const createMuteGroup = fake.returns('muteGroup' as unknown as DCAGroup);
-    const mainLR = createChannel({
+    const channel = createChannel({
       oscClient,
       createChannelConfig: fake(),
       channel: 1,
@@ -365,7 +366,7 @@ suite('Channel', () => {
       createMix: fake(),
       createChannelPreamp: fake(),
     });
-    const muteGroup = mainLR.getMuteGroup();
+    const muteGroup = channel.getMuteGroup();
     assert.strictEqual(muteGroup, 'muteGroup');
     assert.strictEqual(
       createMuteGroup.calledOnceWithExactly({

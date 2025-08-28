@@ -4,7 +4,7 @@ import { Equalizer, EqualizerDependencies } from '../../equalizer/equalizer.js';
 import { createOSCParameterFactory } from '../../osc-parameter.js';
 import { EqMode, eqModeParameterConfig } from './parameters/mode.js';
 
-export type MainLREqualizer = Equalizer & {
+export type MainLREqualizer = Equalizer<6> & {
   /**
    * Update the equalizer mode using raw OSC value
    * @param value - The mode as raw OSC integer (0-5)
@@ -48,7 +48,7 @@ export type MainLREqualizer = Equalizer & {
 
 export type MainLREqualizerDependencies = {
   oscClient: OSCClient;
-  createEqualizer: (dependencies: EqualizerDependencies) => Equalizer;
+  createEqualizer: <T extends 6>(dependencies: EqualizerDependencies<T>) => Equalizer<T>;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
 };
 
@@ -57,14 +57,19 @@ export const createMainLREqualizer = (
 ): MainLREqualizer => {
   const { oscClient, createEqualizer, createEqualizerBand } = dependencies;
   const oscBasePath = `/lr`;
-  const channelEqualizer = createEqualizer({ oscBasePath, oscClient, createEqualizerBand });
+  const equalizer = createEqualizer({
+    oscBasePath,
+    oscClient,
+    numberOfBands: 6,
+    createEqualizerBand,
+  });
   const oscParameterFactory = createOSCParameterFactory(oscClient);
   const mode = oscParameterFactory.createOSCParameter(
     `${oscBasePath}/eq/mode`,
     eqModeParameterConfig,
   );
   return {
-    ...channelEqualizer,
+    ...equalizer,
     updateMode: mode.update,
     fetchMode: mode.fetch,
   };
