@@ -1,51 +1,10 @@
 import { OSCClient } from '../../../osc/client.js';
 import { createLinearParameterConfig } from '../../mapper/linear.js';
 import { createLogarithmicParameterConfig } from '../../mapper/log.js';
-import { onOffParameterConfig } from '../../mapper/on-off.js';
 import { createOSCParameterFactory } from '../../osc-parameter.js';
 import { EqBandType, eqBandTypeParameterConfig } from './mapper/eq-band-type.js';
 
 export type EqualizerBand = {
-  /**
-   * Fetch the current equalizer band enabled state as raw OSC value
-   * @returns Promise that resolves to raw OSC integer (0 = disabled, 1 = enabled)
-   * @example
-   * // Get raw OSC value
-   * const rawEnabled = await band.fetchIsEnabled();
-   */
-  fetchIsEnabled(): Promise<number>;
-
-  /**
-   * Fetch the current equalizer band enabled state as boolean
-   * @param unit - Must be 'flag' to get boolean value
-   * @returns Promise that resolves to boolean value
-   * @example
-   * // Get boolean value
-   * const isEnabled = await band.fetchIsEnabled('flag');
-   */
-  fetchIsEnabled(unit: 'flag'): Promise<boolean>;
-
-  /**
-   * Update the equalizer band enabled state using raw OSC value
-   * @param value - The enabled state as raw OSC integer (0 = disabled, 1 = enabled)
-   * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value
-   * await band.updateEnabled(1);
-   */
-  updateEnabled(value: number): Promise<void>;
-
-  /**
-   * Update the equalizer band enabled state using boolean
-   * @param value - The enabled state as boolean
-   * @param unit - Must be 'flag' when using boolean value
-   * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using boolean
-   * await band.updateEnabled(true, 'flag');
-   */
-  updateEnabled(value: boolean, unit: 'flag'): Promise<void>;
-
   /**
    * Update the equalizer band frequency using raw OSC value
    * @param value - The frequency as raw OSC float (0.0-1.0)
@@ -217,10 +176,6 @@ export const createEqualizerBand = (dependencies: EqualizerBandDependencies): Eq
   const { oscBasePath, band, oscClient } = dependencies;
   const oscBaseAddress = `${oscBasePath}/eq/${band}`;
   const oscParameterFactory = createOSCParameterFactory(oscClient);
-  const enabled = oscParameterFactory.createOSCParameter(
-    `${oscBaseAddress}/on`,
-    onOffParameterConfig,
-  );
   const frequency = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/f`,
     createLogarithmicParameterConfig<'hertz'>(20, 20000),
@@ -239,8 +194,6 @@ export const createEqualizerBand = (dependencies: EqualizerBandDependencies): Eq
   );
 
   return {
-    fetchIsEnabled: enabled.fetch,
-    updateEnabled: enabled.update,
     fetchFrequency: frequency.fetch,
     updateFrequency: frequency.update,
     fetchGain: gain.fetch,

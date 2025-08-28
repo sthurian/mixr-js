@@ -5,37 +5,6 @@ import { createEqualizerBand } from './eq-band.js';
 import assert from 'node:assert';
 import { assertClose, isClose } from '../../../test-helpers/is-close.js';
 suite('ChannelEqualizerBand', () => {
-  test('send the correct osc message to query if the eq band is enabled', async () => {
-    const query = fake.resolves({
-      address: '/ch/01/eq/2/on',
-      args: [{ type: 'integer', value: 1 }],
-    });
-    const oscClient = oscClientFactory.build({ query });
-    const eqBand = createEqualizerBand({
-      oscBasePath: '/ch/01',
-      band: 2,
-      oscClient,
-    });
-    const enabled = await eqBand.fetchIsEnabled('flag');
-    assert.strictEqual(enabled, true);
-    assert.strictEqual(query.calledOnceWithExactly('/ch/01/eq/2/on'), true);
-  });
-
-  test('send the correct osc message to enable the eq band', async () => {
-    const set = fake();
-    const oscClient = oscClientFactory.build({ set });
-    const eqBand = createEqualizerBand({
-      oscBasePath: '/ch/01',
-      band: 2,
-      oscClient,
-    });
-    await eqBand.updateEnabled(false, 'flag');
-    assert.strictEqual(
-      set.calledOnceWithExactly('/ch/01/eq/2/on', [{ type: 'integer', value: 0 }]),
-      true,
-    );
-  });
-
   test('send the correct osc message to query the eq bands frequency', async () => {
     const query = fake.resolves({
       address: '/ch/01/eq/2/f',
