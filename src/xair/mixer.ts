@@ -25,6 +25,7 @@ import { SixBandEqualizer, SixBandEqualizerDependencies } from './equalizer/six-
 import { Bus, BusDependencies } from './bus/bus.js';
 import { Compressor, CompressorDependencies } from './dynamics/compressor/compressor.js';
 import { MainLRInsert, MainLRInsertDependencies } from './main-lr/insert/insert.js';
+import { GraphicEqualizer, GraphicEqualizerDependencies } from './equalizer/geq.js';
 export type Mixer<M extends MixerModel> = {
   getChannel(channel: MixerModelMap[M]['channel']): Channel;
   getBus(bus: MixerModelMap[M]['bus']): Bus;
@@ -56,6 +57,7 @@ type MixerDependencies = {
   createLRMix: (dependencies: { oscClient: OSCClient; oscBasePath: string }) => LRMix;
   createSixBandEqualizer: (dependencies: SixBandEqualizerDependencies) => SixBandEqualizer;
   createBus: (dependencies: BusDependencies) => Bus;
+  createGraphicEqualizer: (dependencies: GraphicEqualizerDependencies) => GraphicEqualizer;
 };
 export const createMixer = <M extends MixerModel>(dependencies: MixerDependencies): Mixer<M> => {
   const {
@@ -82,6 +84,7 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
     createSixBandEqualizer,
     createBus,
     createCompressor,
+    createGraphicEqualizer,
   } = dependencies;
   return {
     getChannel: (channel: MixerModelMap[M]['channel']): Channel => {
@@ -120,6 +123,7 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
         createInsert,
         createMix,
         createMuteGroup,
+        createGraphicEqualizer,
       });
     },
     getMainLR: () => {
@@ -133,6 +137,7 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
         createEqualizer,
         createEqualizerBand,
         createSixBandEqualizer,
+        createGraphicEqualizer,
       });
     },
     closeConnection: () => {

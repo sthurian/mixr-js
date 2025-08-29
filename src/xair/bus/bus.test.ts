@@ -10,6 +10,7 @@ import { MuteGroup } from '../mute/mute-group.js';
 import { Insert } from '../insert/insert.js';
 import { Mix } from '../mix/mix.js';
 import { SixBandEqualizer } from '../equalizer/six-band-equalizer.js';
+import { GraphicEqualizer } from '../equalizer/geq.js';
 
 suite('Bus', () => {
   test('creates the config correctly', () => {
@@ -24,6 +25,7 @@ suite('Bus', () => {
     const createInsert = fake();
     const createMix = fake();
     const createMuteGroup = fake();
+    const createGraphicEqualizer = fake();
     const bus = createBus({
       bus: 1,
       oscClient,
@@ -37,6 +39,7 @@ suite('Bus', () => {
       createInsert,
       createMix,
       createMuteGroup,
+      createGraphicEqualizer,
     });
     assert.strictEqual(bus.getConfig(), 'config');
     assert.strictEqual(
@@ -57,6 +60,7 @@ suite('Bus', () => {
     const createInsert = fake();
     const createMix = fake();
     const createMuteGroup = fake();
+    const createGraphicEqualizer = fake();
     const bus = createBus({
       bus: 1,
       oscClient,
@@ -70,6 +74,7 @@ suite('Bus', () => {
       createInsert,
       createMix,
       createMuteGroup,
+      createGraphicEqualizer,
     });
     assert.strictEqual(bus.getCompressor(), 'compressor');
     assert.strictEqual(
@@ -91,6 +96,7 @@ suite('Bus', () => {
     const createInsert = fake();
     const createMix = fake();
     const createMuteGroup = fake();
+    const createGraphicEqualizer = fake();
     const bus = createBus({
       bus: 1,
       oscClient,
@@ -104,6 +110,7 @@ suite('Bus', () => {
       createInsert,
       createMix,
       createMuteGroup,
+      createGraphicEqualizer,
     });
     assert.strictEqual(bus.getEqualizer(), 'equalizer');
     assert.strictEqual(
@@ -132,6 +139,7 @@ suite('Bus', () => {
       createInsert: fake(),
       createMix: fake(),
       createMuteGroup: fake(),
+      createGraphicEqualizer: fake(),
     });
     assert.strictEqual(bus.getDCAGroup(), 'dcaGroup');
     assert.strictEqual(
@@ -159,6 +167,7 @@ suite('Bus', () => {
       createInsert: fake(),
       createMix: fake(),
       createMuteGroup,
+      createGraphicEqualizer: fake(),
     });
     assert.strictEqual(bus.getMuteGroup(), 'muteGroup');
     assert.strictEqual(
@@ -185,6 +194,7 @@ suite('Bus', () => {
       createInsert,
       createMix: fake(),
       createMuteGroup: fake(),
+      createGraphicEqualizer: fake(),
     });
     assert.strictEqual(bus.getInsert(), 'insert');
     assert.strictEqual(
@@ -211,10 +221,46 @@ suite('Bus', () => {
       createInsert: fake(),
       createMix,
       createMuteGroup: fake(),
+      createGraphicEqualizer: fake(),
     });
     assert.strictEqual(bus.getMix(), 'mix');
     assert.strictEqual(
       createMix.calledOnceWithExactly({
+        oscBasePath: '/bus/1',
+        oscClient,
+      }),
+      true,
+    );
+  });
+
+  test('creates the graphic equalizer correctly', () => {
+    const oscClient = oscClientFactory.build();
+    const createSixBandEqualizer = fake();
+    const createEqualizer = fake();
+    const createEqualizerBand = fake();
+    const createDCAGroup = fake();
+    const createInsert = fake();
+    const createMix = fake();
+    const createMuteGroup = fake();
+    const createGraphicEqualizer = fake.returns('geq' as unknown as GraphicEqualizer);
+    const bus = createBus({
+      bus: 1,
+      oscClient,
+      createConfig: fake(),
+      createChannelCompressor: fake(),
+      createDynamicsFilter: fake(),
+      createSixBandEqualizer,
+      createEqualizer,
+      createEqualizerBand,
+      createDCAGroup,
+      createInsert,
+      createMix,
+      createMuteGroup,
+      createGraphicEqualizer,
+    });
+    assert.strictEqual(bus.getGraphicEqualizer(), 'geq');
+    assert.strictEqual(
+      createGraphicEqualizer.calledOnceWithExactly({
         oscBasePath: '/bus/1',
         oscClient,
       }),

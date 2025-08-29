@@ -27,6 +27,7 @@ A comprehensive TypeScript/JavaScript client library for controlling **digital m
 - **Mix Controls**: Master fader, mute, pan control
 - **Configuration**: Name and color assignment
 - **6-Band Parametric EQ**: Full frequency control with mode selection (PEQ/GEQ/TEQ)
+- **31-Band Graphic EQ**: Professional graphic equalizer with individual band control
 - **Dynamics**: Professional compressor processing
 - **Insert Effects**: FX slot assignment and processing
 - **Audio Processing**: Complete signal path control for main outputs
@@ -36,6 +37,7 @@ A comprehensive TypeScript/JavaScript client library for controlling **digital m
 - **Mix Controls**: Bus level, mute control
 - **Configuration**: Bus name and color assignment
 - **6-Band Parametric EQ**: Complete frequency shaping per bus
+- **31-Band Graphic EQ**: Professional graphic equalizer control per bus
 - **Dynamics**: Full compressor processing per bus
 - **Group Assignments**: DCA and mute group integration
 - **Insert Effects**: Per-bus insert processing
@@ -195,6 +197,16 @@ await lrCompressor.updateEnabled(true, 'flag');
 await lrCompressor.updateThreshold(-6, 'decibels');
 await lrCompressor.updateRatio('3', 'ratio');
 
+// 31-band graphic EQ control
+const lrGEQ = mainLR.getGraphicEqualizer();
+await lrGEQ.updateBandGain('1k', 2.5, 'decibels'); // Boost 1kHz by 2.5dB
+await lrGEQ.updateBandGain('10k', -1.5, 'decibels'); // Cut 10kHz by 1.5dB
+await lrGEQ.updateBandGain('100', 0.8); // Raw OSC value for 100Hz band
+
+// Read current graphic EQ settings
+const gain1k = await lrGEQ.fetchBandGain('1k', 'decibels');
+const rawGain100 = await lrGEQ.fetchBandGain('100');
+
 // Insert effects support
 const lrInsert = mainLR.getInsert();
 await lrInsert.updateEnabled(true, 'flag');
@@ -236,6 +248,16 @@ const busCompressor = bus1.getCompressor();
 await busCompressor.updateEnabled(true, 'flag');
 await busCompressor.updateThreshold(-12, 'decibels');
 await busCompressor.updateRatio('2', 'ratio');
+
+// 31-band graphic EQ control
+const busGEQ = bus1.getGraphicEqualizer();
+await busGEQ.updateBandGain('500', 1.2, 'decibels'); // Boost 500Hz by 1.2dB
+await busGEQ.updateBandGain('4k', -0.8, 'decibels'); // Cut 4kHz by 0.8dB
+await busGEQ.updateBandGain('8k', 0.6); // Raw OSC value for 8kHz band
+
+// Read current graphic EQ settings
+const gain500 = await busGEQ.fetchBandGain('500', 'decibels');
+const rawGain4k = await busGEQ.fetchBandGain('4k');
 
 // Group assignments
 await bus1.getDCAGroup().updateEnabled(3);
@@ -362,6 +384,12 @@ _Future versions will support additional mixer brands and models._
   - Full parametric control (frequency, gain, Q, type)
   - Same interface as channel EQ bands
 
+#### 31-Band Graphic EQ (`mixer.getMainLR().getGraphicEqualizer()`)
+
+- `updateBandGain(band, gain, 'decibels')` / `fetchBandGain(band, 'decibels')` - Band gain in dB (-15dB to +15dB)
+- `updateBandGain(band, gain)` / `fetchBandGain(band)` - Band gain as raw OSC value (0.0-1.0)
+- **Available Bands**: '20', '25', '31.5', '40', '50', '63', '80', '100', '125', '160', '200', '250', '315', '400', '500', '630', '800', '1k', '1k25', '1k6', '2k', '2k5', '3k15', '4k', '5k', '6k3', '8k', '10k', '12k5', '16k', '20k'
+
 #### Compressor (`mixer.getMainLR().getCompressor()`)
 
 - Full dynamics control (threshold, ratio, attack, release, etc.)
@@ -417,6 +445,12 @@ _Note: MainLR insert uses simplified slot names ('FX1', 'FX2', etc.) unlike chan
   - `updateGain(gain, 'decibels')` / `fetchGain()` - Gain adjustment (-15dB to +15dB)
   - `updateQ(q, 'number')` / `fetchQ()` - Q factor (0.3 to 10)
   - `updateType(type)` / `fetchType()` - Band type (LCut, LShv, PEQ, HShv, HCut)
+
+#### 31-Band Graphic EQ (`mixer.getBus('Bus1').getGraphicEqualizer()`)
+
+- `updateBandGain(band, gain, 'decibels')` / `fetchBandGain(band, 'decibels')` - Band gain in dB (-15dB to +15dB)
+- `updateBandGain(band, gain)` / `fetchBandGain(band)` - Band gain as raw OSC value (0.0-1.0)
+- **Available Bands**: '20', '25', '31.5', '40', '50', '63', '80', '100', '125', '160', '200', '250', '315', '400', '500', '630', '800', '1k', '1k25', '1k6', '2k', '2k5', '3k15', '4k', '5k', '6k3', '8k', '10k', '12k5', '16k', '20k'
 
 #### Compressor (`mixer.getBus('Bus1').getCompressor()`)
 

@@ -27,6 +27,7 @@ import { createSixBandEqualizer } from './equalizer/six-band-equalizer.js';
 import { createBus } from './bus/bus.js';
 import { createCompressor } from './dynamics/compressor/compressor.js';
 import { createMainLRInsert } from './main-lr/insert/insert.js';
+import { createGraphicEqualizer } from './equalizer/geq.js';
 export const connectToMixer = async <M extends MixerModel>(
   options: MixerConnectionInformation & { model: M },
 ): Promise<Mixer<M>> => {
@@ -65,6 +66,7 @@ export const connectToMixer = async <M extends MixerModel>(
     createLRMix,
     createCompressor,
     createSixBandEqualizer,
+    createGraphicEqualizer,
     createBus,
   });
 };

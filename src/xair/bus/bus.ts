@@ -8,6 +8,7 @@ import { DCAGroup, DCAGroupDependencies } from '../dca/dca-group.js';
 import { DynamicsFilter, DynamicsFilterDependencies } from '../dynamics/filter/filter.js';
 import { EqualizerBand, EqualizerBandDependencies } from '../equalizer/band/eq-band.js';
 import { Equalizer, EqualizerDependencies } from '../equalizer/equalizer.js';
+import { GraphicEqualizer, GraphicEqualizerDependencies } from '../equalizer/geq.js';
 import { SixBandEqualizer, SixBandEqualizerDependencies } from '../equalizer/six-band-equalizer.js';
 import { Insert, InsertDependencies } from '../insert/insert.js';
 import { Mix, MixDependencies } from '../mix/mix.js';
@@ -21,6 +22,7 @@ export type Bus = {
   getMuteGroup(): MuteGroup;
   getInsert(): Insert;
   getMix(): Mix;
+  getGraphicEqualizer(): GraphicEqualizer;
 };
 
 export type BusDependencies = {
@@ -36,6 +38,7 @@ export type BusDependencies = {
   createMuteGroup: (dependencies: MuteGroupDependencies) => MuteGroup;
   createInsert: (dependencies: InsertDependencies) => Insert;
   createMix: (dependencies: MixDependencies) => Mix;
+  createGraphicEqualizer: (dependencies: GraphicEqualizerDependencies) => GraphicEqualizer;
 };
 
 export const createBus = (dependencies: BusDependencies): Bus => {
@@ -52,6 +55,7 @@ export const createBus = (dependencies: BusDependencies): Bus => {
     createMuteGroup,
     createInsert,
     createMix,
+    createGraphicEqualizer,
   } = dependencies;
   const oscBasePath = `/bus/${bus.toString()}`;
   const config = createConfig({ oscBasePath, oscClient });
@@ -65,6 +69,7 @@ export const createBus = (dependencies: BusDependencies): Bus => {
   const muteGroup = createMuteGroup({ oscBasePath, oscClient });
   const insert = createInsert({ oscBasePath, oscClient });
   const mix = createMix({ oscBasePath, oscClient });
+  const geq = createGraphicEqualizer({ oscBasePath, oscClient });
   return {
     getConfig: () => config,
     getCompressor: () => compressor,
@@ -73,5 +78,6 @@ export const createBus = (dependencies: BusDependencies): Bus => {
     getMuteGroup: () => muteGroup,
     getInsert: () => insert,
     getMix: () => mix,
+    getGraphicEqualizer: () => geq,
   };
 };

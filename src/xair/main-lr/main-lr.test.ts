@@ -8,6 +8,7 @@ import { LRMix } from '../mix/lr-mix.js';
 import { SixBandEqualizer } from '../equalizer/six-band-equalizer.js';
 import { Compressor } from '../dynamics/compressor/compressor.js';
 import { MainLRInsert } from './insert/insert.js';
+import { GraphicEqualizer } from '../equalizer/geq.js';
 
 suite('MainLR', () => {
   test('creates the config correctly', () => {
@@ -23,6 +24,7 @@ suite('MainLR', () => {
       createSixBandEqualizer: fake(),
       createEqualizer: fake(),
       createEqualizerBand: fake(),
+      createGraphicEqualizer: fake(),
     });
     assert.strictEqual(mainLR.getConfig(), 'config');
     assert.strictEqual(createConfig.calledOnceWithExactly({ oscClient, oscBasePath: '/lr' }), true);
@@ -41,6 +43,7 @@ suite('MainLR', () => {
       createSixBandEqualizer: fake(),
       createEqualizer: fake(),
       createEqualizerBand: fake(),
+      createGraphicEqualizer: fake(),
     });
     assert.strictEqual(mainLR.getMix(), 'lrMix');
     assert.strictEqual(createLRMix.calledOnceWithExactly({ oscClient, oscBasePath: '/lr' }), true);
@@ -61,6 +64,7 @@ suite('MainLR', () => {
       createSixBandEqualizer: fake(),
       createEqualizer: fake(),
       createEqualizerBand: fake(),
+      createGraphicEqualizer: fake(),
     });
     assert.strictEqual(mainLR.getCompressor(), 'compressor');
     assert.strictEqual(
@@ -88,6 +92,7 @@ suite('MainLR', () => {
       createSixBandEqualizer,
       createEqualizer,
       createEqualizerBand,
+      createGraphicEqualizer: fake(),
     });
     assert.strictEqual(mainLR.getEqualizer(), 'eq');
     assert.strictEqual(
@@ -113,10 +118,37 @@ suite('MainLR', () => {
       createSixBandEqualizer: fake(),
       createEqualizer: fake(),
       createEqualizerBand: fake(),
+      createGraphicEqualizer: fake(),
     });
     assert.strictEqual(mainLR.getInsert(), 'insert');
     assert.strictEqual(
       createMainLRInsert.calledOnceWithExactly({ oscClient, oscBasePath: '/lr' }),
+      true,
+    );
+  });
+
+  test('creates the graphic equalizer correctly', () => {
+    const oscClient = oscClientFactory.build();
+    const createSixBandEqualizer = fake();
+    const createGraphicEqualizer = fake.returns('eq' as unknown as GraphicEqualizer);
+    const mainLR = createMainLR({
+      oscClient,
+      createConfig: fake(),
+      createLRMix: fake(),
+      createCompressor: fake(),
+      createMainLRInsert: fake(),
+      createDynamicsFilter: fake(),
+      createSixBandEqualizer,
+      createEqualizer: fake(),
+      createEqualizerBand: fake(),
+      createGraphicEqualizer,
+    });
+    assert.strictEqual(mainLR.getGraphicEqualizer(), 'eq');
+    assert.strictEqual(
+      createGraphicEqualizer.calledOnceWithExactly({
+        oscBasePath: '/lr',
+        oscClient,
+      }),
       true,
     );
   });

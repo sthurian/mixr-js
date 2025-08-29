@@ -7,12 +7,14 @@ import { Equalizer, EqualizerDependencies } from '../equalizer/equalizer.js';
 import { LRMix, LRMixDependencies } from '../mix/lr-mix.js';
 import { SixBandEqualizer, SixBandEqualizerDependencies } from '../equalizer/six-band-equalizer.js';
 import { MainLRInsert, MainLRInsertDependencies } from './insert/insert.js';
+import { GraphicEqualizer, GraphicEqualizerDependencies } from '../equalizer/geq.js';
 
 export type MainLR = {
   getMix: () => LRMix;
   getConfig: () => Config;
   getCompressor: () => Compressor;
   getEqualizer: () => SixBandEqualizer;
+  getGraphicEqualizer: () => GraphicEqualizer;
   getInsert: () => MainLRInsert;
 };
 
@@ -26,6 +28,7 @@ export type MainLRDependencies = {
   createSixBandEqualizer: (dependencies: SixBandEqualizerDependencies) => SixBandEqualizer;
   createEqualizer: <T extends 6>(dependencies: EqualizerDependencies<T>) => Equalizer<T>;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
+  createGraphicEqualizer: (dependencies: GraphicEqualizerDependencies) => GraphicEqualizer;
 };
 
 export const createMainLR = (dependencies: MainLRDependencies): MainLR => {
@@ -39,6 +42,7 @@ export const createMainLR = (dependencies: MainLRDependencies): MainLR => {
     createEqualizer,
     createEqualizerBand,
     createMainLRInsert,
+    createGraphicEqualizer,
   } = dependencies;
   const oscBasePath = '/lr';
   const lrMix = createLRMix({ oscClient, oscBasePath });
@@ -50,11 +54,13 @@ export const createMainLR = (dependencies: MainLRDependencies): MainLR => {
     createEqualizerBand,
     oscClient,
   });
+  const geq = createGraphicEqualizer({ oscClient, oscBasePath });
   return {
     getMix: () => lrMix,
     getConfig: () => config,
     getCompressor: () => compressor,
     getEqualizer: () => eq,
+    getGraphicEqualizer: () => geq,
     getInsert: () => insert,
   };
 };

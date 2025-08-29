@@ -32,6 +32,7 @@ suite('Mixer', () => {
     const createSixBandEqualizer = fake();
     const createMainLR = fake();
     const createBus = fake();
+    const createGraphicEqualizer = fake();
     const mixer = createMixer({
       oscClient,
       createChannel,
@@ -56,6 +57,7 @@ suite('Mixer', () => {
       createMainLR,
       createSixBandEqualizer,
       createBus,
+      createGraphicEqualizer,
     });
     const channel = mixer.getChannel('CH01');
     assert.strictEqual(channel, 'channel');
@@ -96,6 +98,7 @@ suite('Mixer', () => {
     const createMainLRInsert = fake();
     const createMix = fake();
     const createMuteGroup = fake();
+    const createGraphicEqualizer = fake();
     const mixer = createMixer({
       oscClient,
       createChannel: fake(),
@@ -118,6 +121,7 @@ suite('Mixer', () => {
       createLRMix: fake(),
       createCompressor: fake(),
       createMainLR: fake(),
+      createGraphicEqualizer,
       createSixBandEqualizer,
       createBus,
     });
@@ -137,6 +141,7 @@ suite('Mixer', () => {
         createInsert,
         createMix,
         createMuteGroup,
+        createGraphicEqualizer,
       }),
       true,
     );
@@ -154,6 +159,7 @@ suite('Mixer', () => {
     const createEqualizer = fake();
     const createEqualizerBand = fake();
     const createMainLRInsert = fake();
+    const createGraphicEqualizer = fake();
     const mixer = createMixer({
       oscClient,
       createChannel: fake(),
@@ -178,6 +184,7 @@ suite('Mixer', () => {
       createCompressor,
       createMainLR,
       createSixBandEqualizer,
+      createGraphicEqualizer,
     });
     const mainLR = mixer.getMainLR();
     assert.strictEqual(mainLR, 'mainLR');
@@ -192,6 +199,7 @@ suite('Mixer', () => {
         createEqualizer,
         createEqualizerBand,
         createSixBandEqualizer,
+        createGraphicEqualizer,
       }),
       true,
     );
@@ -225,6 +233,7 @@ suite('Mixer', () => {
       createMainLR: fake(),
       createSixBandEqualizer: fake(),
       createBus: fake(),
+      createGraphicEqualizer: fake(),
     });
     await mixer.closeConnection();
     assert.strictEqual(close.calledOnce, true);
