@@ -8,6 +8,7 @@ import { DCAGroup, DCAGroupDependencies } from '../dca/dca-group.js';
 import { DynamicsFilter, DynamicsFilterDependencies } from '../dynamics/filter/filter.js';
 import { EqualizerBand, EqualizerBandDependencies } from '../equalizer/band/eq-band.js';
 import { Equalizer, EqualizerDependencies } from '../equalizer/equalizer.js';
+import { SixBandEqualizer, SixBandEqualizerDependencies } from '../equalizer/six-band-equalizer.js';
 import { Insert, InsertDependencies } from '../insert/insert.js';
 import { Mix, MixDependencies } from '../mix/mix.js';
 import { MuteGroup, MuteGroupDependencies } from '../mute/mute-group.js';
@@ -15,7 +16,7 @@ import { MuteGroup, MuteGroupDependencies } from '../mute/mute-group.js';
 export type Bus = {
   getConfig(): Config;
   getCompressor(): ChannelCompressor;
-  getEqualizer(): Equalizer<6>;
+  getEqualizer(): SixBandEqualizer;
   getDCAGroup(): DCAGroup;
   getMuteGroup(): MuteGroup;
   getInsert(): Insert;
@@ -29,6 +30,7 @@ export type BusDependencies = {
   createChannelCompressor: (dependencies: ChannelCompressorDependencies) => ChannelCompressor;
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
   createEqualizer: <T extends 6>(dependencies: EqualizerDependencies<T>) => Equalizer<T>;
+  createSixBandEqualizer: (dependencies: SixBandEqualizerDependencies) => SixBandEqualizer;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
   createDCAGroup: (dependencies: DCAGroupDependencies) => DCAGroup;
   createMuteGroup: (dependencies: MuteGroupDependencies) => MuteGroup;
@@ -44,6 +46,7 @@ export const createBus = (dependencies: BusDependencies): Bus => {
     createChannelCompressor,
     createDynamicsFilter,
     createEqualizer,
+    createSixBandEqualizer,
     createEqualizerBand,
     createDCAGroup,
     createMuteGroup,
@@ -53,10 +56,9 @@ export const createBus = (dependencies: BusDependencies): Bus => {
   const oscBasePath = `/bus/${bus.toString()}`;
   const config = createConfig({ oscBasePath, oscClient });
   const compressor = createChannelCompressor({ oscBasePath, oscClient, createDynamicsFilter });
-  const equalizer = createEqualizer({
+  const equalizer = createSixBandEqualizer({
     createEqualizerBand,
-    numberOfBands: 6,
-    oscBasePath,
+    createEqualizer,
     oscClient,
   });
   const dcaGroup = createDCAGroup({ oscBasePath, oscClient });

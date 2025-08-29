@@ -23,7 +23,7 @@ import { createConfig } from './config/config.js';
 import { createLRMix } from './mix/lr-mix.js';
 import { createChannel } from './channel/channel.js';
 import { createMainLR } from './main-lr/main-lr.js';
-import { createMainLREqualizer } from './main-lr/equalizer/equalizer.js';
+import { createSixBandEqualizer } from './equalizer/six-band-equalizer.js';
 import { createBus } from './bus/bus.js';
 import { createCompressor } from './dynamics/compressor/compressor.js';
 import { createMainLRInsert } from './main-lr/insert/insert.js';
@@ -64,7 +64,7 @@ export const connectToMixer = async <M extends MixerModel>(
     createMainLR,
     createLRMix,
     createCompressor,
-    createMainLREqualizer,
+    createSixBandEqualizer,
     createBus,
   });
 };

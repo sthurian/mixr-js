@@ -5,14 +5,14 @@ import { DynamicsFilter, DynamicsFilterDependencies } from '../dynamics/filter/f
 import { EqualizerBand, EqualizerBandDependencies } from '../equalizer/band/eq-band.js';
 import { Equalizer, EqualizerDependencies } from '../equalizer/equalizer.js';
 import { LRMix, LRMixDependencies } from '../mix/lr-mix.js';
-import { MainLREqualizer, MainLREqualizerDependencies } from './equalizer/equalizer.js';
+import { SixBandEqualizer, SixBandEqualizerDependencies } from '../equalizer/six-band-equalizer.js';
 import { MainLRInsert, MainLRInsertDependencies } from './insert/insert.js';
 
 export type MainLR = {
   getMix: () => LRMix;
   getConfig: () => Config;
   getCompressor: () => Compressor;
-  getEqualizer: () => MainLREqualizer;
+  getEqualizer: () => SixBandEqualizer;
   getInsert: () => MainLRInsert;
 };
 
@@ -23,7 +23,7 @@ export type MainLRDependencies = {
   createMainLRInsert: (dependencies: MainLRInsertDependencies) => MainLRInsert;
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
   createCompressor: (dependencies: CompressorDependencies) => Compressor;
-  createMainLREqualizer: (dependencies: MainLREqualizerDependencies) => MainLREqualizer;
+  createSixBandEqualizer: (dependencies: SixBandEqualizerDependencies) => SixBandEqualizer;
   createEqualizer: <T extends 6>(dependencies: EqualizerDependencies<T>) => Equalizer<T>;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
 };
@@ -35,7 +35,7 @@ export const createMainLR = (dependencies: MainLRDependencies): MainLR => {
     createLRMix,
     createCompressor,
     createDynamicsFilter,
-    createMainLREqualizer,
+    createSixBandEqualizer,
     createEqualizer,
     createEqualizerBand,
     createMainLRInsert,
@@ -45,7 +45,7 @@ export const createMainLR = (dependencies: MainLRDependencies): MainLR => {
   const config = createConfig({ oscClient, oscBasePath });
   const compressor = createCompressor({ oscClient, oscBasePath, createDynamicsFilter });
   const insert = createMainLRInsert({ oscClient, oscBasePath });
-  const eq = createMainLREqualizer({
+  const eq = createSixBandEqualizer({
     createEqualizer,
     createEqualizerBand,
     oscClient,

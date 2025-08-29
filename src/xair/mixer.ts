@@ -21,7 +21,7 @@ import { ChannelPreamp, ChannelPreampDependencies } from './channel/preamp/pream
 import { DCAGroup, DCAGroupDependencies } from './dca/dca-group.js';
 import { Mix, MixDependencies } from './mix/mix.js';
 import { MuteGroup, MuteGroupDependencies } from './mute/mute-group.js';
-import { MainLREqualizer, MainLREqualizerDependencies } from './main-lr/equalizer/equalizer.js';
+import { SixBandEqualizer, SixBandEqualizerDependencies } from './equalizer/six-band-equalizer.js';
 import { Bus, BusDependencies } from './bus/bus.js';
 import { Compressor, CompressorDependencies } from './dynamics/compressor/compressor.js';
 import { MainLRInsert, MainLRInsertDependencies } from './main-lr/insert/insert.js';
@@ -54,7 +54,7 @@ type MixerDependencies = {
   createConfig: (dependencies: { oscClient: OSCClient; oscBasePath: string }) => Config;
   createMainLR: (dependencies: MainLRDependencies) => MainLR;
   createLRMix: (dependencies: { oscClient: OSCClient; oscBasePath: string }) => LRMix;
-  createMainLREqualizer: (dependencies: MainLREqualizerDependencies) => MainLREqualizer;
+  createSixBandEqualizer: (dependencies: SixBandEqualizerDependencies) => SixBandEqualizer;
   createBus: (dependencies: BusDependencies) => Bus;
 };
 export const createMixer = <M extends MixerModel>(dependencies: MixerDependencies): Mixer<M> => {
@@ -79,7 +79,7 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
     createConfig,
     createMainLR,
     createLRMix,
-    createMainLREqualizer,
+    createSixBandEqualizer,
     createBus,
     createCompressor,
   } = dependencies;
@@ -114,6 +114,7 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
         createChannelCompressor,
         createDynamicsFilter,
         createEqualizer,
+        createSixBandEqualizer,
         createEqualizerBand,
         createDCAGroup,
         createInsert,
@@ -131,7 +132,7 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
         createDynamicsFilter,
         createEqualizer,
         createEqualizerBand,
-        createMainLREqualizer,
+        createSixBandEqualizer,
       });
     },
     closeConnection: () => {

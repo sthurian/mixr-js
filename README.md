@@ -218,6 +218,7 @@ await bus1.getConfig().updateColor('Blue', 'color');
 // 6-band EQ control
 const busEQ = bus1.getEqualizer();
 await busEQ.updateEnabled(true, 'flag');
+await busEQ.updateMode('PEQ', 'mode'); // PEQ, GEQ, TEQ, VEQ, LCut, LShv, HShv, HCut
 
 // Configure EQ bands for monitor mix
 const lowBand = busEQ.getBand(1);
@@ -410,9 +411,12 @@ _Note: MainLR insert uses simplified slot names ('FX1', 'FX2', etc.) unlike chan
 #### 6-Band EQ (`mixer.getBus('Bus1').getEqualizer()`)
 
 - `updateEnabled(enabled)` / `fetchIsEnabled()` - EQ on/off
+- `updateMode(mode)` / `fetchMode()` - EQ mode (LCut, LShv, PEQ, VEQ, HShv, HCut)
 - `getBand(1-6)` - Access individual EQ bands
-  - Full parametric control (frequency, gain, Q, type)
-  - Same interface as channel EQ bands
+  - `updateFrequency(freq, 'hertz')` / `fetchFrequency()` - Center frequency
+  - `updateGain(gain, 'decibels')` / `fetchGain()` - Gain adjustment (-15dB to +15dB)
+  - `updateQ(q, 'number')` / `fetchQ()` - Q factor (0.3 to 10)
+  - `updateType(type)` / `fetchType()` - Band type (LCut, LShv, PEQ, HShv, HCut)
 
 #### Compressor (`mixer.getBus('Bus1').getCompressor()`)
 

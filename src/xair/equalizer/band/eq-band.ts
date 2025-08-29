@@ -2,7 +2,7 @@ import { OSCClient } from '../../../osc/client.js';
 import { createLinearParameterConfig } from '../../mapper/linear.js';
 import { createLogarithmicParameterConfig } from '../../mapper/log.js';
 import { createOSCParameterFactory } from '../../osc-parameter.js';
-import { EqBandType, eqBandTypeParameterConfig } from './mapper/eq-band-type.js';
+import { EqBandType, eqBandTypeParameterConfig } from './parameter/eq-band-type.js';
 
 export type EqualizerBand = {
   /**

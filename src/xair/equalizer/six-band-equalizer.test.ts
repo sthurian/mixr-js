@@ -1,17 +1,17 @@
 import { suite, test } from 'mocha';
-import { createMainLREqualizer } from './equalizer.js';
-import { oscClientFactory } from '../../../osc/test-factories/client.js';
+import { createSixBandEqualizer } from './six-band-equalizer.js';
+import { oscClientFactory } from '../../osc/test-factories/client.js';
 import { fake } from 'sinon';
 import assert from 'node:assert';
 
-suite('MainLR Equalizer', () => {
+suite('SixBandEqualizer', () => {
   test('', () => {
     const query = fake.resolves({
       address: '/lr/eq/mode',
       args: [{ type: 'integer', value: 2 }],
     });
     const oscClient = oscClientFactory.build({ query });
-    const eq = createMainLREqualizer({
+    const eq = createSixBandEqualizer({
       oscClient,
       createEqualizer: fake(),
       createEqualizerBand: fake(),

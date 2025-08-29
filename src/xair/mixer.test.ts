@@ -29,7 +29,7 @@ suite('Mixer', () => {
     const createConfig = fake();
     const createLRMix = fake();
     const createCompressor = fake();
-    const createMainLREqualizer = fake();
+    const createSixBandEqualizer = fake();
     const createMainLR = fake();
     const createBus = fake();
     const mixer = createMixer({
@@ -54,7 +54,7 @@ suite('Mixer', () => {
       createLRMix,
       createCompressor,
       createMainLR,
-      createMainLREqualizer,
+      createSixBandEqualizer,
       createBus,
     });
     const channel = mixer.getChannel('CH01');
@@ -89,6 +89,7 @@ suite('Mixer', () => {
     const createChannelCompressor = fake();
     const createDynamicsFilter = fake();
     const createEqualizer = fake();
+    const createSixBandEqualizer = fake();
     const createEqualizerBand = fake();
     const createDCAGroup = fake();
     const createInsert = fake();
@@ -117,7 +118,7 @@ suite('Mixer', () => {
       createLRMix: fake(),
       createCompressor: fake(),
       createMainLR: fake(),
-      createMainLREqualizer: fake(),
+      createSixBandEqualizer,
       createBus,
     });
     const bus = mixer.getBus('Bus1');
@@ -130,6 +131,7 @@ suite('Mixer', () => {
         createChannelCompressor,
         createDynamicsFilter,
         createEqualizer,
+        createSixBandEqualizer,
         createEqualizerBand,
         createDCAGroup,
         createInsert,
@@ -148,7 +150,7 @@ suite('Mixer', () => {
     const createInsert = fake();
     const createCompressor = fake();
     const createDynamicsFilter = fake();
-    const createMainLREqualizer = fake();
+    const createSixBandEqualizer = fake();
     const createEqualizer = fake();
     const createEqualizerBand = fake();
     const createMainLRInsert = fake();
@@ -175,7 +177,7 @@ suite('Mixer', () => {
       createLRMix,
       createCompressor,
       createMainLR,
-      createMainLREqualizer,
+      createSixBandEqualizer,
     });
     const mainLR = mixer.getMainLR();
     assert.strictEqual(mainLR, 'mainLR');
@@ -189,7 +191,7 @@ suite('Mixer', () => {
         createDynamicsFilter,
         createEqualizer,
         createEqualizerBand,
-        createMainLREqualizer,
+        createSixBandEqualizer,
       }),
       true,
     );
@@ -221,7 +223,7 @@ suite('Mixer', () => {
       createLRMix: fake(),
       createCompressor: fake(),
       createMainLR: fake(),
-      createMainLREqualizer: fake(),
+      createSixBandEqualizer: fake(),
       createBus: fake(),
     });
     await mixer.closeConnection();

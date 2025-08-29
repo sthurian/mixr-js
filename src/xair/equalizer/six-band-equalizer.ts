@@ -1,10 +1,10 @@
-import { OSCClient } from '../../../osc/client.js';
-import { EqualizerBand, EqualizerBandDependencies } from '../../equalizer/band/eq-band.js';
-import { Equalizer, EqualizerDependencies } from '../../equalizer/equalizer.js';
-import { createOSCParameterFactory } from '../../osc-parameter.js';
+import { OSCClient } from '../../osc/client.js';
+import { EqualizerBand, EqualizerBandDependencies } from './band/eq-band.js';
+import { Equalizer, EqualizerDependencies } from './equalizer.js';
+import { createOSCParameterFactory } from '../osc-parameter.js';
 import { EqMode, eqModeParameterConfig } from './parameters/mode.js';
 
-export type MainLREqualizer = Equalizer<6> & {
+export type SixBandEqualizer = Equalizer<6> & {
   /**
    * Update the equalizer mode using raw OSC value
    * @param value - The mode as raw OSC integer (0-5)
@@ -46,15 +46,15 @@ export type MainLREqualizer = Equalizer<6> & {
   fetchMode(unit: 'mode'): Promise<EqMode>;
 };
 
-export type MainLREqualizerDependencies = {
+export type SixBandEqualizerDependencies = {
   oscClient: OSCClient;
   createEqualizer: <T extends 6>(dependencies: EqualizerDependencies<T>) => Equalizer<T>;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
 };
 
-export const createMainLREqualizer = (
-  dependencies: MainLREqualizerDependencies,
-): MainLREqualizer => {
+export const createSixBandEqualizer = (
+  dependencies: SixBandEqualizerDependencies,
+): SixBandEqualizer => {
   const { oscClient, createEqualizer, createEqualizerBand } = dependencies;
   const oscBasePath = `/lr`;
   const equalizer = createEqualizer({

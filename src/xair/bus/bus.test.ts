@@ -5,11 +5,11 @@ import assert from 'node:assert';
 import { createBus } from './bus.js';
 import { Config } from '../config/config.js';
 import { ChannelCompressor } from '../channel/dynamics/compressor/compressor.js';
-import { Equalizer } from '../equalizer/equalizer.js';
 import { DCAGroup } from '../dca/dca-group.js';
 import { MuteGroup } from '../mute/mute-group.js';
 import { Insert } from '../insert/insert.js';
 import { Mix } from '../mix/mix.js';
+import { SixBandEqualizer } from '../equalizer/six-band-equalizer.js';
 
 suite('Bus', () => {
   test('creates the config correctly', () => {
@@ -18,6 +18,7 @@ suite('Bus', () => {
     const createChannelCompressor = fake();
     const createDynamicsFilter = fake();
     const createEqualizer = fake();
+    const createSixBandEqualizer = fake();
     const createEqualizerBand = fake();
     const createDCAGroup = fake();
     const createInsert = fake();
@@ -30,6 +31,7 @@ suite('Bus', () => {
       createChannelCompressor,
       createDynamicsFilter,
       createEqualizer,
+      createSixBandEqualizer,
       createEqualizerBand,
       createDCAGroup,
       createInsert,
@@ -49,6 +51,7 @@ suite('Bus', () => {
     const createChannelCompressor = fake.returns('compressor' as unknown as ChannelCompressor);
     const createDynamicsFilter = fake();
     const createEqualizer = fake();
+    const createSixBandEqualizer = fake();
     const createEqualizerBand = fake();
     const createDCAGroup = fake();
     const createInsert = fake();
@@ -61,6 +64,7 @@ suite('Bus', () => {
       createChannelCompressor,
       createDynamicsFilter,
       createEqualizer,
+      createSixBandEqualizer,
       createEqualizerBand,
       createDCAGroup,
       createInsert,
@@ -80,7 +84,8 @@ suite('Bus', () => {
 
   test('creates the equalizer correctly', () => {
     const oscClient = oscClientFactory.build();
-    const createEqualizer = fake.returns('equalizer' as unknown as Equalizer<6>);
+    const createSixBandEqualizer = fake.returns('equalizer' as unknown as SixBandEqualizer);
+    const createEqualizer = fake();
     const createEqualizerBand = fake();
     const createDCAGroup = fake();
     const createInsert = fake();
@@ -92,6 +97,7 @@ suite('Bus', () => {
       createConfig: fake(),
       createChannelCompressor: fake(),
       createDynamicsFilter: fake(),
+      createSixBandEqualizer,
       createEqualizer,
       createEqualizerBand,
       createDCAGroup,
@@ -101,10 +107,9 @@ suite('Bus', () => {
     });
     assert.strictEqual(bus.getEqualizer(), 'equalizer');
     assert.strictEqual(
-      createEqualizer.calledOnceWithExactly({
+      createSixBandEqualizer.calledOnceWithExactly({
         createEqualizerBand,
-        numberOfBands: 6,
-        oscBasePath: '/bus/1',
+        createEqualizer,
         oscClient,
       }),
       true,
@@ -121,6 +126,7 @@ suite('Bus', () => {
       createChannelCompressor: fake(),
       createDynamicsFilter: fake(),
       createEqualizer: fake(),
+      createSixBandEqualizer: fake(),
       createEqualizerBand: fake(),
       createDCAGroup,
       createInsert: fake(),
@@ -147,6 +153,7 @@ suite('Bus', () => {
       createChannelCompressor: fake(),
       createDynamicsFilter: fake(),
       createEqualizer: fake(),
+      createSixBandEqualizer: fake(),
       createEqualizerBand: fake(),
       createDCAGroup: fake(),
       createInsert: fake(),
@@ -172,6 +179,7 @@ suite('Bus', () => {
       createChannelCompressor: fake(),
       createDynamicsFilter: fake(),
       createEqualizer: fake(),
+      createSixBandEqualizer: fake(),
       createEqualizerBand: fake(),
       createDCAGroup: fake(),
       createInsert,
@@ -197,6 +205,7 @@ suite('Bus', () => {
       createChannelCompressor: fake(),
       createDynamicsFilter: fake(),
       createEqualizer: fake(),
+      createSixBandEqualizer: fake(),
       createEqualizerBand: fake(),
       createDCAGroup: fake(),
       createInsert: fake(),

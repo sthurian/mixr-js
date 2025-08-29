@@ -5,7 +5,7 @@ import { fake } from 'sinon';
 import assert from 'node:assert';
 import { Config } from '../config/config.js';
 import { LRMix } from '../mix/lr-mix.js';
-import { MainLREqualizer } from './equalizer/equalizer.js';
+import { SixBandEqualizer } from '../equalizer/six-band-equalizer.js';
 import { Compressor } from '../dynamics/compressor/compressor.js';
 import { MainLRInsert } from './insert/insert.js';
 
@@ -20,7 +20,7 @@ suite('MainLR', () => {
       createCompressor: fake(),
       createMainLRInsert: fake(),
       createDynamicsFilter: fake(),
-      createMainLREqualizer: fake(),
+      createSixBandEqualizer: fake(),
       createEqualizer: fake(),
       createEqualizerBand: fake(),
     });
@@ -38,7 +38,7 @@ suite('MainLR', () => {
       createCompressor: fake(),
       createMainLRInsert: fake(),
       createDynamicsFilter: fake(),
-      createMainLREqualizer: fake(),
+      createSixBandEqualizer: fake(),
       createEqualizer: fake(),
       createEqualizerBand: fake(),
     });
@@ -58,7 +58,7 @@ suite('MainLR', () => {
       createCompressor,
       createMainLRInsert,
       createDynamicsFilter,
-      createMainLREqualizer: fake(),
+      createSixBandEqualizer: fake(),
       createEqualizer: fake(),
       createEqualizerBand: fake(),
     });
@@ -75,7 +75,7 @@ suite('MainLR', () => {
 
   test('creates the equalizer correctly', () => {
     const oscClient = oscClientFactory.build();
-    const createMainLREqualizer = fake.returns('eq' as unknown as MainLREqualizer);
+    const createSixBandEqualizer = fake.returns('eq' as unknown as SixBandEqualizer);
     const createEqualizer = fake();
     const createEqualizerBand = fake();
     const mainLR = createMainLR({
@@ -85,13 +85,13 @@ suite('MainLR', () => {
       createCompressor: fake(),
       createMainLRInsert: fake(),
       createDynamicsFilter: fake(),
-      createMainLREqualizer,
+      createSixBandEqualizer,
       createEqualizer,
       createEqualizerBand,
     });
     assert.strictEqual(mainLR.getEqualizer(), 'eq');
     assert.strictEqual(
-      createMainLREqualizer.calledOnceWithExactly({
+      createSixBandEqualizer.calledOnceWithExactly({
         createEqualizer,
         createEqualizerBand,
         oscClient,
@@ -110,7 +110,7 @@ suite('MainLR', () => {
       createCompressor: fake(),
       createMainLRInsert,
       createDynamicsFilter: fake(),
-      createMainLREqualizer: fake(),
+      createSixBandEqualizer: fake(),
       createEqualizer: fake(),
       createEqualizerBand: fake(),
     });
