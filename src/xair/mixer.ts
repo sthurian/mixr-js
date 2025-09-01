@@ -27,16 +27,19 @@ import { Compressor, CompressorDependencies } from './dynamics/compressor/compre
 import { MainLRInsert, MainLRInsertDependencies } from './main-lr/insert/insert.js';
 import { GraphicEqualizer, GraphicEqualizerDependencies } from './equalizer/geq.js';
 export type Mixer<M extends MixerModel> = {
-  getChannel(channel: MixerModelMap[M]['channel']): Channel;
+  getChannel(channel: MixerModelMap[M]['channel']): Channel<M>;
   getBus(bus: MixerModelMap[M]['bus']): Bus;
   getMainLR(): MainLR;
   closeConnection(): Promise<void>;
 };
 
-type MixerDependencies = {
+type MixerDependencies<M extends MixerModel> = {
   oscClient: OSCClient;
-  createChannel: (dependencies: ChannelDependencies) => Channel;
-  createChannelConfig: (dependencies: ChannelConfigDependencies) => ChannelConfig;
+  model: M;
+  createChannel: (dependencies: ChannelDependencies<M>) => Channel<M>;
+  createChannelConfig: <M extends MixerModel>(
+    dependencies: ChannelConfigDependencies<M>,
+  ) => ChannelConfig<M>;
   createChannelCompressor: (dependencies: ChannelCompressorDependencies) => ChannelCompressor;
   createCompressor: (dependencies: CompressorDependencies) => Compressor;
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
@@ -59,9 +62,10 @@ type MixerDependencies = {
   createBus: (dependencies: BusDependencies) => Bus;
   createGraphicEqualizer: (dependencies: GraphicEqualizerDependencies) => GraphicEqualizer;
 };
-export const createMixer = <M extends MixerModel>(dependencies: MixerDependencies): Mixer<M> => {
+export const createMixer = <M extends MixerModel>(dependencies: MixerDependencies<M>): Mixer<M> => {
   const {
     oscClient,
+    model,
     createChannel,
     createChannelConfig,
     createChannelCompressor,
@@ -87,11 +91,12 @@ export const createMixer = <M extends MixerModel>(dependencies: MixerDependencie
     createGraphicEqualizer,
   } = dependencies;
   return {
-    getChannel: (channel: MixerModelMap[M]['channel']): Channel => {
+    getChannel: (channel: MixerModelMap[M]['channel']): Channel<M> => {
       const channelNumber = parseInt(channel.replace('CH', ''), 10);
       return createChannel({
         channel: channelNumber,
         oscClient,
+        model,
         createChannelConfig,
         createChannelCompressor,
         createDynamicsFilter,

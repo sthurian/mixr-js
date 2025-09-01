@@ -19,9 +19,10 @@ import {
   ChannelCompressor,
   ChannelCompressorDependencies,
 } from './dynamics/compressor/compressor.js';
+import { MixerModel } from '../models.js';
 
-export type Channel = {
-  getConfig(): ChannelConfig;
+export type Channel<M extends MixerModel> = {
+  getConfig(): ChannelConfig<M>;
   getAutomix(): ChannelAutomix;
   getCompressor(): Compressor;
   getEqualizer(): Equalizer<4>;
@@ -35,10 +36,11 @@ export type Channel = {
   getPreAmp(): ChannelPreamp;
 };
 
-export type ChannelDependencies = {
+export type ChannelDependencies<M extends MixerModel> = {
   channel: number;
   oscClient: OSCClient;
-  createChannelConfig: (dependencies: ChannelConfigDependencies) => ChannelConfig;
+  model: M;
+  createChannelConfig: (dependencies: ChannelConfigDependencies<M>) => ChannelConfig<M>;
   createChannelCompressor: (dependencies: ChannelCompressorDependencies) => ChannelCompressor;
   createDynamicsFilter: (dependencies: DynamicsFilterDependencies) => DynamicsFilter;
   createEqualizerBand: (dependencies: EqualizerBandDependencies) => EqualizerBand;
@@ -54,10 +56,13 @@ export type ChannelDependencies = {
   createChannelSendBus: (dependencies: ChannelSendBusDependencies) => ChannelSendBus;
 };
 
-export const createChannel = (dependencies: ChannelDependencies): Channel => {
+export const createChannel = <M extends MixerModel>(
+  dependencies: ChannelDependencies<M>,
+): Channel<M> => {
   const {
     channel,
     oscClient,
+    model,
     createDynamicsFilter,
     createEqualizerBand,
     createChannelCompressor,
@@ -74,7 +79,7 @@ export const createChannel = (dependencies: ChannelDependencies): Channel => {
     createChannelSendBus,
   } = dependencies;
   const oscBasePath = `/ch/${channel.toString().padStart(2, '0')}`;
-  const config = createChannelConfig({ channel, oscClient });
+  const config = createChannelConfig({ channel, oscClient, model });
   const compressor = createChannelCompressor({ oscBasePath, oscClient, createDynamicsFilter });
   const automix = createChannelAutomix({ channel, oscClient });
   const equalizer = createEqualizer({

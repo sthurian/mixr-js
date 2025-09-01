@@ -9,8 +9,11 @@ import {
   channelUsbReturnSourceParameterConfig,
 } from './parameter/usb-return-source.js';
 import { Config, createConfig } from '../../config/config.js';
+import { MixerModel } from '../../models.js';
 
-export type ChannelConfig = Config & {
+type XR12Config = Config;
+type XR16Config = Config;
+type XR18Config = Config & {
   /**
    * Fetch the current analog input source assignment as raw OSC value
    * @returns Promise that resolves to raw OSC integer (0-18, where 0-15 = INP 01-16, 16-17 = LINE 17-18, 18 = OFF)
@@ -120,16 +123,35 @@ export type ChannelConfig = Config & {
   updateUsbReturnSource(value: ChannelUsbReturnSource, unit: 'usbReturnSource'): Promise<void>;
 };
 
-export type ChannelConfigDependencies = {
+export type ChannelConfig<M extends MixerModel> = M extends 'XR12'
+  ? XR12Config
+  : M extends 'XR16'
+    ? XR16Config
+    : XR18Config;
+
+export type ChannelConfigDependencies<M extends MixerModel> = {
   channel: number;
   oscClient: OSCClient;
+  model: M;
 };
 
-export const createChannelConfig = (dependencies: ChannelConfigDependencies): ChannelConfig => {
-  const { channel, oscClient } = dependencies;
-  const oscParameterFactory = createOSCParameterFactory(oscClient);
+export function createChannelConfig(dependencies: ChannelConfigDependencies<'XR12'>): XR12Config;
+export function createChannelConfig(dependencies: ChannelConfigDependencies<'XR16'>): XR16Config;
+export function createChannelConfig(dependencies: ChannelConfigDependencies<'XR18'>): XR18Config;
+export function createChannelConfig(
+  dependencies: ChannelConfigDependencies<MixerModel>,
+): ChannelConfig<MixerModel> {
+  const { channel, oscClient, model } = dependencies;
   const oscBasePath = `/ch/${channel.toString().padStart(2, '0')}`;
+  const config = createConfig({ oscBasePath, oscClient });
+
+  if (model === 'XR12' || model === 'XR16') {
+    return config;
+  }
+
+  const oscParameterFactory = createOSCParameterFactory(oscClient);
   const oscBaseAddress = `${oscBasePath}/config`;
+
   const analogInputSource = oscParameterFactory.createOSCParameter(
     `${oscBaseAddress}/insrc`,
     channelAnalogInputSourceParameterConfig,
@@ -138,7 +160,6 @@ export const createChannelConfig = (dependencies: ChannelConfigDependencies): Ch
     `${oscBaseAddress}/rtnsrc`,
     channelUsbReturnSourceParameterConfig,
   );
-  const config = createConfig({ oscBasePath, oscClient });
 
   return {
     ...config,
@@ -147,4 +168,4 @@ export const createChannelConfig = (dependencies: ChannelConfigDependencies): Ch
     fetchUsbReturnSource: usbReturnSource.fetch,
     updateUsbReturnSource: usbReturnSource.update,
   };
-};
+}

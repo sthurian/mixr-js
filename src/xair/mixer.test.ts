@@ -10,7 +10,7 @@ import { Bus } from './bus/bus.js';
 suite('Mixer', () => {
   test('creates the channel correctly', () => {
     const oscClient = oscClientFactory.build();
-    const createChannel = fake.returns('channel' as unknown as Channel);
+    const createChannel = fake.returns('channel' as unknown as Channel<'XR18'>);
     const createChannelConfig = fake();
     const createChannelCompressor = fake();
     const createDynamicsFilter = fake();
@@ -35,6 +35,7 @@ suite('Mixer', () => {
     const createGraphicEqualizer = fake();
     const mixer = createMixer({
       oscClient,
+      model: 'XR18',
       createChannel,
       createChannelConfig,
       createChannelCompressor,
@@ -65,6 +66,7 @@ suite('Mixer', () => {
       createChannel.calledOnceWithExactly({
         channel: 1,
         oscClient,
+        model: 'XR18',
         createChannelConfig,
         createChannelCompressor,
         createDynamicsFilter,
@@ -101,6 +103,7 @@ suite('Mixer', () => {
     const createGraphicEqualizer = fake();
     const mixer = createMixer({
       oscClient,
+      model: 'XR18',
       createChannel: fake(),
       createChannelConfig: fake(),
       createChannelCompressor,
@@ -162,6 +165,7 @@ suite('Mixer', () => {
     const createGraphicEqualizer = fake();
     const mixer = createMixer({
       oscClient,
+      model: 'XR18',
       createChannel: fake(),
       createChannelConfig: fake(),
       createChannelCompressor: fake(),
@@ -211,6 +215,7 @@ suite('Mixer', () => {
     oscClient.close = close;
     const mixer = createMixer({
       oscClient,
+      model: 'XR18',
       createChannel: fake(),
       createChannelConfig: fake(),
       createChannelCompressor: fake(),

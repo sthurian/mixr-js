@@ -31,7 +31,7 @@ import { createGraphicEqualizer } from './equalizer/geq.js';
 export const connectToMixer = async <M extends MixerModel>(
   options: MixerConnectionInformation & { model: M },
 ): Promise<Mixer<M>> => {
-  const { mixerPort = 10024, mixerAddress } = options;
+  const { mixerPort = 10024, mixerAddress, model } = options;
   const oscSocket = await createOSCSocket({
     socket: createSocket({ type: 'udp4', reuseAddr: true }),
     fromBuffer,
@@ -45,6 +45,7 @@ export const connectToMixer = async <M extends MixerModel>(
 
   return createMixer<M>({
     oscClient,
+    model,
     createChannel,
     createChannelConfig,
     createChannelAutomix,

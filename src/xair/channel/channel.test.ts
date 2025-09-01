@@ -18,9 +18,10 @@ import { DCAGroup } from '../dca/dca-group.js';
 suite('Channel', () => {
   test('creates the config correctly', () => {
     const oscClient = oscClientFactory.build();
-    const createChannelConfig = fake.returns('config' as unknown as ChannelConfig);
+    const createChannelConfig = fake.returns('config' as unknown as ChannelConfig<'XR18'>);
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig,
       channel: 1,
       createDynamicsFilter: fake(),
@@ -38,7 +39,10 @@ suite('Channel', () => {
       createChannelPreamp: fake(),
     });
     assert.strictEqual(channel.getConfig(), 'config');
-    assert.strictEqual(createChannelConfig.calledOnceWithExactly({ channel: 1, oscClient }), true);
+    assert.strictEqual(
+      createChannelConfig.calledOnceWithExactly({ channel: 1, oscClient, model: 'XR18' }),
+      true,
+    );
   });
 
   test('creates the compressor correctly', () => {
@@ -47,6 +51,7 @@ suite('Channel', () => {
     const createDynamicsFilter = fake();
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter,
@@ -78,6 +83,7 @@ suite('Channel', () => {
     const createChannelFxSend = fake.returns('fxSend' as unknown as ChannelFxSend);
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter: fake(),
@@ -109,6 +115,7 @@ suite('Channel', () => {
     const createChannelSendBus = fake.returns('sendBus' as unknown as ChannelSendBus);
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter: fake(),
@@ -140,6 +147,7 @@ suite('Channel', () => {
     const createChannelAutomix = fake.returns('automix' as unknown as ChannelAutomix);
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter: fake(),
@@ -165,6 +173,7 @@ suite('Channel', () => {
     const createDynamicsFilter = fake();
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter,
@@ -196,6 +205,7 @@ suite('Channel', () => {
     const createChannelPreamp = fake.returns('preamp' as unknown as ChannelPreamp);
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       channel: 1,
       createChannelConfig: fake(),
       createDynamicsFilter: fake(),
@@ -221,6 +231,7 @@ suite('Channel', () => {
     const createEqualizerBand = fake();
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter: fake(),
@@ -254,6 +265,7 @@ suite('Channel', () => {
     const createInsert = fake.returns('insert' as unknown as Insert);
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter: fake(),
@@ -286,6 +298,7 @@ suite('Channel', () => {
     const createMix = fake.returns('mix' as unknown as Mix);
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter: fake(),
@@ -318,6 +331,7 @@ suite('Channel', () => {
     const createDCAGroup = fake.returns('dcaGroup' as unknown as DCAGroup);
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter: fake(),
@@ -350,6 +364,7 @@ suite('Channel', () => {
     const createMuteGroup = fake.returns('muteGroup' as unknown as DCAGroup);
     const channel = createChannel({
       oscClient,
+      model: 'XR18',
       createChannelConfig: fake(),
       channel: 1,
       createDynamicsFilter: fake(),

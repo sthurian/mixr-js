@@ -4,6 +4,56 @@ import { fake } from 'sinon';
 import assert from 'node:assert';
 import { oscClientFactory } from '../../../osc/test-factories/client.js';
 suite('ChannelConfig', () => {
+  test('createChannelConfig returns the correct config for XR12 mixers', async () => {
+    const oscClient = oscClientFactory.build();
+    const channelConfig = createChannelConfig({
+      channel: 1,
+      oscClient,
+      model: 'XR12',
+    });
+    assert.strictEqual('updateColor' in channelConfig, true);
+    assert.strictEqual('fetchColor' in channelConfig, true);
+    assert.strictEqual('updateName' in channelConfig, true);
+    assert.strictEqual('fetchName' in channelConfig, true);
+    assert.strictEqual('fetchAnalogSource' in channelConfig, false);
+    assert.strictEqual('updateAnalogSource' in channelConfig, false);
+    assert.strictEqual('fetchUsbReturnSource' in channelConfig, false);
+    assert.strictEqual('updateUsbReturnSource' in channelConfig, false);
+  });
+
+  test('createChannelConfig returns the correct config for XR16 mixers', async () => {
+    const oscClient = oscClientFactory.build();
+    const channelConfig = createChannelConfig({
+      channel: 1,
+      oscClient,
+      model: 'XR16',
+    });
+    assert.strictEqual('updateColor' in channelConfig, true);
+    assert.strictEqual('fetchColor' in channelConfig, true);
+    assert.strictEqual('updateName' in channelConfig, true);
+    assert.strictEqual('fetchName' in channelConfig, true);
+    assert.strictEqual('fetchAnalogSource' in channelConfig, false);
+    assert.strictEqual('updateAnalogSource' in channelConfig, false);
+    assert.strictEqual('fetchUsbReturnSource' in channelConfig, false);
+    assert.strictEqual('updateUsbReturnSource' in channelConfig, false);
+  });
+
+  test('createChannelConfig returns the correct config for XR18 mixers', async () => {
+    const oscClient = oscClientFactory.build();
+    const channelConfig = createChannelConfig({
+      channel: 1,
+      oscClient,
+      model: 'XR18',
+    });
+    assert.strictEqual('updateColor' in channelConfig, true);
+    assert.strictEqual('fetchColor' in channelConfig, true);
+    assert.strictEqual('updateName' in channelConfig, true);
+    assert.strictEqual('fetchName' in channelConfig, true);
+    assert.strictEqual('fetchAnalogSource' in channelConfig, true);
+    assert.strictEqual('updateAnalogSource' in channelConfig, true);
+    assert.strictEqual('fetchUsbReturnSource' in channelConfig, true);
+    assert.strictEqual('updateUsbReturnSource' in channelConfig, true);
+  });
   test('send the correct osc message to fetch the channels name', async () => {
     const query = fake.resolves({
       address: '/ch/01/config/name',
@@ -15,6 +65,7 @@ suite('ChannelConfig', () => {
     const channelConfig = createChannelConfig({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const result = await channelConfig.fetchName();
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/config/name'), true);
@@ -29,6 +80,7 @@ suite('ChannelConfig', () => {
     const channelConfig = createChannelConfig({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await channelConfig.updateName('test-channel');
     assert.strictEqual(
@@ -48,6 +100,7 @@ suite('ChannelConfig', () => {
     const channelConfig = createChannelConfig({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const result = await channelConfig.fetchColor('color');
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/config/color'), true);
@@ -62,6 +115,7 @@ suite('ChannelConfig', () => {
     const channelConfig = createChannelConfig({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await channelConfig.updateColor('Blue Inv', 'color');
     assert.strictEqual(
@@ -81,6 +135,7 @@ suite('ChannelConfig', () => {
     const channelConfig = createChannelConfig({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const result = await channelConfig.fetchAnalogSource('inputSource');
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/config/insrc'), true);
@@ -95,6 +150,7 @@ suite('ChannelConfig', () => {
     const channelConfig = createChannelConfig({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await channelConfig.updateAnalogSource('INP 06', 'inputSource');
     assert.strictEqual(
@@ -114,6 +170,7 @@ suite('ChannelConfig', () => {
     const channelConfig = createChannelConfig({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const result = await channelConfig.fetchUsbReturnSource('usbReturnSource');
     assert.strictEqual(query.calledOnceWithExactly('/ch/01/config/rtnsrc'), true);
@@ -128,6 +185,7 @@ suite('ChannelConfig', () => {
     const channelConfig = createChannelConfig({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await channelConfig.updateUsbReturnSource('USB 10', 'usbReturnSource');
     assert.strictEqual(
