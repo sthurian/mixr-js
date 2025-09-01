@@ -8,14 +8,16 @@ type XR12Channel =
   | 'CH07'
   | 'CH08'
   | 'CH09'
-  | 'CH10';
+  | 'CH10'
+  | 'CH11'
+  | 'CH12';
 
 type XR12Bus = 'Bus1' | 'Bus2';
 type XR16Bus = XR12Bus | 'Bus3' | 'Bus4';
 type XR18Bus = XR16Bus | 'Bus5' | 'Bus6';
 
-type XR16Channel = XR12Channel | 'CH11' | 'CH12' | 'CH13' | 'CH14';
-type XR18Channel = XR16Channel | 'CH15' | 'CH16';
+type XR16Channel = XR12Channel | 'CH11' | 'CH12' | 'CH13' | 'CH14' | 'CH15' | 'CH16';
+type XR18Channel = XR16Channel;
 
 const mixerModels = ['XR12', 'XR16', 'XR18'] as const;
 export type MixerModel = (typeof mixerModels)[number];

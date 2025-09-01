@@ -2,9 +2,9 @@ import { OSCClient } from '../../../osc/client.js';
 import { createLinearParameterConfig } from '../../mapper/linear.js';
 import { createLogarithmicParameterConfig } from '../../mapper/log.js';
 import { onOffParameterConfig } from '../../mapper/on-off.js';
+import { MixerModel } from '../../models.js';
 import { createOSCParameterFactory } from '../../osc-parameter.js';
-
-export interface ChannelPreamp {
+type XR12ChannelPreamp = {
   /**
    * Fetch the current low cut filter enabled state
    * @returns Promise that resolves to raw OSC integer (0/1)
@@ -82,44 +82,6 @@ export interface ChannelPreamp {
   updatePolarityInverted(value: boolean, unit: 'flag'): Promise<void>;
 
   /**
-   * Fetch the current USB return enabled state
-   * @returns Promise that resolves to raw OSC integer (0/1)
-   * @example
-   * // Get raw OSC value (0 = disabled, 1 = enabled)
-   * const rawEnabled = await preamp.fetchIsUSBReturnEnabled();
-   */
-  fetchIsUSBReturnEnabled(): Promise<number>;
-  /**
-   * Fetch the current USB return enabled state
-   * @param unit - Unit parameter. When 'flag' is provided, returns boolean value
-   * @returns Promise that resolves to boolean value
-   * @example
-   * // Get boolean value
-   * const isEnabled = await preamp.fetchIsUSBReturnEnabled('flag');
-   */
-  fetchIsUSBReturnEnabled(unit: 'flag'): Promise<boolean>;
-
-  /**
-   * Update the USB return enabled state
-   * @param value - The enabled state as raw OSC integer (0/1)
-   * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0 = disabled, 1 = enabled)
-   * await preamp.updateUSBReturnEnabled(1);
-   */
-  updateUSBReturnEnabled(value: number): Promise<void>;
-  /**
-   * Update the USB return enabled state
-   * @param value - The enabled state as boolean
-   * @param unit - Unit parameter. When 'flag' is provided, value should be boolean
-   * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using boolean
-   * await preamp.updateUSBReturnEnabled(true, 'flag');
-   */
-  updateUSBReturnEnabled(value: boolean, unit: 'flag'): Promise<void>;
-
-  /**
    * Update the low cut filter frequency
    * @param value - The frequency value as raw OSC float (0.0-1.0)
    * @returns Promise that resolves when the update is complete
@@ -156,44 +118,6 @@ export interface ChannelPreamp {
    * const freqHz = await preamp.fetchLowCutFrequency('hertz');
    */
   fetchLowCutFrequency(unit: 'hertz'): Promise<number>;
-
-  /**
-   * Update the USB return trim level
-   * @param value - The trim value as raw OSC float (0.0-1.0)
-   * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using raw OSC value (0.0 to 1.0)
-   * await preamp.updateUSBTrim(0.75);
-   */
-  updateUSBTrim(value: number): Promise<void>;
-  /**
-   * Update the USB return trim level
-   * @param value - The trim value in dB (-18 to +18dB)
-   * @param unit - Unit parameter. When 'decibels' is provided, value should be in dB
-   * @returns Promise that resolves when the update is complete
-   * @example
-   * // Set using decibels (-18 to +18dB)
-   * await preamp.updateUSBTrim(-6, 'decibels');
-   */
-  updateUSBTrim(value: number, unit: 'decibels'): Promise<void>;
-
-  /**
-   * Fetch the current USB return trim level
-   * @returns Promise that resolves to raw OSC float (0.0-1.0)
-   * @example
-   * // Get raw OSC value (0.0 to 1.0)
-   * const rawTrim = await preamp.fetchUSBTrim();
-   */
-  fetchUSBTrim(): Promise<number>;
-  /**
-   * Fetch the current USB return trim level
-   * @param unit - Unit parameter. When 'decibels' is provided, returns level in dB
-   * @returns Promise that resolves to level in dB (-18 to +18dB)
-   * @example
-   * // Get trim level in dB (-18 to +18dB)
-   * const trimDb = await preamp.fetchUSBTrim('decibels');
-   */
-  fetchUSBTrim(unit: 'decibels'): Promise<number>;
 
   /**
    * Update the preamp gain
@@ -270,15 +194,111 @@ export interface ChannelPreamp {
    * await preamp.updatePhantomPowerEnabled(true, 'flag');
    */
   updatePhantomPowerEnabled(value: boolean, unit: 'flag'): Promise<void>;
-}
-
-export type ChannelPreampDependencies = {
-  channel: number;
-  oscClient: OSCClient;
 };
 
-export const createChannelPreamp = (dependencies: ChannelPreampDependencies): ChannelPreamp => {
-  const { channel, oscClient } = dependencies;
+type XR16ChannelPreamp = XR12ChannelPreamp;
+
+type XR18ChannelPreamp = XR16ChannelPreamp & {
+  /**
+   * Update the USB return trim level
+   * @param value - The trim value as raw OSC float (0.0-1.0)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value (0.0 to 1.0)
+   * await preamp.updateUSBTrim(0.75);
+   */
+  updateUSBTrim(value: number): Promise<void>;
+  /**
+   * Update the USB return trim level
+   * @param value - The trim value in dB (-18 to +18dB)
+   * @param unit - Unit parameter. When 'decibels' is provided, value should be in dB
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using decibels (-18 to +18dB)
+   * await preamp.updateUSBTrim(-6, 'decibels');
+   */
+  updateUSBTrim(value: number, unit: 'decibels'): Promise<void>;
+
+  /**
+   * Fetch the current USB return trim level
+   * @returns Promise that resolves to raw OSC float (0.0-1.0)
+   * @example
+   * // Get raw OSC value (0.0 to 1.0)
+   * const rawTrim = await preamp.fetchUSBTrim();
+   */
+  fetchUSBTrim(): Promise<number>;
+  /**
+   * Fetch the current USB return trim level
+   * @param unit - Unit parameter. When 'decibels' is provided, returns level in dB
+   * @returns Promise that resolves to level in dB (-18 to +18dB)
+   * @example
+   * // Get trim level in dB (-18 to +18dB)
+   * const trimDb = await preamp.fetchUSBTrim('decibels');
+   */
+  fetchUSBTrim(unit: 'decibels'): Promise<number>;
+
+  /**
+   * Fetch the current USB return enabled state
+   * @returns Promise that resolves to raw OSC integer (0/1)
+   * @example
+   * // Get raw OSC value (0 = disabled, 1 = enabled)
+   * const rawEnabled = await preamp.fetchIsUSBReturnEnabled();
+   */
+  fetchIsUSBReturnEnabled(): Promise<number>;
+  /**
+   * Fetch the current USB return enabled state
+   * @param unit - Unit parameter. When 'flag' is provided, returns boolean value
+   * @returns Promise that resolves to boolean value
+   * @example
+   * // Get boolean value
+   * const isEnabled = await preamp.fetchIsUSBReturnEnabled('flag');
+   */
+  fetchIsUSBReturnEnabled(unit: 'flag'): Promise<boolean>;
+
+  /**
+   * Update the USB return enabled state
+   * @param value - The enabled state as raw OSC integer (0/1)
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using raw OSC value (0 = disabled, 1 = enabled)
+   * await preamp.updateUSBReturnEnabled(1);
+   */
+  updateUSBReturnEnabled(value: number): Promise<void>;
+  /**
+   * Update the USB return enabled state
+   * @param value - The enabled state as boolean
+   * @param unit - Unit parameter. When 'flag' is provided, value should be boolean
+   * @returns Promise that resolves when the update is complete
+   * @example
+   * // Set using boolean
+   * await preamp.updateUSBReturnEnabled(true, 'flag');
+   */
+  updateUSBReturnEnabled(value: boolean, unit: 'flag'): Promise<void>;
+};
+
+export type ChannelPreamp<M extends MixerModel> = M extends 'XR12'
+  ? XR12ChannelPreamp
+  : M extends 'XR16'
+    ? XR16ChannelPreamp
+    : XR18ChannelPreamp;
+export type ChannelPreampDependencies<M extends MixerModel> = {
+  channel: number;
+  oscClient: OSCClient;
+  model: M;
+};
+export function createChannelPreamp<M extends 'XR12'>(
+  dependencies: ChannelPreampDependencies<M>,
+): XR12ChannelPreamp;
+export function createChannelPreamp<M extends 'XR16'>(
+  dependencies: ChannelPreampDependencies<M>,
+): XR16ChannelPreamp;
+export function createChannelPreamp<M extends 'XR18'>(
+  dependencies: ChannelPreampDependencies<M>,
+): XR18ChannelPreamp;
+export function createChannelPreamp(
+  dependencies: ChannelPreampDependencies<MixerModel>,
+): ChannelPreamp<MixerModel> {
+  const { channel, oscClient, model } = dependencies;
   const channelNumber = channel.toString().padStart(2, '0');
   const oscBaseAddress = `/ch/${channelNumber}/preamp`;
   const headAmpOscBaseAddress = `/headamp/${channelNumber}`;
@@ -312,6 +332,21 @@ export const createChannelPreamp = (dependencies: ChannelPreampDependencies): Ch
     onOffParameterConfig,
   );
 
+  if (model !== 'XR18') {
+    return {
+      fetchIsLowCutEnabled: lowcut.fetch,
+      updateLowCutEnabled: lowcut.update,
+      fetchIsPolarityInverted: polaritySwitch.fetch,
+      updatePolarityInverted: polaritySwitch.update,
+      updateLowCutFrequency: lowcutFreq.update,
+      fetchLowCutFrequency: lowcutFreq.fetch,
+      updateGain: gain.update,
+      fetchGain: gain.fetch,
+      fetchIsPhantomPowerEnabled: phantom.fetch,
+      updatePhantomPowerEnabled: phantom.update,
+    };
+  }
+
   return {
     fetchIsLowCutEnabled: lowcut.fetch,
     updateLowCutEnabled: lowcut.update,
@@ -328,4 +363,4 @@ export const createChannelPreamp = (dependencies: ChannelPreampDependencies): Ch
     fetchIsPhantomPowerEnabled: phantom.fetch,
     updatePhantomPowerEnabled: phantom.update,
   };
-};
+}

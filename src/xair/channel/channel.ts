@@ -4,7 +4,6 @@ import { ChannelConfig, ChannelConfigDependencies } from './config/config.js';
 import { Equalizer, EqualizerDependencies } from '../equalizer/equalizer.js';
 import { ChannelGate, ChannelGateDependencies } from './dynamics/gate/gate.js';
 import { Insert, InsertDependencies } from '../insert/insert.js';
-import { ChannelSendBusLabel } from './sends/mapper/send-bus.js';
 import { ChannelFxSend, ChannelFxSendDependencies } from './sends/fx-send.js';
 import { ChannelFxSendLabel } from './sends/mapper/fx-send.js';
 import { ChannelSendBus, ChannelSendBusDependencies } from './sends/send-bus.js';
@@ -19,7 +18,7 @@ import {
   ChannelCompressor,
   ChannelCompressorDependencies,
 } from './dynamics/compressor/compressor.js';
-import { MixerModel } from '../models.js';
+import { MixerModel, MixerModelMap } from '../models.js';
 
 export type Channel<M extends MixerModel> = {
   getConfig(): ChannelConfig<M>;
@@ -28,12 +27,12 @@ export type Channel<M extends MixerModel> = {
   getEqualizer(): Equalizer<4>;
   getGate(): ChannelGate;
   getInsert(): Insert;
-  getSendBus(send: ChannelSendBusLabel): ChannelSendBus;
+  getSendBus(send: MixerModelMap[M]['bus']): ChannelSendBus;
   getSendFx(fx: ChannelFxSendLabel): ChannelFxSend;
   getDCAGroup(): DCAGroup;
   getMuteGroup(): MuteGroup;
   getMix(): Mix;
-  getPreAmp(): ChannelPreamp;
+  getPreAmp(): ChannelPreamp<M>;
 };
 
 export type ChannelDependencies<M extends MixerModel> = {
@@ -51,7 +50,7 @@ export type ChannelDependencies<M extends MixerModel> = {
   createDCAGroup: (dependencies: DCAGroupDependencies) => DCAGroup;
   createMuteGroup: (dependencies: MuteGroupDependencies) => MuteGroup;
   createMix: (dependencies: MixDependencies) => Mix;
-  createChannelPreamp: (dependencies: ChannelPreampDependencies) => ChannelPreamp;
+  createChannelPreamp: (dependencies: ChannelPreampDependencies<M>) => ChannelPreamp<M>;
   createChannelFxSend: (dependencies: ChannelFxSendDependencies) => ChannelFxSend;
   createChannelSendBus: (dependencies: ChannelSendBusDependencies) => ChannelSendBus;
 };
@@ -93,7 +92,7 @@ export const createChannel = <M extends MixerModel>(
   const dcaGroup = createDCAGroup({ oscBasePath, oscClient });
   const muteGroup = createMuteGroup({ oscBasePath, oscClient });
   const mix = createMix({ oscBasePath, oscClient });
-  const preamp = createChannelPreamp({ channel, oscClient });
+  const preamp = createChannelPreamp({ channel, oscClient, model });
   return {
     getConfig: () => config,
     getCompressor: () => compressor,
@@ -101,7 +100,7 @@ export const createChannel = <M extends MixerModel>(
     getEqualizer: () => equalizer,
     getGate: () => gate,
     getInsert: () => insert,
-    getSendBus: (sendBus: ChannelSendBusLabel) =>
+    getSendBus: (sendBus: MixerModelMap[M]['bus']) =>
       createChannelSendBus({ channel, oscClient, sendBus }),
     getSendFx: (fx: ChannelFxSendLabel) => createChannelFxSend({ channel, oscClient, fx }),
     getDCAGroup: () => dcaGroup,

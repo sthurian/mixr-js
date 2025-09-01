@@ -52,7 +52,9 @@ type MixerDependencies<M extends MixerModel> = {
   createDCAGroup: (dependencies: DCAGroupDependencies) => DCAGroup;
   createMuteGroup: (dependencies: MuteGroupDependencies) => MuteGroup;
   createMix: (dependencies: MixDependencies) => Mix;
-  createChannelPreamp: (dependencies: ChannelPreampDependencies) => ChannelPreamp;
+  createChannelPreamp: <M extends MixerModel>(
+    dependencies: ChannelPreampDependencies<M>,
+  ) => ChannelPreamp<M>;
   createChannelFxSend: (dependencies: ChannelFxSendDependencies) => ChannelFxSend;
   createChannelSendBus: (dependencies: ChannelSendBusDependencies) => ChannelSendBus;
   createConfig: (dependencies: { oscClient: OSCClient; oscBasePath: string }) => Config;

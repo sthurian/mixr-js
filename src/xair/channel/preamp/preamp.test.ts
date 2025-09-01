@@ -6,6 +6,72 @@ import assert from 'node:assert';
 import { assertClose, isClose } from '../../../test-helpers/is-close.js';
 
 suite('ChannelPreamp', () => {
+  test('createPreamp returns the correct preamp for XR12 mixers', async () => {
+    const oscClient = oscClientFactory.build();
+    const preamp = createChannelPreamp({
+      channel: 1,
+      oscClient,
+      model: 'XR12',
+    });
+    assert.strictEqual('fetchGain' in preamp, true);
+    assert.strictEqual('fetchIsLowCutEnabled' in preamp, true);
+    assert.strictEqual('fetchIsPhantomPowerEnabled' in preamp, true);
+    assert.strictEqual('fetchIsPolarityInverted' in preamp, true);
+    assert.strictEqual('fetchLowCutFrequency' in preamp, true);
+    assert.strictEqual('updateGain' in preamp, true);
+    assert.strictEqual('updateLowCutEnabled' in preamp, true);
+    assert.strictEqual('updatePhantomPowerEnabled' in preamp, true);
+    assert.strictEqual('updatePolarityInverted' in preamp, true);
+    assert.strictEqual('updateLowCutFrequency' in preamp, true);
+    assert.strictEqual('fetchIsUSBReturnEnabled' in preamp, false);
+    assert.strictEqual('fetchUSBTrim' in preamp, false);
+    assert.strictEqual('updateUSBReturnEnabled' in preamp, false);
+    assert.strictEqual('updateUSBTrim' in preamp, false);
+  });
+  test('createPreamp returns the correct preamp for XR16 mixers', async () => {
+    const oscClient = oscClientFactory.build();
+    const preamp = createChannelPreamp({
+      channel: 1,
+      oscClient,
+      model: 'XR16',
+    });
+    assert.strictEqual('fetchGain' in preamp, true);
+    assert.strictEqual('fetchIsLowCutEnabled' in preamp, true);
+    assert.strictEqual('fetchIsPhantomPowerEnabled' in preamp, true);
+    assert.strictEqual('fetchIsPolarityInverted' in preamp, true);
+    assert.strictEqual('fetchLowCutFrequency' in preamp, true);
+    assert.strictEqual('updateGain' in preamp, true);
+    assert.strictEqual('updateLowCutEnabled' in preamp, true);
+    assert.strictEqual('updatePhantomPowerEnabled' in preamp, true);
+    assert.strictEqual('updatePolarityInverted' in preamp, true);
+    assert.strictEqual('updateLowCutFrequency' in preamp, true);
+    assert.strictEqual('fetchIsUSBReturnEnabled' in preamp, false);
+    assert.strictEqual('fetchUSBTrim' in preamp, false);
+    assert.strictEqual('updateUSBReturnEnabled' in preamp, false);
+    assert.strictEqual('updateUSBTrim' in preamp, false);
+  });
+  test('createPreamp returns the correct preamp for XR18 mixers', async () => {
+    const oscClient = oscClientFactory.build();
+    const preamp = createChannelPreamp({
+      channel: 1,
+      oscClient,
+      model: 'XR18',
+    });
+    assert.strictEqual('fetchGain' in preamp, true);
+    assert.strictEqual('fetchIsLowCutEnabled' in preamp, true);
+    assert.strictEqual('fetchIsPhantomPowerEnabled' in preamp, true);
+    assert.strictEqual('fetchIsPolarityInverted' in preamp, true);
+    assert.strictEqual('fetchLowCutFrequency' in preamp, true);
+    assert.strictEqual('updateGain' in preamp, true);
+    assert.strictEqual('updateLowCutEnabled' in preamp, true);
+    assert.strictEqual('updatePhantomPowerEnabled' in preamp, true);
+    assert.strictEqual('updatePolarityInverted' in preamp, true);
+    assert.strictEqual('updateLowCutFrequency' in preamp, true);
+    assert.strictEqual('fetchIsUSBReturnEnabled' in preamp, true);
+    assert.strictEqual('fetchUSBTrim' in preamp, true);
+    assert.strictEqual('updateUSBReturnEnabled' in preamp, true);
+    assert.strictEqual('updateUSBTrim' in preamp, true);
+  });
   test('send the correct osc message to fetch the preamps gain', async () => {
     const query = fake.resolves({
       address: '/headamp/01/gain',
@@ -15,6 +81,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const gain = await preamp.fetchGain('decibels');
     assert.strictEqual(gain, 24);
@@ -27,6 +94,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await preamp.updateGain(6, 'decibels');
     assert.strictEqual(
@@ -44,6 +112,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const lcf = await preamp.fetchLowCutFrequency('hertz');
     assertClose(lcf, 89.442);
@@ -56,6 +125,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await preamp.updateLowCutFrequency(200, 'hertz');
     assert.ok(
@@ -72,6 +142,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const trim = await preamp.fetchUSBTrim('decibels');
     assert.strictEqual(trim, 9);
@@ -84,6 +155,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await preamp.updateUSBTrim(-9, 'decibels');
     assert.strictEqual(
@@ -101,6 +173,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const lowcutEnabled = await preamp.fetchIsLowCutEnabled('flag');
     assert.strictEqual(lowcutEnabled, true);
@@ -113,6 +186,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await preamp.updateLowCutEnabled(false, 'flag');
     assert.strictEqual(
@@ -130,6 +204,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const phantomPowerEnabled = await preamp.fetchIsPhantomPowerEnabled('flag');
     assert.strictEqual(phantomPowerEnabled, true);
@@ -142,6 +217,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await preamp.updatePhantomPowerEnabled(false, 'flag');
     assert.strictEqual(
@@ -159,6 +235,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const polaritySwitchEnabled = await preamp.fetchIsPolarityInverted('flag');
     assert.strictEqual(polaritySwitchEnabled, true);
@@ -171,6 +248,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await preamp.updatePolarityInverted(false, 'flag');
     assert.strictEqual(
@@ -188,6 +266,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     const usbReturnEnabled = await preamp.fetchIsUSBReturnEnabled('flag');
     assert.strictEqual(usbReturnEnabled, true);
@@ -200,6 +279,7 @@ suite('ChannelPreamp', () => {
     const preamp = createChannelPreamp({
       channel: 1,
       oscClient,
+      model: 'XR18',
     });
     await preamp.updateUSBReturnEnabled(false, 'flag');
     assert.strictEqual(

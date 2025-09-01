@@ -202,7 +202,7 @@ suite('Channel', () => {
   });
   test('creates the preamp correctly', () => {
     const oscClient = oscClientFactory.build();
-    const createChannelPreamp = fake.returns('preamp' as unknown as ChannelPreamp);
+    const createChannelPreamp = fake.returns('preamp' as unknown as ChannelPreamp<'XR18'>);
     const channel = createChannel({
       oscClient,
       model: 'XR18',
@@ -223,7 +223,10 @@ suite('Channel', () => {
       createChannelPreamp,
     });
     assert.strictEqual(channel.getPreAmp(), 'preamp');
-    assert.strictEqual(createChannelPreamp.calledOnceWithExactly({ channel: 1, oscClient }), true);
+    assert.strictEqual(
+      createChannelPreamp.calledOnceWithExactly({ channel: 1, oscClient, model: 'XR18' }),
+      true,
+    );
   });
   test('creates the equalizer correctly', () => {
     const oscClient = oscClientFactory.build();
